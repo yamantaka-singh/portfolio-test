@@ -62,8 +62,10 @@ settled four things:
 - Bio facts
 
 **Trade-offs accepted**
-- **No lead tracking**: WhatsApp/email clicks are the only conversion signal;
-  count them as analytics events.
+- **No lead tracking**: WhatsApp/email clicks are the only conversion signal.
+  The buttons point at `/go/whatsapp` and `/go/email`, static pages that
+  redirect onward, so clicks show up as page views. Vercel custom events
+  need a Pro plan; page views work on Hobby.
 - **One URL**: SEO targets his name and "cricket content creator" on a
   single page.
 - **Zone anchors**: deep links use `#pitch`, `#scoreboard`, etc.

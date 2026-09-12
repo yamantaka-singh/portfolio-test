@@ -40,11 +40,15 @@ between fixed keyframes possible without a 3D model.
    - Generate several takes and the user picks one each (human gate).
    - Download at highest quality and **strip audio** (no sound in v1).
 5. **Frame export (agent, Flash tier)**
-   - `scripts/export-frames.sh` uses ffmpeg to sample each clip to the frame
-     budget in ADR-0001.
-   - It scales to desktop and mobile widths and writes AVIF, falling back to
-     WebP if the local ffmpeg lacks an AV1 encoder.
-   - Output goes to `public/frames/<zone>/<tier>/NNN.avif`.
+   - `scripts/export-frames.mjs` uses ffmpeg to sample each clip to JPEG at
+     the frame budget in ADR-0001.
+   - It then uses `sharp` to resize to desktop and mobile widths and encode
+     AVIF. Homebrew's ffmpeg has no WebP encoder, and sharp encodes AVIF
+     reliably.
+   - Output goes to `public/frames/<transition>/<tier>/NNN.avif`, plus
+     `src/data/frames.json` with frame counts.
+   - `--placeholder` generates test-pattern frames, so the scrub engine can
+     be built before real clips exist.
 6. **Provenance log**
    - Every prompt, the chosen take, and date go into
      `assets/prompts/log.md`.

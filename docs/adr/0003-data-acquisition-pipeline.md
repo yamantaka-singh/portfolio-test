@@ -18,25 +18,43 @@ Decisions from grilling:
 - Live embeds cost roughly 0.5–1MB of JS each.
 
 ## Decision
-- **One-time seed**: a Python script (`scraper/scrape.py`, Scrapling 0.4.x,
-  `StealthyFetcher`, logged out, no credentials ever) writes
-  `src/data/social.json` and downloads thumbnails into `src/assets/social/`.
-  Astro's `<Image>` converts them to AVIF/WebP at build time.
-- **Contract**: `social.json` is loaded as an Astro content collection with a
-  zod schema, so a malformed scrape fails the build instead of shipping
-  broken sections. Every count is nullable because public scraping may not
+- **One-time seed**: a Python script (`scraper/scrape.py`, Scrapling 0.4.15
+  `Fetcher` with Chrome impersonation, logged out, no credentials ever)
+  writes `src/data/social.json` and downloads thumbnails into
+  `src/assets/social/`. Astro's `<Image>` converts them to AVIF/WebP at
+  build time.
+- **Per-platform sources**, each checked logged-out on 2026-09-12:
+
+  | Platform | What | Source | Result |
+  |----------|------|--------|--------|
+  | Instagram | Follower/post counts | Profile page `og:description` | HTTP 200 |
+  | Instagram | Posts | Profile JSON endpoint | **401 `require_login`**, not usable |
+  | Instagram | Posts (used instead) | Shortcodes in the profile page HTML (~5 most recent), or URLs in optional `scraper/instagram_posts.txt`; each post page's `og:image` + `og:description` (likes, comments, date, caption) | HTTP 200, image downloads |
+  | YouTube | Channel ID + subscriber count | Channel page: `<link rel="canonical">` and the `@handle • N subscribers` text | HTTP 200 |
+  | YouTube | Latest 15 videos with views | `feeds/videos.xml?channel_id=…` (`media:statistics views`) | HTTP 200 |
+  | LinkedIn | Name/headline | Public profile `og:title` / `og:description` | HTTP 200 |
+
+  `StealthyFetcher` (a real browser, needs `scrapling install`) is the first
+  thing to try if any source starts blocking the plain fetcher.
+- **Contract**: `src/lib/social.ts` imports `social.json` and parses it with
+  a zod schema (`astro/zod`) at build time, so a malformed scrape fails the
+  build instead of shipping broken sections. A content collection is not
+  used, because the file is one object, not a list of entries. Every count is nullable because public scraping may not
   return it.
   ```json
   {
-    "scrapedAt": "2026-09-12T00:00:00Z",
+    "scrapedAt": "2026-09-12T10:00:00+00:00",
     "profiles": [{ "platform": "instagram|youtube|linkedin", "handle": "", "url": "",
-                   "followers": null, "postCount": null, "bio": null }],
-    "videos":   [{ "platform": "youtube", "id": "", "title": "", "views": null,
-                   "publishedAt": "", "thumb": "", "featured": false }],
-    "posts":    [{ "platform": "instagram", "shortcode": "", "caption": "", "likes": null,
-                   "isReel": false, "thumb": "", "featured": false }]
+                   "followers": null, "postCount": null, "name": null, "headline": null }],
+    "videos":   [{ "platform": "youtube", "channel": "", "id": "", "title": "", "views": null,
+                   "publishedAt": "", "thumb": "yt-<id>.jpg", "featured": false }],
+    "posts":    [{ "platform": "instagram", "account": "", "shortcode": "", "url": "",
+                   "caption": "", "likes": null, "isReel": false,
+                   "thumb": "ig-<shortcode>.jpg", "featured": false }]
   }
   ```
+  The authoritative version is the zod schema in `src/lib/social-schema.js`
+  (plan Task 5).
 - **Human curation gate**: the user sets `featured: true` on the videos and
   posts that appear on the site. The scraper never picks.
 - **Tap-to-play facades**: cards show the self-hosted thumbnail. Tapping

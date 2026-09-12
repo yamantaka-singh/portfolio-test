@@ -44,17 +44,17 @@ Versions checked on npm, 2026-09-12:
   framework.
 
 **Data**
-- Astro content collection with a zod schema over `src/data/social.json`
-  (ADR-0003).
+- `src/data/social.json` imported and parsed with a zod schema from
+  `astro/zod` at build time (ADR-0003).
 
 **Images**
 - Astro `<Image>` for thumbnails and photos.
 - Frames are pre-exported by ffmpeg (ADR-0002) and served from `public/`.
 
 **Analytics**
-- Vercel Web Analytics.
-- Custom events for WhatsApp and email clicks, which are the only conversion
-  signal (ADR-0006).
+- Vercel Web Analytics via `@vercel/analytics/astro`.
+- WhatsApp and email clicks are counted as page views of the `/go/whatsapp`
+  and `/go/email` redirect pages (ADR-0006). Custom events need Vercel Pro.
 
 **Gates**
 - Keep web3d's gate **order** and its rule that a gate closes only on
