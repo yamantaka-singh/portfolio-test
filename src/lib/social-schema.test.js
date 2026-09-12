@@ -6,7 +6,7 @@ const sample = {
   scrapedAt: '2026-09-12T10:00:00+00:00',
   profiles: [{ platform: 'youtube', handle: 'spinandswing26', url: 'https://www.youtube.com/@spinandswing26', followers: 12300, postCount: null, name: null, headline: null }],
   videos: [{ platform: 'youtube', channel: 'spinandswing26', id: 'DfECjUL9ZvU', title: 'Nets', views: 147443, publishedAt: '2026-09-10T20:00:18+00:00', thumb: 'yt-DfECjUL9ZvU.jpg', featured: true }],
-  posts: [{ platform: 'instagram', account: 'spinandswing26', shortcode: 'DdHNbqDJusb', url: 'https://www.instagram.com/p/DdHNbqDJusb/', caption: 'hi', likes: null, isReel: false, thumb: 'ig-DdHNbqDJusb.jpg', featured: false }],
+  posts: [{ platform: 'instagram', account: 'spinandswing26', shortcode: 'DdHNbqDJusb', url: 'https://www.instagram.com/p/DdHNbqDJusb/', caption: 'hi', likes: null, views: null, isReel: false, thumb: 'ig-DdHNbqDJusb.jpg', featured: false }],
 };
 
 test('accepts a valid scrape', () => {

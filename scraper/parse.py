@@ -1,4 +1,5 @@
 """Pure parsers for public Instagram, YouTube and LinkedIn pages. No network here."""
+import json
 import re
 from html import unescape
 
@@ -11,6 +12,13 @@ _SHORTS_ITEM = re.compile(r'"entityId":"shorts-shelf-item-([\w-]{11})"[^}]*?"acc
 # response -- \D* (any non-digits) bridges either without caring which.
 _SHORTS_VIEWS = re.compile(r"^.*,\s*([\d.,]+)\s*(thousand|million|billion)?\s*views?\D*play Short$")
 _POST_URL = re.compile(r"instagram\.com/(p|reel)/([A-Za-z0-9_-]{8,})")
+_REEL_TAB_ITEM = re.compile(
+    r'"__typename":"XIGPolarisVideoMedia".*?'
+    r'"like_count":(\d+),"play_count":(\d+),.*?'
+    r'"code":"([\w-]+)".*?'
+    r'"display_uri":"(.*?)(?<!\\)"',
+    re.S,
+)
 # The trailing ": caption" is itself optional -- a post with no caption text leaves
 # og:description as just "<account> on <date>", with no colon at all.
 _POST_META = re.compile(
@@ -36,11 +44,25 @@ def parse_instagram_profile(og_description):
     return {"followers": parse_count(m.group(1)), "postCount": parse_count(m.group(2))}
 
 
-def parse_instagram_shortcodes(html, limit=5):
-    seen = {}
-    for kind, code in re.findall(r"/(p|reel)/([A-Za-z0-9_-]{8,})", html):
-        seen.setdefault(code, kind == "reel")
-    return [{"shortcode": c, "isReel": r} for c, r in list(seen.items())[:limit]]
+def parse_instagram_reels_tab(html):
+    """[{id, views, likes, thumbUrl}] from a profile's dedicated /reels/ tab.
+
+    Neither the profile grid nor an individual reel's own page exposes a view count
+    at all -- checked live, only like_count and comment_count exist there. This tab is
+    different: its server-embedded GraphQL connection (polaris_clips_connection) carries
+    an exact play_count, like_count, shortcode and thumbnail URL for every reel in one
+    page load, no per-reel fetch needed. Confirmed live: this surfaces an 11M-view reel
+    that isn't among the profile grid's 12 most recent items at all.
+    """
+    out = []
+    for likes, plays, code, thumb_uri in _REEL_TAB_ITEM.findall(html):
+        out.append({
+            "id": code,
+            "views": int(plays),
+            "likes": int(likes),
+            "thumbUrl": json.loads(f'"{thumb_uri}"'),
+        })
+    return out
 
 
 def parse_instagram_post_url(url):

@@ -68,12 +68,28 @@ class Instagram(unittest.TestCase):
     def test_profile_login_wall_is_nulls(self):
         self.assertEqual(parse.parse_instagram_profile(None), {"followers": None, "postCount": None})
 
-    def test_shortcodes_dedupe_and_kind(self):
-        html = 'href="/p/DdHNbqDJusb/" x href="/reel/DdGyUtFsnRO/" y href="/p/DdHNbqDJusb/"'
-        self.assertEqual(
-            parse.parse_instagram_shortcodes(html),
-            [{"shortcode": "DdHNbqDJusb", "isReel": False}, {"shortcode": "DdGyUtFsnRO", "isReel": True}],
+    def test_reels_tab_extracts_views_likes_code_and_thumb(self):
+        # Trimmed to the fields the parser reads; a real page repeats several other
+        # keys per node (comment_count, clips_tab_pinned_user_ids, ...) in between.
+        html = (
+            '"__typename":"XIGPolarisVideoMedia","pk":"1","like_count":3,"play_count":11183407,'
+            '"clips_tab_pinned_user_ids":[],"code":"DW84LM4y4Fr","seo_canonical_url":null,'
+            '"display_uri":"https:\\/\\/scontent.cdninstagram.com\\/img.jpg?a=1\\u00253D2"}},'
+            '{"node":{"__typename":"XIGPolarisVideoMedia","pk":"2","like_count":8860,"play_count":119608,'
+            '"code":"Dcs1bhEoeTf","seo_canonical_url":null,"display_uri":"https:\\/\\/x.test\\/b.jpg"'
         )
+        self.assertEqual(
+            parse.parse_instagram_reels_tab(html),
+            [
+                {"id": "DW84LM4y4Fr", "views": 11_183_407, "likes": 3,
+                 "thumbUrl": "https://scontent.cdninstagram.com/img.jpg?a=1%3D2"},
+                {"id": "Dcs1bhEoeTf", "views": 119_608, "likes": 8860,
+                 "thumbUrl": "https://x.test/b.jpg"},
+            ],
+        )
+
+    def test_reels_tab_empty_when_no_items(self):
+        self.assertEqual(parse.parse_instagram_reels_tab("<html></html>"), [])
 
     def test_post_url(self):
         self.assertEqual(

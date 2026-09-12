@@ -36,6 +36,7 @@ export const SocialSchema = z.object({
       url: z.url(),
       caption: z.string(),
       likes: count,
+      views: count,
       isReel: z.boolean(),
       thumb: z.string().regex(/^ig-[\w-]{8,}\.jpg$/),
       featured: z.boolean(),

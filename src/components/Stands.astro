@@ -2,13 +2,13 @@
 import { Image } from 'astro:assets';
 import { social, profilesBy, thumb } from '../lib/social.js';
 import { compactCount } from '../lib/format.js';
-import { Instagram, Heart, Play, Flame, Sparkles, ExternalLink } from 'lucide-astro';
+import { Instagram, Heart, Eye, Play, Flame, Sparkles, ExternalLink } from 'lucide-astro';
 
 const accounts = profilesBy('instagram');
 
-// Sort posts by highest likes / engagement first
+// Sort strictly by real view count to surface the most-viewed reels first
 const topPosts = [...social.posts]
-  .sort((a, b) => (b.likes ?? 0) - (a.likes ?? 0))
+  .sort((a, b) => (b.views ?? 0) - (a.views ?? 0))
   .slice(0, 6);
 ---
 <div class="stands-container">
@@ -68,12 +68,20 @@ const topPosts = [...social.posts]
 
               <!-- Bottom Content Overlay -->
               <div class="reel-bottom-info">
-                {p.likes != null && (
-                  <div class="likes-chip">
-                    <Heart class="icon-heart" />
-                    <span>{compactCount(p.likes)} LIKES</span>
-                  </div>
-                )}
+                <div class="metric-chips">
+                  {p.views != null && (
+                    <div class="views-chip">
+                      <Eye class="icon-eye" />
+                      <span>{compactCount(p.views)}</span>
+                    </div>
+                  )}
+                  {p.likes != null && (
+                    <div class="likes-chip">
+                      <Heart class="icon-heart" />
+                      <span>{compactCount(p.likes)}</span>
+                    </div>
+                  )}
+                </div>
                 {p.caption && <p class="caption-text">{p.caption}</p>}
               </div>
             </div>
@@ -328,25 +336,44 @@ const topPosts = [...social.posts]
     gap: var(--space-2xs);
   }
 
-  .likes-chip {
+  .metric-chips {
+    display: flex;
+    gap: var(--space-2xs);
+  }
+
+  .likes-chip,
+  .views-chip {
     display: inline-flex;
     align-items: center;
     gap: var(--space-3xs);
-    align-self: flex-start;
     padding: 2px 8px;
     border-radius: 4px;
     background: rgba(7, 9, 14, 0.85);
-    border: 1px solid rgba(255, 51, 68, 0.4);
     font-family: var(--font-mono);
     font-size: var(--step--2);
     font-weight: 700;
+  }
+
+  .likes-chip {
+    border: 1px solid rgba(255, 51, 68, 0.4);
     color: var(--color-crimson);
+  }
+
+  .views-chip {
+    border: 1px solid var(--color-line);
+    color: #FFF;
   }
 
   .icon-heart {
     width: 0.8rem;
     height: 0.8rem;
     fill: var(--color-crimson);
+  }
+
+  .icon-eye {
+    width: 0.8rem;
+    height: 0.8rem;
+    color: var(--color-cyan);
   }
 
   .caption-text {

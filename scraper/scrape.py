@@ -18,12 +18,13 @@ OUT_JSON = ROOT / "src/data/social.json"
 THUMBS = ROOT / "src/assets/social"
 OVERRIDE = ROOT / "scraper/instagram_posts.txt"
 IG_ACCOUNTS = ["abhishekpandey_26", "spinandswing26"]
+IG_REELS_ACCOUNTS = ["abhishekpandey_26"]  # Pulse of the Crowd: reels from this account only
 YT_CHANNELS = ["spinandswing26", "abhishekunseen26"]
 LINKEDIN = "abhishek-pandey-26sep03"
 
 
 def get(url, **kw):
-    time.sleep(2)  # ponytail: fixed politeness delay; ~70 requests total, no need for a rate limiter
+    time.sleep(2)  # ponytail: fixed politeness delay; ~50 requests total, no need for a rate limiter
     page = Fetcher.get(url, impersonate="chrome", stealthy_headers=True, timeout=30, **kw)
     if page.status != 200:
         raise RuntimeError(f"HTTP {page.status} for {url}")
@@ -53,18 +54,18 @@ def profile_row(platform, handle, url):
             "followers": None, "postCount": None, "name": None, "headline": None}
 
 
-def scrape_instagram(featured, pool_size=5):
-    """Ranks by likes, not upload recency.
+def scrape_instagram(featured, pool_size=6):
+    """Ranks by real view count from IG_REELS_ACCOUNTS's own /reels/ tab, not upload recency.
 
-    Instagram exposes no view/play count on a logged-out reel or post page -- checked
-    live, only like_count and comment_count are present -- so likes is the only real
-    engagement signal available without login. The profile grid's static HTML caps at
-    12 items -- verified live on both accounts -- but parse_instagram_shortcodes used
-    to only look at the first 5 of those (recency order), so a more-liked reel sitting
-    at position 6-12 was structurally invisible. Now every available candidate gets
-    fetched and each account's own results are ranked by likes before slicing.
+    Neither the profile grid nor an individual reel's own page exposes any view/play
+    count when logged out -- checked live, only like_count and comment_count exist
+    there. The dedicated /reels/ tab is different: its server-embedded GraphQL
+    connection carries an exact play_count, like_count, shortcode and thumbnail URL for
+    every reel already, no per-reel fetch needed to rank them. Confirmed live:
+    abhishekpandey_26's /reels/ tab surfaces reels the profile grid's 12 most recent
+    items never show at all -- the two are genuinely different pools.
     """
-    def fetch_post(c):
+    def fetch_override_post(c):
         kind = "reel" if c["isReel"] else "p"
         url = f"https://www.instagram.com/{kind}/{c['shortcode']}/"
         page = get(url)
@@ -75,41 +76,51 @@ def scrape_instagram(featured, pool_size=5):
         thumb = save_image(image, f"ig-{c['shortcode']}.jpg")
         return {"platform": "instagram", "account": info["account"] or "unknown",
                 "shortcode": c["shortcode"], "url": url, "caption": info["caption"],
-                "likes": info["likes"], "isReel": c["isReel"], "thumb": thumb,
+                "likes": info["likes"], "views": None, "isReel": c["isReel"], "thumb": thumb,
                 "featured": c["shortcode"] in featured}
 
-    profiles, per_account = [], []
+    profiles = []
     for handle in IG_ACCOUNTS:
-        url = f"https://www.instagram.com/{handle}/"
-        row = profile_row("instagram", handle, url)
-        shortcodes = []
+        row = profile_row("instagram", handle, f"https://www.instagram.com/{handle}/")
         try:
-            page = get(url)
-            row.update(parse.parse_instagram_profile(meta(page, "og:description")))
-            shortcodes = parse.parse_instagram_shortcodes(page.body.decode("utf-8", "ignore"), limit=12)
+            row.update(parse.parse_instagram_profile(meta(get(row["url"]), "og:description")))
         except Exception as err:
             print("WARN IG profile", err)
         profiles.append(row)
-        per_account.append(shortcodes)
 
     posts = []
     if OVERRIDE.exists():
         urls = [line.strip() for line in OVERRIDE.read_text().splitlines() if line.strip()]
         for c in filter(None, map(parse.parse_instagram_post_url, urls)):
             try:
-                posts.append(fetch_post(c))
+                posts.append(fetch_override_post(c))
             except Exception as err:
                 print("WARN IG post", err)
-    else:
-        for shortcodes in per_account:
-            fetched = []
-            for c in shortcodes:
-                try:
-                    fetched.append(fetch_post(c))
-                except Exception as err:
-                    print("WARN IG post", err)
-            fetched.sort(key=lambda p: p["likes"] or 0, reverse=True)
-            posts += fetched[:pool_size]
+        return profiles, posts
+
+    for handle in IG_REELS_ACCOUNTS:
+        try:
+            reels_page = get(f"https://www.instagram.com/{handle}/reels/")
+            candidates = parse.parse_instagram_reels_tab(reels_page.body.decode("utf-8", "ignore"))
+        except Exception as err:
+            print("WARN IG reels tab", err)
+            candidates = []
+        candidates.sort(key=lambda c: c["views"], reverse=True)
+        for c in candidates[:pool_size]:
+            url = f"https://www.instagram.com/reel/{c['id']}/"
+            try:
+                caption = parse.parse_instagram_post(meta(get(url), "og:description"))["caption"]
+                thumb = save_image(c["thumbUrl"], f"ig-{c['id']}.jpg")
+            except Exception as err:
+                print("WARN IG reel", err)
+                continue
+            posts.append({"platform": "instagram", "account": handle, "shortcode": c["id"],
+                          "url": url, "caption": caption, "likes": c["likes"], "views": c["views"],
+                          "isReel": True, "thumb": thumb, "featured": c["id"] in featured})
+
+    # A reel cross-posted to both accounts shows up in both accounts' own /reels/ tab --
+    # keep it once rather than showing the same card twice.
+    posts = list({p["shortcode"]: p for p in posts}.values())
     return profiles, posts
 
 
