@@ -116,7 +116,7 @@
       "publishedAt": "2026-08-25T12:00:14+00:00",
       "views": 2754,
       "thumb": "yt-MrPz1ou6WFg.jpg",
-      "featured": false
+      "featured": true
     },
     {
       "platform": "youtube",
@@ -126,7 +126,7 @@
       "publishedAt": "2026-08-25T08:30:06+00:00",
       "views": 3031,
       "thumb": "yt-OPHjPD0CzzA.jpg",
-      "featured": false
+      "featured": true
     },
     {
       "platform": "youtube",
@@ -136,7 +136,7 @@
       "publishedAt": "2026-08-21T08:30:29+00:00",
       "views": 5059,
       "thumb": "yt-EJN5QLhYmdw.jpg",
-      "featured": false
+      "featured": true
     },
     {
       "platform": "youtube",
@@ -156,7 +156,7 @@
       "publishedAt": "2026-08-18T13:30:18+00:00",
       "views": 1608,
       "thumb": "yt-trYcRaF-Un0.jpg",
-      "featured": false
+      "featured": true
     },
     {
       "platform": "youtube",
@@ -166,7 +166,7 @@
       "publishedAt": "2026-08-15T09:24:13+00:00",
       "views": 1571,
       "thumb": "yt-Shn7mjBClkg.jpg",
-      "featured": false
+      "featured": true
     },
     {
       "platform": "youtube",
@@ -186,7 +186,7 @@
       "publishedAt": "2026-08-12T08:30:11+00:00",
       "views": 11330,
       "thumb": "yt-04nkEA2WKAc.jpg",
-      "featured": false
+      "featured": true
     },
     {
       "platform": "youtube",
@@ -359,7 +359,7 @@
       "likes": 2223,
       "isReel": false,
       "thumb": "ig-DciD4zBAb_w.jpg",
-      "featured": false
+      "featured": true
     },
     {
       "platform": "instagram",
@@ -370,7 +370,7 @@
       "likes": null,
       "isReel": false,
       "thumb": "ig-Dak8ZlsAVmz.jpg",
-      "featured": false
+      "featured": true
     },
     {
       "platform": "instagram",
@@ -381,7 +381,7 @@
       "likes": 12000,
       "isReel": false,
       "thumb": "ig-DblNSTTAbO5.jpg",
-      "featured": false
+      "featured": true
     },
     {
       "platform": "instagram",
@@ -425,7 +425,7 @@
       "likes": 73,
       "isReel": false,
       "thumb": "ig-DK6-KNWo0CL.jpg",
-      "featured": false
+      "featured": true
     },
     {
       "platform": "instagram",
@@ -436,7 +436,7 @@
       "likes": 80,
       "isReel": false,
       "thumb": "ig-DG-E5FWy-Pf.jpg",
-      "featured": false
+      "featured": true
     },
     {
       "platform": "instagram",
@@ -447,7 +447,7 @@
       "likes": 2328,
       "isReel": true,
       "thumb": "ig-DdBtYkwy1zp.jpg",
-      "featured": false
+      "featured": true
     },
     {
       "platform": "instagram",
