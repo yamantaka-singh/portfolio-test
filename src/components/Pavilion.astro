@@ -1,0 +1,96 @@
+---
+import { Image } from 'astro:assets';
+import { site } from '../data/site.js';
+import { Content as Story } from '../data/story.md';
+
+// alt text comes from the file name: "abhishek-batting-nets.jpg" -> "abhishek batting nets"
+const photos = Object.entries(
+  import.meta.glob('../assets/photos/*.{jpg,jpeg,png,webp}', { eager: true, import: 'default' }),
+)
+  .slice(0, 4)
+  .map(([path, src]) => ({ src, alt: path.split('/').pop().replace(/\.\w+$/, '').replace(/[-_]+/g, ' ') }));
+---
+<div class="pavilion">
+  <header>
+    <p class="kicker">Pavilion</p>
+    <h2>The story</h2>
+  </header>
+  <div class="layout">
+    <div class="text">
+      <div class="story"><Story /></div>
+      <ul class="facts" role="list">
+        {site.bio.map((fact) => <li>{fact}</li>)}
+      </ul>
+    </div>
+    <div class="photos">
+      {photos.map((p) => (
+        <Image class="photo" src={p.src} alt={p.alt} widths={[480, 960, 1440]} sizes="(min-width: 64rem) 22vw, 50vw" />
+      ))}
+    </div>
+  </div>
+</div>
+
+<style>
+  .pavilion {
+    display: grid;
+    gap: var(--space-l);
+  }
+  .layout {
+    display: grid;
+    gap: var(--space-l);
+  }
+  @media (min-width: 64rem) {
+    .layout {
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+    }
+  }
+  .text {
+    display: grid;
+    gap: var(--space-m);
+    padding: var(--space-m);
+    background: color-mix(in oklab, var(--color-surface) 85%, transparent);
+  }
+  .story :global(p) {
+    margin: 0 0 var(--space-s);
+    max-width: 60ch;
+    font-size: var(--step-1);
+    line-height: 1.5;
+  }
+  .facts {
+    display: grid;
+    gap: var(--space-xs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: fact;
+  }
+  .facts li {
+    counter-increment: fact;
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+    align-items: baseline;
+    color: var(--color-muted);
+  }
+  .facts li::before {
+    content: counter(fact, decimal-leading-zero);
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    color: var(--wood);
+  }
+  .photos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-s);
+  }
+  .photo {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+  .photo:first-child {
+    grid-row: span 2;
+    aspect-ratio: auto;
+    height: 100%;
+  }
+</style>
