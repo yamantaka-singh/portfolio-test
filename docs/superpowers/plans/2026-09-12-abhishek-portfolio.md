@@ -99,7 +99,7 @@ Lanes A, B and C all start after Task 2 and run together. Task 5 can start again
 ```
 AGENTS.md, CLAUDE.md                   Task 1   task-observer activation block + precedence rules
 .agents/rules/00-task-observer.md      Task 1   always-on copy of AGENTS.md (trigger: always_on)
-.agents/skills/                        Tasks 1–2  pinned skills (40); changed only via approved staged updates
+.agents/skills/                        Tasks 1–2  pinned skills (41); changed only via approved staged updates
 skill-observations/                    Task 1+  task-observer log, one file per observation (at /Users/kaalu/projects/abhishek-portfolio)
 skill-updates/                         gates    staged skill updates + PENDING.md
 .gitignore, package.json,
@@ -409,7 +409,7 @@ add obra/superpowers executing-plans subagent-driven-development dispatching-par
   using-git-worktrees test-driven-development verification-before-completion requesting-code-review
 add D4Vinci/Scrapling scrapling-official
 add nextlevelbuilder/ui-ux-pro-max-skill ui-ux-pro-max
-add anthropics/skills frontend-design
+add anthropics/skills frontend-design webapp-testing
 add vercel-labs/agent-skills web-design-guidelines deploy-to-vercel
 add DietrichGebert/ponytail ponytail ponytail-review
 add leonxlnx/taste-skill design-taste-frontend high-end-visual-design full-output-enforcement
@@ -447,7 +447,7 @@ ls .agents/skills | wc -l
 ls .agents/skills/*/SKILL.md | wc -l
 ```
 
-Expected: both counts are `40`, and no `MISSING` lines. If a public install fails, re-run that one `add` line; if a local folder is missing, use the printed `skills find` command and add the result to the script.
+Expected: both counts are `41`, and no `MISSING` lines. If a public install fails, re-run that one `add` line; if a local folder is missing, use the printed `skills find` command and add the result to the script.
 
 - [ ] **Step 3: Write the project files**
 
@@ -3427,7 +3427,7 @@ git commit -m "feat(sections): Boundary Rope CTAs with counted /go redirects"
 ### Task 19: Integration
 
 **Tier:** Pro · **Owner:** Agent → **User** reviews · **Lane:** — (after Tasks 13–18 are all merged) · **Gate:** **G6** · **ADRs:** 0001, 0006
-**Skills:** `scroll-experience`, `web3d-motion-choreography`, `web3d-interaction-ux`, `requesting-code-review`, `ponytail-review`, `design-taste-frontend`, `web-design-engineer` (browser acceptance QA of the integrated page before G6), `grilling` (only when the user asks for changes at G6)
+**Skills:** `scroll-experience`, `web3d-motion-choreography`, `web3d-interaction-ux`, `requesting-code-review`, `ponytail-review`, `design-taste-frontend`, `web-design-engineer` (browser acceptance QA of the integrated page before G6), `webapp-testing` (Playwright for the Step 8 behaviour checks — reduced motion, frames blocked, JS disabled — instead of doing them by hand every time), `grilling` (only when the user asks for changes at G6)
 
 **Files:**
 - Modify: `src/pages/index.astro`, `src/lib/keyframes.js`, `src/components/Zone.astro`

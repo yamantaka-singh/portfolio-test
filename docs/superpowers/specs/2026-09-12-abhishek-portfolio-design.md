@@ -167,7 +167,7 @@ Skill names below were checked against each repo's `skills/` folder on
 | `obra/superpowers` | `executing-plans`, `subagent-driven-development`, `dispatching-parallel-agents`, `using-git-worktrees`, `test-driven-development`, `verification-before-completion`, `requesting-code-review` |
 | `D4Vinci/Scrapling` | `scrapling-official` |
 | `nextlevelbuilder/ui-ux-pro-max-skill` | `ui-ux-pro-max` |
-| `anthropics/skills` | `frontend-design` |
+| `anthropics/skills` | `frontend-design`, `webapp-testing` (Playwright checks for the fallback/behaviour steps in Tasks 10, 14, 16, 18, 19) |
 | `vercel-labs/agent-skills` | `web-design-guidelines`, `deploy-to-vercel` |
 | `DietrichGebert/ponytail` | `ponytail`, `ponytail-review` |
 | `rebelytics/one-skill-to-rule-them-all` | `task-observer` — installed first, governs all others (ADR-0008) |
@@ -196,6 +196,7 @@ clone needs no install at all.
 - `gpt-taste` (mandates React, Tailwind, a nav bar and AIDA sections, against ADR-0006/0007)
 - mattpocock `code-review` (needs its setup skill's issue-tracker file) and `tdd` (duplicates superpowers)
 - garden-skills `beautiful-article` and `kb-retriever` (not this project's job) and `web-video-presentation` (builds a Vite + React app, against ADR-0007)
+- anthropics/skills `canvas-design` and `algorithmic-art` (this project's art is Gemini/Flow stills per ADR-0002, not generated PNG/p5.js art), `theme-factory` (tokens are already fixed by ADR-0007), `web-artifacts-builder` (builds claude.ai artifacts, not a deployed site), `mcp-builder`/`skill-creator`/`brand-guidelines`/`docx`/`pdf`/`pptx`/`xlsx`/`slack-gif-creator`/`academy-guide`/`discernment-nudge`/`doc-coauthoring`/`internal-comms`/`claude-api` (no MCP server, skill authoring already covered by task-observer + writing-for-agents, no Anthropic-branded or document/slide/spreadsheet output in this project)
 
 ## 6. Inputs needed before Phase 1 (`docs/inputs.md`)
 - [ ] Abhishek's consent to scrape and republish his public content
