@@ -3,6 +3,7 @@ import '@fontsource-variable/big-shoulders-display';
 import '@fontsource-variable/hanken-grotesk';
 import '../styles/global.css';
 import Analytics from '@vercel/analytics/astro';
+import BroadcastDock from '../components/BroadcastDock.astro';
 
 interface Props {
   title: string;
@@ -22,5 +23,10 @@ const { title, description } = Astro.props;
   </head>
   <body>
     <slot />
+    <BroadcastDock />
+    <script>
+      import { initAllInteractions } from '../scripts/interactions.js';
+      initAllInteractions();
+    </script>
   </body>
 </html>

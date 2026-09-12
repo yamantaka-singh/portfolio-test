@@ -1,7 +1,6 @@
 ---
 import { getImage } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import ScrubStage from '../components/ScrubStage.astro';
 import Zone from '../components/Zone.astro';
 import Hero from '../components/Hero.astro';
 import Pitch from '../components/Pitch.astro';
@@ -33,13 +32,12 @@ const title = `${site.name} — Cricket Content Creator`;
     <meta name="twitter:card" content="summary_large_image" />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </Fragment>
-  <ScrubStage />
   <main>
-    <Zone id="tunnel" label="Intro" still={still(0)} eager><Hero /></Zone>
-    <Zone id="pitch" label="The Pitch" still={still(1)}><Pitch /></Zone>
-    <Zone id="scoreboard" label="Scoreboard" still={still(2)}><Scoreboard /></Zone>
-    <Zone id="stands" label="The Stands" still={still(3)}><Stands /></Zone>
-    <Zone id="pavilion" label="Pavilion" still={still(4)}><Pavilion /></Zone>
-    <Zone id="boundary" label="Boundary Rope" still={still(5)}><Boundary /></Zone>
+    <Hero />
+    <Zone id="pitch" label="The Pitch" still={still(1)} eager position="center 60%"><Pitch /></Zone>
+    <Zone id="scoreboard" label="Scoreboard" still={still(2)} position="center 30%"><Scoreboard /></Zone>
+    <Zone id="stands" label="The Stands" still={still(3)} position="center 45%"><Stands /></Zone>
+    <Zone id="pavilion" label="Pavilion" still={still(4)} position="center 50%"><Pavilion /></Zone>
+    <Zone id="boundary" label="Boundary Rope" still={still(5)} position="center 70%"><Boundary /></Zone>
   </main>
 </Base>

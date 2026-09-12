@@ -79,6 +79,19 @@ export function initScrub(canvas) {
     ),
   );
 
+  ScrollTrigger.create({
+    trigger: document.body,
+    start: 'top top',
+    end: 'bottom bottom',
+    onUpdate: (self) => {
+      if (self.direction === -1) {
+        gsap.to(canvas, { opacity: 0, duration: 0.5, ease: 'power2.out', overwrite: true });
+      } else {
+        gsap.to(canvas, { opacity: 1, duration: 0.5, ease: 'power2.out', overwrite: true });
+      }
+    }
+  });
+
   ScrollTrigger.addEventListener('refresh', sync);
   addEventListener('resize', resize);
   resize();
