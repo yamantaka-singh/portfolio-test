@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /go/
+Sitemap: https://abhishek-pandey-portfolio.vercel.app/sitemap.xml

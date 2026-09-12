@@ -1,4 +1,5 @@
 ---
+import { getImage } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import ScrubStage from '../components/ScrubStage.astro';
 import Zone from '../components/Zone.astro';
@@ -10,8 +11,28 @@ import Pavilion from '../components/Pavilion.astro';
 import Boundary from '../components/Boundary.astro';
 import { still } from '../lib/keyframes.js';
 import { site } from '../data/site.js';
+import { featuredVideos } from '../lib/social.js';
+import { buildJsonLd } from '../lib/jsonld.js';
+
+const pageUrl = new URL('/', Astro.site).href;
+const og = await getImage({ src: still(0), width: 1200, height: 630, fit: 'cover', format: 'jpg' });
+const imageUrl = new URL(og.src, Astro.site).href;
+const jsonLd = buildJsonLd({ site, videos: featuredVideos, pageUrl, imageUrl });
+const title = `${site.name} — Cricket Content Creator`;
 ---
-<Base title={`${site.name} — Cricket Content Creator`} description={site.tagline}>
+<Base title={title} description={site.tagline}>
+  <Fragment slot="head">
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="profile" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={site.tagline} />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
   <ScrubStage />
   <main>
     <Zone id="tunnel" label="Intro" still={still(0)} eager><Hero /></Zone>
