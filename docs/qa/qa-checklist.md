@@ -3,7 +3,7 @@
 Tick each item only after doing it on the production URL.
 
 ## Automated
-- [x] `node scripts/verify-pipeline.mjs` prints `All green.`
+- [x] `node scripts/verify-pipeline.mjs https://abhishek-pandey-portfolio-pink.vercel.app` prints `All green.`
 - [x] `npm test` passes (25 tests)
 - [x] `docs/qa/perf-report.md` shows every target met
 
@@ -33,3 +33,11 @@ Tick each item only after doing it on the production URL.
 
 ## Content and consent
 - [x] `docs/inputs.md` consent line is ticked and dated
+- [x] No `/dev/` pages in production (`/dev/pitch` returns 404)
+- [x] Pavilion story and tagline approved at G6
+
+## Maintenance (how to update later)
+- New stats/posts: `scraper/.venv/bin/python scraper/scrape.py`, re-flag `featured`, commit, push (Task 4)
+- Replace a transition: new clip in `assets/clips/`, `node scripts/export-frames.mjs`, commit, push (Task 13)
+- Edit the About copy: `src/data/story.md`, push
+- Change any skill: only through task-observer (AGENTS.md section 3); ask for "the task-observer review" any time
