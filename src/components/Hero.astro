@@ -1,0 +1,32 @@
+---
+import { site } from '../data/site.js';
+---
+<div class="hero">
+  <p class="kicker">Cricket content creator · Spin &amp; Swing · Unseen</p>
+  <h1>{site.name}</h1>
+  <p class="tagline">{site.tagline}</p>
+  <a class="cue" href="#pitch">Walk out <span aria-hidden="true">↓</span></a>
+</div>
+
+<style>
+  .hero {
+    display: grid;
+    gap: var(--space-s);
+  }
+  .tagline {
+    margin: 0;
+    max-width: 36ch;
+    font-size: var(--step-1);
+    color: var(--color-muted);
+  }
+  .cue {
+    justify-self: start;
+    margin-top: var(--space-l);
+    padding-bottom: var(--space-2xs);
+    border-bottom: 2px solid var(--color-accent);
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+</style>

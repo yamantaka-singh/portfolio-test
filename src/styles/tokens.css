@@ -1,0 +1,42 @@
+:root {
+  /* primitives: sampled from src/assets/keyframes (G3) */
+  --turf-950: #0e1f17;
+  --willow-300: #d9b98a;
+  --cherry-600: #b3261e;
+  --flood-50: #f4f1e6;
+  --chalk-100: #e9e4d4;
+  --amber-400: #ffb020;
+
+  /* semantic: components use only these */
+  --color-bg: var(--turf-950);
+  --color-surface: color-mix(in oklab, var(--turf-950) 75%, black);
+  --color-text: var(--flood-50);
+  --color-muted: var(--chalk-100);
+  --color-accent: var(--cherry-600); /* fills only, with --color-text on top */
+  --color-highlight: var(--amber-400); /* numbers, focus ring, one kicker per view */
+  --color-line: color-mix(in oklab, var(--flood-50) 18%, transparent);
+  --wood: var(--willow-300);
+
+  --font-display: 'Big Shoulders Display Variable', 'Arial Narrow', sans-serif;
+  --font-body: 'Hanken Grotesk Variable', system-ui, sans-serif;
+
+  --step--1: clamp(0.83rem, 0.8rem + 0.15vw, 0.9rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --step-1: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+  --step-2: clamp(1.6rem, 1.4rem + 1vw, 2.25rem);
+  --step-3: clamp(2.2rem, 1.8rem + 2vw, 3.5rem);
+  --step-4: clamp(3rem, 2.2rem + 4vw, 6rem);
+  --step-5: clamp(4rem, 2.5rem + 8vw, 10rem);
+
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-s: 1rem;
+  --space-m: 1.5rem;
+  --space-l: 2.5rem;
+  --space-xl: 4rem;
+  --space-2xl: 6rem;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 180ms;
+  --dur-reveal: 600ms;
+}

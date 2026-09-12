@@ -29,7 +29,8 @@ const { id, label, still, eager = false } = Astro.props;
     display: grid;
   }
   .zone-still,
-  .zone-content {
+  .zone-content,
+  .zone::after {
     grid-area: 1 / 1;
   }
   .zone-still {
@@ -37,11 +38,19 @@ const { id, label, still, eager = false } = Astro.props;
     height: 100%;
     object-fit: cover;
   }
+  .zone::after {
+    content: '';
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(to bottom, rgb(14 31 23 / 0.15) 0%, rgb(14 31 23 / 0.35) 45%, rgb(14 31 23 / 0.85) 100%);
+  }
   .zone-content {
     position: relative;
-    z-index: 1;
-    align-self: center;
-    padding: 1.5rem;
+    z-index: 2;
+    align-self: end;
+    width: min(100%, 80rem);
+    margin-inline: auto;
+    padding: var(--space-xl) var(--space-m);
   }
   :global(html.scrub-on) .zone-still {
     visibility: hidden;
