@@ -17,6 +17,7 @@ const { id, label, still, eager = false, position = 'center' } = Astro.props;
     alt=""
     widths={[720, 1280, 1920, 2560]}
     sizes="100vw"
+    quality={55}
     loading={eager ? 'eager' : 'lazy'}
     fetchpriority={eager ? 'high' : 'auto'}
     style={`object-position: ${position};`}
