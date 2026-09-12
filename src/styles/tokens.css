@@ -1,30 +1,32 @@
 :root {
-  /* Maximalist Floodlit Stadium Palette */
+  /* Sunset Stadium Palette (Charcoal Blue / Verdigris / Jasmine / Sandy Brown / Burnt Peach) */
   --color-bg: #07090E;
-  --color-surface: #11141D;
-  --color-surface-elevated: #181C28;
-  --color-card: rgba(17, 20, 29, 0.82);
+  --color-surface: #1B2E38;    /* darkened Charcoal Blue #264653 -- keeps muted-text contrast >=4.5:1 */
+  --color-surface-elevated: #23404D;
+  --color-card: rgba(27, 46, 56, 0.82);
   --color-text: #FAFAF8;
   --color-muted: #8E96A6;
   --color-faint: #444B59;
-  
-  /* High-Octane Stadium Accents */
-  --color-neon: #E64B6B;       /* Floodlight maroon-rose (was electric lime); 4.5:1+ on both bg and card */
-  --gradient-neon: linear-gradient(135deg, #E0457A, #7A1030); /* maroon gradient for solid fills */
-  --color-cyan: #00F0FF;       /* Broadcast telemetry cyan */
-  --color-crimson: #FF3344;    /* Live REC / Umpire crimson */
-  --color-gold: #F6E05E;       /* Pitch trophy gold */
+
+  /* Sunset Accents -- all four are light/mid saturated tones: pair with dark text on a fill, use directly as text/icon/border on the near-black bg */
+  --color-neon: #E76F51;       /* Burnt Peach -- primary accent (was maroon, before that lime) */
+  --gradient-neon: linear-gradient(135deg, #F4A261, #E76F51); /* Sandy Brown -> Burnt Peach, analogous warm gradient for solid fills */
+  --color-cyan: #2A9D8F;       /* Verdigris -- secondary/"verified" accent (was cyan) */
+  --color-crimson: #FF3344;    /* Live REC / Umpire crimson -- unchanged, not part of the 5-swatch set */
+  --color-gold: #E9C46A;       /* Jasmine -- trophy/premium accent (was gold) */
+  --color-sand: #F4A261;       /* Sandy Brown -- used sparingly: gradient stop + "not yet accredited" status */
   --color-highlight: var(--color-neon);
   --color-accent: var(--color-crimson);
   --color-line: rgba(250, 250, 248, 0.12);
   --color-line-bright: rgba(250, 250, 248, 0.28);
   --wood: #2D3748;
 
-  /* Tactical Neon Glows */
-  --glow-neon: 0 0 24px rgba(230, 75, 107, 0.35);
-  --glow-cyan: 0 0 24px rgba(0, 240, 255, 0.35);
+  /* Accent glows */
+  --glow-neon: 0 0 24px rgba(231, 111, 81, 0.35);
+  --glow-cyan: 0 0 24px rgba(42, 157, 143, 0.35);
   --glow-crimson: 0 0 24px rgba(255, 51, 68, 0.45);
-  --glow-gold: 0 0 24px rgba(246, 224, 94, 0.35);
+  --glow-gold: 0 0 24px rgba(233, 196, 106, 0.35);
+  --glow-sand: 0 0 24px rgba(244, 162, 97, 0.35);
 
   /* Typography */
   --font-display: 'Big Shoulders Display Variable', 'Arial Narrow', sans-serif;

@@ -8,10 +8,11 @@ import photoStands from '../assets/photos/abhishek-india-stands.jpg';
 import photoRail from '../assets/photos/abhishek-stadium-gt.jpg';
 
 const inningsTimeline = [
-  { era: '2021 · INNINGS 01', title: 'The Technical Spark', desc: 'Dissecting wrist positions and seam angles from local club matches.' },
-  { era: '2025 · INNINGS 02', title: 'Spin & Swing Launch', desc: 'Grew from 1K to 10K purists in 15 days; established the unfiltered broadcast tone.' },
-  { era: '2025 · INNINGS 03', title: 'Pitchside & DPL Access', desc: 'Covering Delhi Premier League from the field of play and interviewing international stars.' },
-  { era: '2026 · INNINGS 04', title: 'The Premier Voice', desc: '50M+ impressions, premier technical cricket creator in India.' },
+  { dates: 'March – May 2025', title: 'IPL 2025', accredited: false, desc: 'Content creation & audience engagement.' },
+  { dates: 'January – February 2026', title: 'WPL 2026', accredited: false, desc: "Women's Premier League coverage." },
+  { dates: 'February – March 2026', title: "ICC Men's T20 World Cup 2026", accredited: false, desc: 'Global tournament reaction & match content.' },
+  { dates: 'March – May 2026', title: 'IPL 2026', accredited: false, desc: 'Extensive match-by-match digital content.' },
+  { dates: 'August – September 2026', title: 'DPL 2026', accredited: true, desc: 'Ground/field access, exclusive reporting, and professional media coverage.' },
 ];
 ---
 <div class="pavilion-container">
@@ -58,7 +59,12 @@ const inningsTimeline = [
             <div class="timeline-step">
               <span class="step-num">0{idx + 1}</span>
               <div class="step-content">
-                <span class="step-era">{item.era}</span>
+                <div class="step-meta">
+                  <span class="step-era">{item.dates}</span>
+                  <span class={`step-status ${item.accredited ? 'accredited' : 'independent'}`}>
+                    {item.accredited ? 'Accredited' : 'Independent Coverage'}
+                  </span>
+                </div>
                 <h4 class="step-title">{item.title}</h4>
                 <p class="step-desc">{item.desc}</p>
               </div>
@@ -292,11 +298,41 @@ const inningsTimeline = [
     gap: 2px;
   }
 
+  .step-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
   .step-era {
     font-family: var(--font-mono);
     font-size: var(--step--2);
     color: var(--color-cyan);
     letter-spacing: 0.08em;
+  }
+
+  .step-status {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 2px var(--space-xs);
+    border-radius: 9999px;
+    border: 1px solid var(--color-line-bright);
+    color: var(--color-muted);
+  }
+
+  .step-status.accredited {
+    color: var(--color-cyan);
+    border-color: rgba(42, 157, 143, 0.4);
+    background: rgba(42, 157, 143, 0.08);
+  }
+
+  .step-status.independent {
+    color: var(--color-sand);
+    border-color: rgba(244, 162, 97, 0.4);
+    background: rgba(244, 162, 97, 0.08);
   }
 
   .step-title {
@@ -382,9 +418,9 @@ const inningsTimeline = [
     position: absolute;
     width: 60px;
     height: 20px;
-    background: rgba(246, 224, 94, 0.4);
+    background: rgba(233, 196, 106, 0.4);
     backdrop-filter: blur(4px);
-    border: 1px dashed rgba(246, 224, 94, 0.6);
+    border: 1px dashed rgba(233, 196, 106, 0.6);
     pointer-events: none;
   }
 
@@ -435,12 +471,12 @@ const inningsTimeline = [
 
   .photo-badge-chip.neon {
     color: var(--color-neon);
-    border-color: rgba(230, 75, 107, 0.5);
+    border-color: rgba(231, 111, 81, 0.5);
   }
 
   .photo-badge-chip.cyan {
     color: var(--color-cyan);
-    border-color: rgba(0, 240, 255, 0.5);
+    border-color: rgba(42, 157, 143, 0.5);
   }
 
   .photo-caption {

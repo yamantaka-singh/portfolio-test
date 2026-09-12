@@ -24,8 +24,8 @@ body {
   overflow-x: hidden;
   /* High-tech stadium background mesh */
   background-image: 
-    radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.08) 0%, transparent 60%),
-    radial-gradient(circle at 80% 30%, rgba(230, 75, 107, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 50% 0%, rgba(42, 157, 143, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 80% 30%, rgba(231, 111, 81, 0.05) 0%, transparent 50%),
     linear-gradient(to bottom, rgba(7, 9, 14, 0.8), rgba(7, 9, 14, 1));
   background-attachment: fixed;
 }
@@ -123,15 +123,15 @@ img {
 }
 
 .hud-pill.neon {
-  border-color: rgba(230, 75, 107, 0.4);
+  border-color: rgba(231, 111, 81, 0.4);
   color: var(--color-neon);
-  background: rgba(230, 75, 107, 0.08);
+  background: rgba(231, 111, 81, 0.08);
 }
 
 .hud-pill.cyan {
-  border-color: rgba(0, 240, 255, 0.4);
+  border-color: rgba(42, 157, 143, 0.4);
   color: var(--color-cyan);
-  background: rgba(0, 240, 255, 0.08);
+  background: rgba(42, 157, 143, 0.08);
 }
 
 .hud-pill.live {
@@ -247,11 +247,11 @@ img {
 .custom-cursor.hovering {
   width: 52px;
   height: 52px;
-  background-color: rgba(230, 75, 107, 0.15);
+  background-color: rgba(231, 111, 81, 0.15);
   border: 1px solid var(--color-neon);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-  box-shadow: 0 0 28px rgba(230, 75, 107, 0.35);
+  box-shadow: 0 0 28px rgba(231, 111, 81, 0.35);
   color: var(--color-neon);
 }
 
@@ -259,8 +259,8 @@ img {
   width: 70px;
   height: 70px;
   background: var(--gradient-neon);
-  color: #FFF;
-  box-shadow: 0 0 35px rgba(230, 75, 107, 0.6);
+  color: var(--color-bg);
+  box-shadow: 0 0 35px rgba(231, 111, 81, 0.6);
 }
 
 /* SplitType text reveal mask */

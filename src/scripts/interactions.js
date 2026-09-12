@@ -163,22 +163,37 @@ export function initCursor() {
 export function initTextReveals() {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const elements = document.querySelectorAll('.reveal-text');
-  
+
   elements.forEach((el) => {
     try {
       const split = new SplitType(el, { types: 'lines, words' });
-      if (split.words && split.words.length) {
+      if (!split.words || !split.words.length) return;
+
+      const tweenVars = {
+        y: '80%',
+        opacity: 0,
+        duration: 0.6,
+        stagger: 0.015,
+        ease: 'power3.out',
+      };
+
+      // An element already on screen at load doesn't need a scroll trigger
+      // at all -- that dependency is exactly what races against web-font
+      // swap-in (font-display: swap) reflowing the page after
+      // ScrollTrigger has already cached a pixel-based trigger position,
+      // leaving above-the-fold text stuck at its pre-animation opacity.
+      // Below-the-fold text has no such race: the user must scroll,
+      // which is itself a layout-settled, correctly-measured event.
+      if (el.getBoundingClientRect().top < window.innerHeight) {
+        gsap.from(split.words, tweenVars);
+      } else {
         gsap.from(split.words, {
+          ...tweenVars,
           scrollTrigger: {
             trigger: el,
             start: 'top 92%',
             toggleActions: 'play none none none',
           },
-          y: '80%',
-          opacity: 0,
-          duration: 0.6,
-          stagger: 0.015,
-          ease: 'power3.out',
         });
       }
     } catch {
@@ -192,5 +207,14 @@ export function initAllInteractions() {
   initCursor();
   initMagneticButtons();
   initTiltCards();
-  initTextReveals();
+
+  // SplitType measures word widths at call time, and the custom display
+  // fonts swap in later (font-display: swap), reflowing the page after
+  // ScrollTrigger has already cached "top 92%" as a pixel position --
+  // stuck-invisible text above the fold that never gets scrolled past its
+  // (now-wrong) trigger point. Wait for the real fonts before splitting
+  // and creating the triggers, instead of creating them wrong and patching
+  // after (a later ScrollTrigger.refresh() just replays the tween in slow
+  // motion instead of fixing this).
+  (document.fonts?.ready ?? Promise.resolve()).then(initTextReveals);
 }
