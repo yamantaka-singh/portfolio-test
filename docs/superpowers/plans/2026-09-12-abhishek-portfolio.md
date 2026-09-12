@@ -99,7 +99,7 @@ Lanes A, B and C all start after Task 2 and run together. Task 5 can start again
 ```
 AGENTS.md, CLAUDE.md                   Task 1   task-observer activation block + precedence rules
 .agents/rules/00-task-observer.md      Task 1   always-on copy of AGENTS.md (trigger: always_on)
-.agents/skills/                        Tasks 1–2  pinned skills (41); changed only via approved staged updates
+.agents/skills/                        Tasks 1–2  pinned skills (49); changed only via approved staged updates
 skill-observations/                    Task 1+  task-observer log, one file per observation (at /Users/kaalu/projects/abhishek-portfolio)
 skill-updates/                         gates    staged skill updates + PENDING.md
 .gitignore, package.json,
@@ -432,7 +432,9 @@ done
 
 AG=${ANTIGRAVITY_SKILLS:-$HOME/.gemini/config/skills}
 for s in astro scroll-experience premium-web-design design-system modern-web-guidance seo schema-markup \
-  core-web-vitals accessibility-auditor copywriting humanizer architecture-decision-records; do
+  core-web-vitals accessibility-auditor copywriting humanizer architecture-decision-records \
+  zod-validation-expert javascript-testing-patterns python-testing-patterns \
+  web-performance-optimization debug-optimize-lcp clean-code a11y-debugging seo-fundamentals; do
   copy_local "$AG/$s" "$s"
 done
 
@@ -447,7 +449,7 @@ ls .agents/skills | wc -l
 ls .agents/skills/*/SKILL.md | wc -l
 ```
 
-Expected: both counts are `41`, and no `MISSING` lines. If a public install fails, re-run that one `add` line; if a local folder is missing, use the printed `skills find` command and add the result to the script.
+Expected: both counts are `49`, and no `MISSING` lines. If a public install fails, re-run that one `add` line; if a local folder is missing, use the printed `skills find` command and add the result to the script.
 
 - [ ] **Step 3: Write the project files**
 
@@ -597,7 +599,7 @@ Expected: `https://VERCEL_PROJECT.vercel.app` shows "Abhishek Pandey".
 ### Task 3: Scraper parsers
 
 **Tier:** Flash · **Owner:** Agent · **Lane:** A · **Gate:** — · **ADRs:** 0003
-**Skills:** `scrapling-official`, `test-driven-development`, `ponytail`
+**Skills:** `scrapling-official`, `python-testing-patterns`, `test-driven-development`, `ponytail`
 
 **Files:**
 - Create: `scraper/parse.py`, `scraper/test_parse.py`
@@ -1076,7 +1078,7 @@ git commit -m "chore(data): G1 curated featured videos and posts"
 ### Task 5: Data schema and helpers
 
 **Tier:** Flash · **Owner:** Agent · **Lane:** A (Steps 1–8 can run before Task 4 finishes; Step 9 needs Task 4's real `social.json`) · **Gate:** — · **ADRs:** 0003, 0006
-**Skills:** `test-driven-development`, `astro`, `ponytail`
+**Skills:** `zod-validation-expert`, `javascript-testing-patterns`, `clean-code`, `test-driven-development`, `astro`, `ponytail`
 
 **Files:**
 - Create: `src/lib/social-schema.js`, `src/lib/social-schema.test.js`, `src/lib/social.js`, `src/lib/format.js`, `src/lib/format.test.js`, `src/lib/links.js`, `src/lib/links.test.js`, `src/data/site.js`
@@ -1668,7 +1670,7 @@ git commit -m "feat(frames): AVIF frame exporter with placeholder mode"
 ### Task 9: Scrub math
 
 **Tier:** Pro · **Owner:** Agent · **Lane:** C (∥ with Task 8) · **Gate:** — · **ADRs:** 0001
-**Skills:** `test-driven-development`, `web3d-motion-choreography`, `ponytail`
+**Skills:** `javascript-testing-patterns`, `clean-code`, `test-driven-development`, `web3d-motion-choreography`, `ponytail`
 
 **Files:**
 - Create: `src/lib/scrub-math.js`, `src/lib/scrub-math.test.js`
@@ -2633,7 +2635,7 @@ git commit -m "feat(sections): Pitch with tap-to-play YouTube facades"
 ### Task 15: Scoreboard section
 
 **Tier:** Flash · **Owner:** Agent · **Lane:** D · **Gate:** — · **ADRs:** 0003, 0006
-**Skills:** `frontend-design`, `premium-web-design`, `test-driven-development`, `astro`, `high-end-visual-design`, `full-output-enforcement`
+**Skills:** `frontend-design`, `premium-web-design`, `javascript-testing-patterns`, `test-driven-development`, `astro`, `high-end-visual-design`, `full-output-enforcement`
 
 **Files:**
 - Create: `src/lib/stats.js`, `src/lib/stats.test.js`, `src/components/Scoreboard.astro`, `src/pages/dev/scoreboard.astro`
@@ -3561,7 +3563,7 @@ Wait for "G6 approved". Fix requested changes inside the owning component (or `s
 ### Task 20: SEO
 
 **Tier:** Flash · **Owner:** Agent · **Lane:** E (∥ with Task 21) · **Gate:** — · **ADRs:** 0005, 0006
-**Skills:** `seo`, `schema-markup`, `test-driven-development`, `astro`
+**Skills:** `seo`, `schema-markup`, `seo-fundamentals`, `javascript-testing-patterns`, `test-driven-development`, `astro`
 
 **Files:**
 - Create: `src/lib/jsonld.js`, `src/lib/jsonld.test.js`, `src/pages/sitemap.xml.js`, `public/robots.txt`
@@ -3748,7 +3750,7 @@ git commit -m "feat(seo): Person/VideoObject JSON-LD, Open Graph, sitemap, robot
 ### Task 21: Accessibility and performance audits
 
 **Tier:** Flash · **Owner:** Agent (two agents in parallel: one per report) · **Lane:** E (∥ with Task 20) · **Gate:** — · **ADRs:** 0001, 0007
-**Skills:** a11y agent: `accessibility-auditor`, `web3d-interaction-ux` · perf agent: `core-web-vitals`, `web3d-performance-budget`
+**Skills:** a11y agent: `accessibility-auditor`, `a11y-debugging`, `web3d-interaction-ux` · perf agent: `core-web-vitals`, `web-performance-optimization`, `debug-optimize-lcp`, `web3d-performance-budget`
 
 **Files:**
 - Create: `docs/qa/a11y-report.md`, `docs/qa/perf-audit.md`, `docs/qa/lighthouse-mobile.json`
@@ -3820,7 +3822,7 @@ git commit -m "docs(qa): accessibility and performance audit reports"
 ### Task 22: Fix pass and perf report
 
 **Tier:** Pro · **Owner:** Agent · **Lane:** — (after Tasks 20 and 21) · **Gate:** — · **ADRs:** 0001, 0007
-**Skills:** `accessibility-auditor`, `core-web-vitals`, `web3d-performance-budget`, `verification-before-completion`, `ponytail`, `diagnosing-bugs`
+**Skills:** `accessibility-auditor`, `core-web-vitals`, `web-performance-optimization`, `debug-optimize-lcp`, `web3d-performance-budget`, `verification-before-completion`, `ponytail`, `diagnosing-bugs`
 
 **Files:**
 - Modify: whichever components the findings name; `scripts/export-frames.mjs` `TIERS` if frame weight is the problem

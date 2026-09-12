@@ -4,10 +4,10 @@
 Accepted — 2026-09-12
 
 ## Context
-This build runs on 41 pinned skills from twelve sources (superpowers,
+This build runs on 49 pinned skills from twelve sources (superpowers,
 Scrapling, ui-ux-pro-max, anthropics, vercel-labs, ponytail, task-observer,
 web3d-skills, taste-skill, mattpocock/skills, garden-skills, plus
-Antigravity globals). They overlap and
+twenty Antigravity globals). They overlap and
 sometimes contradict each other and the spec. For example, taste-skill's
 `design-taste-frontend` defaults to React/Next.js and Tailwind v4, while
 ADR-0007 fixes Astro and plain CSS.

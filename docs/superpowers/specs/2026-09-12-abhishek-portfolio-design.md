@@ -180,7 +180,7 @@ Skill names below were checked against each repo's `skills/` folder on
 | Local path | Skills |
 |------------|--------|
 | `~/projects/3d-design/web3d-skills/` (each folder's single top-level `*.md` is renamed to `SKILL.md` on copy) | `web3d-art-direction`, `web3d-motion-choreography`, `web3d-interaction-ux`, `web3d-performance-budget`, `web3d-ship-deploy` |
-| `~/.gemini/config/skills/` (Antigravity global on this machine) | `astro`, `scroll-experience`, `premium-web-design`, `design-system`, `modern-web-guidance`, `seo`, `schema-markup`, `core-web-vitals`, `accessibility-auditor`, `copywriting`, `humanizer`, `architecture-decision-records` |
+| `~/.gemini/config/skills/` (Antigravity global on this machine) | `astro`, `scroll-experience`, `premium-web-design`, `design-system`, `modern-web-guidance`, `seo`, `schema-markup`, `core-web-vitals`, `accessibility-auditor`, `copywriting`, `humanizer`, `architecture-decision-records`, `zod-validation-expert`, `javascript-testing-patterns`, `python-testing-patterns`, `web-performance-optimization`, `debug-optimize-lcp`, `clean-code`, `a11y-debugging`, `seo-fundamentals` |
 
 **Fallback**: for a capability not listed, run `npx skills find <keyword>`
 and log the match as a task-observer `proposes_skill` observation; it is
