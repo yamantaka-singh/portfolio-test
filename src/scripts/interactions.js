@@ -116,7 +116,7 @@ export function initCursor() {
   cursor.className = 'custom-cursor';
   document.body.appendChild(cursor);
   
-  gsap.set(cursor, { opacity: 0 });
+  gsap.set(cursor, { opacity: 0, xPercent: -50, yPercent: -50 });
   
   const pos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
   const mouse = { x: pos.x, y: pos.y };

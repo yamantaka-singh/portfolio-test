@@ -3,7 +3,7 @@ import { Image } from 'astro:assets';
 import { social, thumb } from '../lib/social.js';
 import { compactCount, longDate } from '../lib/format.js';
 import { videoTag } from '../lib/video-tags.js';
-import { Play, Eye, Sparkles, Flame, Trophy, ExternalLink } from 'lucide-astro';
+import { Play, Eye, Sparkles, Flame, Trophy, ExternalLink, X } from 'lucide-astro';
 
 // Sort videos strictly by views descending to surface the most viral hits first
 const topVideos = [...social.videos]
@@ -31,13 +31,13 @@ const topVideos = [...social.videos]
   </header>
 
   <!-- Video Grid Matrix with Smooth Horizontal Carousel on Touch / Grid on Desktop -->
-  <div class="carousel-wrapper" data-lenis-prevent>
+  <div class="carousel-wrapper">
     <div class="video-grid" role="list">
       {topVideos.map((v, i) => (
         <article class="video-card tilt-card tilt-pop" role="listitem" data-cursor-text="PLAY">
           <div class="card-media">
             <a 
-              class="video-link magnetic" 
+              class="video-link" 
               href={`https://www.youtube.com/watch?v=${v.id}`} 
               data-yt={v.id} 
               data-title={v.title}
@@ -83,24 +83,88 @@ const topVideos = [...social.videos]
       ))}
     </div>
   </div>
+
+  <!-- Video Cinema Lightbox Modal -->
+  <dialog class="video-modal" id="video-modal" aria-label="Video Player">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-video-title">Matchday Intel</h3>
+        <button class="modal-close-btn" type="button" aria-label="Close video player" data-cursor-text="CLOSE">
+          <X class="icon-close" />
+        </button>
+      </div>
+      <div class="modal-media-frame" id="modal-iframe-slot">
+        <!-- YouTube iframe dynamically injected on open, removed on close -->
+      </div>
+    </div>
+  </dialog>
 </div>
 
 <script>
-  // Instant YouTube Player Injection
+  // High-Impact Video Lightbox Modal (prevents scroll lock and cursor trapping)
+  const modal = document.getElementById('video-modal') as HTMLDialogElement | null;
+  const iframeSlot = document.getElementById('modal-iframe-slot');
+  const modalTitle = document.getElementById('modal-video-title');
+  const closeBtn = modal?.querySelector('.modal-close-btn');
+
+  function openModal(ytId: string, title: string) {
+    if (!modal || !iframeSlot) return;
+    if (modalTitle) modalTitle.textContent = title;
+    iframeSlot.innerHTML = `<iframe 
+      src="https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&playsinline=1&rel=0" 
+      title="${title}" 
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
+      allowfullscreen 
+      class="player-embed modal-iframe"
+    ></iframe>`;
+
+    if (typeof modal.showModal === 'function') {
+      modal.showModal();
+    } else {
+      modal.setAttribute('open', '');
+    }
+    const lenis = (window as unknown as { __lenis?: { stop: () => void } }).__lenis;
+    if (lenis) lenis.stop();
+  }
+
+  function closeModal() {
+    if (!modal || !iframeSlot) return;
+    if (typeof modal.close === 'function') {
+      modal.close();
+    } else {
+      modal.removeAttribute('open');
+    }
+    iframeSlot.innerHTML = '';
+    const lenis = (window as unknown as { __lenis?: { start: () => void } }).__lenis;
+    if (lenis) lenis.start();
+  }
+
   document.querySelectorAll('a[data-yt]').forEach((link) => {
     link.addEventListener('click', (event) => {
       event.preventDefault();
       const ytId = (link as HTMLElement).dataset.yt;
       const title = (link as HTMLElement).dataset.title || 'YouTube video';
-      const iframe = document.createElement('iframe');
-      iframe.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&playsinline=1&rel=0`;
-      iframe.title = title;
-      iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
-      iframe.allowFullscreen = true;
-      iframe.className = 'player-embed';
-      link.parentElement?.replaceChild(iframe, link);
-      iframe.focus();
+      if (ytId) openModal(ytId, title);
     });
+  });
+
+  closeBtn?.addEventListener('click', closeModal);
+
+  modal?.addEventListener('click', (event) => {
+    if (event.target === modal) {
+      closeModal();
+    }
+  });
+
+  modal?.addEventListener('close', () => {
+    if (iframeSlot) iframeSlot.innerHTML = '';
+    const lenis = (window as unknown as { __lenis?: { start: () => void } }).__lenis;
+    if (lenis) lenis.start();
+  });
+
+  modal?.addEventListener('cancel', (event) => {
+    event.preventDefault();
+    closeModal();
   });
 </script>
 
@@ -383,11 +447,95 @@ const topVideos = [...social.videos]
     color: var(--color-neon);
   }
 
-  :global(.player-embed) {
+  /* Video Cinema Lightbox Modal */
+  .video-modal {
+    margin: auto;
+    padding: 0;
+    border: 1px solid var(--color-line-bright);
+    border-radius: 16px;
+    background: rgba(13, 16, 24, 0.96);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.9), 0 0 50px rgba(231, 111, 81, 0.25);
+    width: min(92vw, 56rem);
+    max-width: 56rem;
+    overflow: hidden;
+    color: var(--color-text);
+  }
+
+  .video-modal::backdrop {
+    background: rgba(7, 9, 14, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .modal-box {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-s) var(--space-m);
+    border-bottom: 1px solid var(--color-line);
+    gap: var(--space-s);
+  }
+
+  .modal-title {
+    font-family: var(--font-body);
+    font-size: var(--step-0);
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .modal-close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--color-line);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: all 0.2s var(--ease-out);
+    flex-shrink: 0;
+  }
+
+  .modal-close-btn:hover {
+    background: rgba(231, 111, 81, 0.2);
+    border-color: var(--color-neon);
+    color: var(--color-neon);
+    transform: scale(1.05);
+  }
+
+  .modal-media-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #000;
+  }
+
+  :global(.player-embed),
+  :global(.modal-iframe) {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     border: none;
-    border-radius: 8px;
+  }
+
+  .icon-close {
+    width: 1.25rem;
+    height: 1.25rem;
   }
 
   .icon-tiny {
