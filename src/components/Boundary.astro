@@ -9,12 +9,6 @@ const socials = [
   { url: site.profiles.linkedin, icon: Linkedin, handle: 'abhishek-pandey' },
 ];
 
-const collaborationPillars = [
-  { id: '01', title: 'Title Series Sponsorship', desc: 'Pre-roll and mid-roll integration across Spin & Swing YouTube deep-dives.' },
-  { id: '02', title: 'Pitchside Brand Activation', desc: 'On-ground brand features during IPL, DPL, and international matchdays.' },
-  { id: '03', title: 'Custom Tactical Breakdown', desc: 'Data-driven technical analysis tailored to your brand narrative.' },
-  { id: '04', title: 'Live Panels & Masterclasses', desc: 'Cricket analytics keynote, podcast appearances, and purist workshops.' },
-];
 ---
 <div class="boundary-container">
   <!-- Top Marquee Banner -->
@@ -78,21 +72,10 @@ const collaborationPillars = [
         THE BOUNDARY // PARTNERSHIPS &amp; ENQUIRIES
       </p>
       <h2 class="massive-headline reveal-text">LET'S BUILD SOMETHING ICONIC.</h2>
-      <p class="boundary-lede reveal-text">
-        Partner with India's premier technical cricket creator. We connect serious sports brands with passionate purists through high-impact, high-credibility storytelling.
-      </p>
+      <blockquote class="boundary-quote reveal-text">
+        "Cricket content works when it feels real. Get that right, and the brand partnership takes care of itself."
+      </blockquote>
     </header>
-
-    <!-- Commercial Services Grid -->
-    <div class="pillars-grid">
-      {collaborationPillars.map((p) => (
-        <div class="pillar-card tilt-card" data-cursor-text="PACKAGE">
-          <span class="pillar-num">{p.id}</span>
-          <h3 class="pillar-title">{p.title}</h3>
-          <p class="pillar-desc">{p.desc}</p>
-        </div>
-      ))}
-    </div>
 
     <!-- Action Center & Social Ledger -->
     <div class="action-grid">
@@ -193,59 +176,15 @@ const collaborationPillars = [
     word-break: break-word;
   }
 
-  .boundary-lede {
+  .boundary-quote {
     margin: 0;
-    font-size: var(--step-1);
-    color: var(--color-muted);
-    line-height: 1.5;
-  }
-
-  /* Commercial Pillars */
-  .pillars-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
-    gap: var(--space-m);
-    width: 100%;
-  }
-
-  .pillar-card {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-xs);
-    padding: var(--space-m);
-    background: var(--color-card);
-    border: 1px solid var(--color-line);
-    border-radius: 12px;
-    backdrop-filter: blur(12px);
-    transition: transform 0.3s var(--ease-out), border-color 0.3s var(--ease-out);
-  }
-
-  .pillar-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--color-neon);
-  }
-
-  .pillar-num {
-    font-family: var(--font-mono);
-    font-size: var(--step-0);
-    font-weight: 700;
-    color: var(--color-neon);
-  }
-
-  .pillar-title {
+    padding-left: var(--space-m);
+    border-left: 3px solid var(--color-neon);
     font-family: var(--font-body);
     font-size: var(--step-1);
-    font-weight: 700;
+    font-style: italic;
     color: var(--color-text);
-    text-transform: none;
-    letter-spacing: 0;
-  }
-
-  .pillar-desc {
-    margin: 0;
-    font-size: var(--step--1);
-    color: var(--color-muted);
-    line-height: 1.45;
+    line-height: 1.5;
   }
 
   /* Action Grid */
