@@ -38,7 +38,7 @@ const topPosts = [...social.posts]
   <div class="carousel-wrapper" data-lenis-prevent>
     <div class="reels-track" role="list">
       {topPosts.map((p, idx) => (
-        <div class="reel-card tilt-card" role="listitem" data-cursor-text="VIEW">
+        <div class="reel-card tilt-card tilt-pop" role="listitem" data-cursor-text="VIEW">
           <a
             class="reel-anchor"
             href={p.url}
@@ -212,9 +212,12 @@ const topPosts = [...social.posts]
   }
 
   .reel-card:hover {
-    transform: translateY(-4px);
+    position: relative;
+    z-index: 2;
     border-color: var(--color-blood);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 28px rgba(141, 8, 1, 0.45);
+    box-shadow: 0 24px 50px rgba(0, 0, 0, 0.75), 0 0 32px rgba(141, 8, 1, 0.5);
+    /* transform (the actual "pop out" scale) is driven by initTiltCards()'s
+       GSAP tween on this .tilt-pop card, not CSS -- see interactions.js */
   }
 
   .reel-anchor {
@@ -242,7 +245,6 @@ const topPosts = [...social.posts]
   }
 
   .reel-card:hover .reel-thumb {
-    transform: scale(1.1);
     filter: contrast(1.15) brightness(1.02);
   }
 

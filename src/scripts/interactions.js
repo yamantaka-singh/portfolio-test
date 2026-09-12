@@ -58,9 +58,19 @@ export function initTiltCards() {
 
   cards.forEach((card) => {
     let bounds = null;
+    // GSAP writes rotationX/Y into the element's inline `transform`, which
+    // always beats a CSS `:hover { transform: scale(...) }` rule on the same
+    // property (inline style wins regardless of selector specificity) --
+    // .tilt-pop cards fold their "pop out" scale into this same tween
+    // instead of fighting it from CSS, so it's the one thing driving transform.
+    const pop = card.classList.contains('tilt-pop') ? 1.06 : 1;
+    const y0 = pop > 1 ? -6 : 0;
 
     card.addEventListener('mouseenter', () => {
       bounds = card.getBoundingClientRect();
+      if (pop > 1) {
+        gsap.to(card, { y: y0, scale: pop, duration: 0.3, ease: 'power2.out', overwrite: 'auto' });
+      }
     });
 
     card.addEventListener('mousemove', (e) => {
@@ -72,6 +82,8 @@ export function initTiltCards() {
         rotationY: x * 10,
         rotationX: -y * 10,
         transformPerspective: 1000,
+        y: y0,
+        scale: pop,
         duration: 0.35,
         ease: 'power2.out',
         overwrite: 'auto',
@@ -83,6 +95,8 @@ export function initTiltCards() {
       gsap.to(card, {
         rotationY: 0,
         rotationX: 0,
+        y: 0,
+        scale: 1,
         duration: 0.6,
         ease: 'power3.out',
         overwrite: 'auto',

@@ -1,19 +1,20 @@
 """Pure parsers for public Instagram, YouTube and LinkedIn pages. No network here."""
 import re
-import xml.etree.ElementTree as ET
+from html import unescape
 
 _SUFFIX = {"": 1, "K": 1_000, "M": 1_000_000, "B": 1_000_000_000}
+_WORD_SCALE = {"thousand": "K", "million": "M", "billion": "B"}
 _NUM = r"[\d.,]+[KMB]?"
+_SHORTS_ITEM = re.compile(r'"entityId":"shorts-shelf-item-([\w-]{11})"[^}]*?"accessibilityText":"(.*?)(?<!\\)"')
+# The separator between "views" and "play Short" is a plain hyphen on the page's
+# own initial render but an en dash ("–") on the "Popular" sort's continuation
+# response -- \D* (any non-digits) bridges either without caring which.
+_SHORTS_VIEWS = re.compile(r"^.*,\s*([\d.,]+)\s*(thousand|million|billion)?\s*views?\D*play Short$")
 _POST_URL = re.compile(r"instagram\.com/(p|reel)/([A-Za-z0-9_-]{8,})")
 _POST_META = re.compile(
     rf"^(?:({_NUM}) likes?, )?(?:{_NUM} comments?\s*-\s*)?(\S+) on [A-Z][a-z]+ \d{{1,2}}, \d{{4}}:\s*\"?(.*?)\"?\s*$",
     re.S,
 )
-_FEED_NS = {
-    "a": "http://www.w3.org/2005/Atom",
-    "yt": "http://www.youtube.com/xml/schemas/2015",
-    "media": "http://search.yahoo.com/mrss/",
-}
 
 
 def parse_count(text):
@@ -61,17 +62,76 @@ def parse_youtube_channel(html, handle):
     }
 
 
-def parse_youtube_feed(xml):
-    videos = []
-    for entry in ET.fromstring(xml).findall("a:entry", _FEED_NS):
-        stats = entry.find("media:group/media:community/media:statistics", _FEED_NS)
-        videos.append({
-            "id": entry.findtext("yt:videoId", namespaces=_FEED_NS),
-            "title": entry.findtext("a:title", namespaces=_FEED_NS),
-            "publishedAt": entry.findtext("a:published", namespaces=_FEED_NS),
-            "views": int(stats.get("views")) if stats is not None else None,
-        })
-    return videos
+def parse_youtube_videos_page(html):
+    """[{id, views}] from a channel's /videos listing, in whatever order YouTube served it.
+
+    YouTube's legacy "?sort=p" popularity param no longer sorts anything on the current
+    (lockupViewModel-based) channel page -- verified live: it still returns latest-first.
+    So this returns the page's own order; the caller sorts by "views" itself.
+    """
+    seen, out = set(), []
+    for chunk in html.split('"richItemRenderer"')[1:]:
+        vid_m = re.search(r'"videoId":"([\w-]{11})"', chunk)
+        views_m = re.search(r'"content":"([\d,.]+[KMB]?) views?"', chunk)
+        if not (vid_m and views_m) or vid_m.group(1) in seen:
+            continue
+        seen.add(vid_m.group(1))
+        out.append({"id": vid_m.group(1), "views": parse_count(views_m.group(1))})
+    return out
+
+
+def parse_youtube_shorts_page(html):
+    """[{id, views}] from a channel's /shorts listing.
+
+    Shorts never appear on the /videos listing at all -- a separate tab with its own
+    renderer (shortsLockupViewModel) whose view count only exists as prose inside an
+    accessibility-text string ("<title>, 1.4 thousand views - play Short"), spelled out
+    in words ("thousand"/"million") rather than the "N views" form /videos uses.
+    """
+    out = []
+    for vid, text in dict(_SHORTS_ITEM.findall(html)).items():
+        m = _SHORTS_VIEWS.match(text)
+        if not m:
+            continue
+        qty, scale = m.groups()
+        out.append({"id": vid, "views": parse_count(qty + _WORD_SCALE.get(scale, ""))})
+    return out
+
+
+def parse_youtube_shorts_popular_request(html):
+    """What's needed to fetch the Shorts tab's "Popular" sort: the innertube API
+    key + client version (from the page's ytcfg) and the "Popular" chip's own
+    continuation token.
+
+    The chip bar (Latest / Popular / Oldest) and every chip's token are already
+    present in the page's initial, un-clicked render -- sorting by popularity is
+    a client-side action that POSTs this token to /youtubei/v1/browse, it doesn't
+    need a real click. Confirmed live: this is a completely different, far higher-
+    viewed pool than what the page shows by default (Latest) or what /videos ever
+    surfaces -- spinandswing26's top Short here is 18M views vs. 12K on /videos.
+    Returns None if any piece is missing (layout change, no Shorts tab, etc.) so
+    the caller can fall back to the plain (recency-ordered) /shorts page instead.
+    """
+    api_key = re.search(r'"INNERTUBE_API_KEY":"([^"]+)"', html)
+    version = re.search(r'"INNERTUBE_CONTEXT_CLIENT_VERSION":"([^"]+)"', html)
+    i = html.find('"text":"Popular"')
+    token = re.search(r'"token":"([^"]+)"', html[i:i + 700]) if i != -1 else None
+    if not (api_key and version and token):
+        return None
+    return {"apiKey": api_key.group(1), "clientVersion": version.group(1), "token": token.group(1)}
+
+
+def parse_youtube_watch_page(html):
+    """Exact title/views/publish date for one video, read from its own watch page."""
+    title_m = re.search(r'<meta property="og:title" content="([^"]*)"', html)
+    views_m = re.search(r'"viewCount":"(\d+)"', html)
+    date_m = re.search(r'itemprop="datePublished" content="([^"]+)"', html)
+    return {
+        # og:title is an HTML attribute value, so "&" arrives as "&amp;" -- unescape it.
+        "title": unescape(title_m.group(1)) if title_m else None,
+        "views": int(views_m.group(1)) if views_m else None,
+        "publishedAt": date_m.group(1) if date_m else None,
+    }
 
 
 def parse_linkedin(og_title):

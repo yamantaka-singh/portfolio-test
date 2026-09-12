@@ -23,8 +23,17 @@ LINKEDIN = "abhishek-pandey-26sep03"
 
 
 def get(url, **kw):
-    time.sleep(2)  # ponytail: fixed politeness delay; ~30 requests total, no need for a rate limiter
+    time.sleep(2)  # ponytail: fixed politeness delay; ~45 requests total, no need for a rate limiter
     page = Fetcher.get(url, impersonate="chrome", stealthy_headers=True, timeout=30, **kw)
+    if page.status != 200:
+        raise RuntimeError(f"HTTP {page.status} for {url}")
+    return page
+
+
+def post_json(url, body, **kw):
+    time.sleep(2)  # ponytail: same politeness delay as get()
+    page = Fetcher.post(url, data=json.dumps(body), headers={"Content-Type": "application/json"},
+                         impersonate="chrome", stealthy_headers=True, timeout=30, **kw)
     if page.status != 200:
         raise RuntimeError(f"HTTP {page.status} for {url}")
     return page
@@ -91,7 +100,25 @@ def youtube_thumb(video_id):
     return None
 
 
-def scrape_youtube(featured):
+def scrape_youtube(featured, pool_size=8):
+    """Ranks by real view count, not upload recency.
+
+    The RSS feed used here previously only ever returns a channel's ~15 most recent
+    uploads, so an older video with far more views than anything recent was structurally
+    invisible to it -- not a parsing bug, a coverage gap. Fixed by reading the channel's
+    /videos AND /shorts listings instead (both render an approximate view count per item
+    already), sorting the combined pool ourselves (YouTube's own "?sort=p" no longer sorts
+    anything server-side on the current /videos page -- verified live), and then fetching
+    each of the top candidates' own watch page for its exact view count and publish date.
+
+    Shorts turned out to matter a lot more than the plain /shorts tab shows: it renders
+    "Latest" order by default, capped at recent uploads' modest view counts (spinandswing26
+    tops out around 235K there). Its "Popular" sort is a client-side action -- clicking the
+    chip POSTs a continuation token to /youtubei/v1/browse -- but that token already exists
+    in the page's own initial render, so this replicates the click as a direct request rather
+    than needing a real browser. Confirmed live: this surfaces an 18M-view Short on the same
+    channel that neither /videos nor the plain /shorts page has any way to find.
+    """
     profiles, videos = [], []
     for handle in YT_CHANNELS:
         url = f"https://www.youtube.com/@{handle}"
@@ -102,12 +129,38 @@ def scrape_youtube(featured):
             row["followers"] = info["followers"]
             if not info["channelId"]:
                 raise RuntimeError(f"no channel id on {url}")
-            feed = get(f"https://www.youtube.com/feeds/videos.xml?channel_id={info['channelId']}")
-            for v in parse.parse_youtube_feed(feed.body):
-                thumb = youtube_thumb(v["id"])
-                if thumb:
-                    videos.append({"platform": "youtube", "channel": handle, **v,
-                                   "thumb": thumb, "featured": v["id"] in featured})
+            listing = get(f"https://www.youtube.com/channel/{info['channelId']}/videos")
+            shorts_page = get(f"https://www.youtube.com/channel/{info['channelId']}/shorts")
+            shorts_html = shorts_page.body.decode("utf-8", "ignore")
+            shorts_candidates = parse.parse_youtube_shorts_page(shorts_html)  # fallback: recency order
+            req = parse.parse_youtube_shorts_popular_request(shorts_html)
+            if req:
+                try:
+                    popular = post_json(
+                        f"https://www.youtube.com/youtubei/v1/browse?prettyPrint=false&key={req['apiKey']}",
+                        {"context": {"client": {"clientName": "WEB", "clientVersion": req["clientVersion"]}},
+                         "continuation": req["token"]},
+                    )
+                    shorts_candidates = parse.parse_youtube_shorts_page(popular.body.decode("utf-8", "ignore"))
+                except Exception as err:
+                    print("WARN YT shorts-popular, falling back to /shorts recency order:", err)
+            candidates = {v["id"]: v for v in (
+                parse.parse_youtube_videos_page(listing.body.decode("utf-8", "ignore")) + shorts_candidates
+            )}.values()
+            candidates = sorted(candidates, key=lambda v: v["views"] or 0, reverse=True)
+            for c in candidates[:pool_size]:
+                try:
+                    watch = get(f"https://www.youtube.com/watch?v={c['id']}")
+                    detail = parse.parse_youtube_watch_page(watch.body.decode("utf-8", "ignore"))
+                    thumb = youtube_thumb(c["id"])
+                    if not thumb or detail["views"] is None:
+                        raise RuntimeError(f"incomplete detail for {c['id']}: {detail}, thumb={thumb}")
+                    videos.append({"platform": "youtube", "channel": handle, "id": c["id"],
+                                   "title": detail["title"], "publishedAt": detail["publishedAt"],
+                                   "views": detail["views"], "thumb": thumb,
+                                   "featured": c["id"] in featured})
+                except Exception as err:
+                    print("WARN YT video", err)
         except Exception as err:
             print("WARN YT", err)
         profiles.append(row)

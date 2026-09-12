@@ -8,22 +8,44 @@ YT_HTML = (
     '"content":"‎⁨@YouTubeBrasil⁩ • ⁨3.45M subscribers⁩"'
 )
 
-YT_FEED = """<?xml version="1.0" encoding="UTF-8"?>
-<feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/" xmlns="http://www.w3.org/2005/Atom">
- <title>YouTube</title>
- <entry>
-  <yt:videoId>DfECjUL9ZvU</yt:videoId>
-  <title>a creator award almost as beautiful as your art</title>
-  <published>2026-09-10T20:00:18+00:00</published>
-  <media:group>
-   <media:thumbnail url="https://i1.ytimg.com/vi/DfECjUL9ZvU/hqdefault.jpg" width="480" height="360"/>
-   <media:community>
-    <media:starRating count="1091" average="5.00" min="1" max="5"/>
-    <media:statistics views="147443"/>
-   </media:community>
-  </media:group>
- </entry>
-</feed>"""
+# Two richItemRenderer blocks, shaped like the current (lockupViewModel-based) channel
+# /videos page -- trimmed to just the fields the parser reads. Real pages repeat
+# "videoId" several times per block (thumbnail, watch command, add-to-queue, ...);
+# the second block's title text is deliberately absent from here to prove the parser
+# doesn't need it -- the real title comes from the watch page, not the listing.
+YT_VIDEOS_PAGE = (
+    '"richItemRenderer":{"content":{"lockupViewModel":{"contentImage":'
+    '{"thumbnailViewModel":{"image":{"sources":[{"url":"https://i.ytimg.com/vi/w2ry0G8wLW0/hq720.jpg"}]}}}}}},'
+    '"richItemRenderer":{"content":{"lockupViewModel":{"contentId":"bEwKiLsjEBg",'
+    '"metadata":{"lockupMetadataViewModel":{"metadata":{"contentMetadataViewModel":'
+    '{"metadataRows":[{"metadataParts":[{"text":{"content":"channel name"}}]},'
+    '{"metadataParts":[{"text":{"content":"240 views"}},{"text":{"content":"1 month ago"}}]}]}}}}}},'
+    '"videoId":"bEwKiLsjEBg"}}}'
+)
+
+YT_WATCH_PAGE = (
+    '<meta property="og:title" content="This Train Journey Turned Into a Nightmare">'
+    '"viewCount":"243",'
+    '<meta itemprop="datePublished" content="2026-08-10T09:00:00-07:00">'
+)
+
+# og:title is an HTML attribute value, so a literal "&" arrives HTML-escaped.
+YT_WATCH_PAGE_ESCAPED_TITLE = (
+    '<meta property="og:title" content="Guess the Player | Spin &amp; Swing">'
+    '"viewCount":"100",'
+    '<meta itemprop="datePublished" content="2026-05-28T09:00:00-07:00">'
+)
+
+# Shorts never appear on /videos -- separate tab, separate renderer. Its view count
+# is prose inside an accessibility-text string, not a "N views" short form.
+YT_SHORTS_PAGE = (
+    '{"shortsLockupViewModel":{"entityId":"shorts-shelf-item-aLzViKNysEQ",'
+    '"accessibilityText":"Guess the Squad of Indian team Pt - 2, 235 thousand views - play Short",'
+    'garbage},'
+    '{"shortsLockupViewModel":{"entityId":"shorts-shelf-item-U-Kw8RA5Dlw",'
+    '"accessibilityText":"What does DPL mean to you ?, 666 views - play Short",'
+    'garbage}'
+)
 
 
 class ParseCount(unittest.TestCase):
@@ -83,11 +105,61 @@ class YouTube(unittest.TestCase):
     def test_channel_page_missing_bits(self):
         self.assertEqual(parse.parse_youtube_channel("<html></html>", "x"), {"channelId": None, "followers": None})
 
-    def test_feed(self):
+    def test_videos_page_skips_blocks_with_no_videoid_and_parses_the_rest(self):
+        self.assertEqual(parse.parse_youtube_videos_page(YT_VIDEOS_PAGE), [{"id": "bEwKiLsjEBg", "views": 240}])
+
+    def test_videos_page_dedupes_repeated_videoid(self):
+        html = YT_VIDEOS_PAGE + YT_VIDEOS_PAGE
+        self.assertEqual(parse.parse_youtube_videos_page(html), [{"id": "bEwKiLsjEBg", "views": 240}])
+
+    def test_watch_page(self):
         self.assertEqual(
-            parse.parse_youtube_feed(YT_FEED),
-            [{"id": "DfECjUL9ZvU", "title": "a creator award almost as beautiful as your art",
-              "publishedAt": "2026-09-10T20:00:18+00:00", "views": 147443}],
+            parse.parse_youtube_watch_page(YT_WATCH_PAGE),
+            {"title": "This Train Journey Turned Into a Nightmare",
+             "views": 243, "publishedAt": "2026-08-10T09:00:00-07:00"},
+        )
+
+    def test_shorts_page_parses_word_scale_views(self):
+        self.assertEqual(
+            parse.parse_youtube_shorts_page(YT_SHORTS_PAGE),
+            [{"id": "aLzViKNysEQ", "views": 235_000}, {"id": "U-Kw8RA5Dlw", "views": 666}],
+        )
+
+    def test_shorts_page_tolerates_en_dash_separator(self):
+        # The "Popular" sort's continuation response uses "–" (en dash) here where the
+        # page's own initial render uses a plain hyphen -- both must parse the same way.
+        html = (
+            '{"shortsLockupViewModel":{"entityId":"shorts-shelf-item-DxgBGpUzZ08",'
+            '"accessibilityText":"Gt fan vs Mi fan, 18 million views – play Short",'
+            'garbage}}'
+        )
+        self.assertEqual(parse.parse_youtube_shorts_page(html), [{"id": "DxgBGpUzZ08", "views": 18_000_000}])
+
+    def test_shorts_popular_request_extracts_key_version_and_token(self):
+        html = (
+            '"INNERTUBE_API_KEY":"AIzaFake123",'
+            '"INNERTUBE_CONTEXT_CLIENT_VERSION":"2.20260911.01.00",'
+            '"text":"Latest","selected":false,"...":"...","token":"latest-token",'
+            '"text":"Popular","selected":false,"...":"...","token":"popular-token-abc"'
+        )
+        self.assertEqual(
+            parse.parse_youtube_shorts_popular_request(html),
+            {"apiKey": "AIzaFake123", "clientVersion": "2.20260911.01.00", "token": "popular-token-abc"},
+        )
+
+    def test_shorts_popular_request_missing_bits_is_none(self):
+        self.assertIsNone(parse.parse_youtube_shorts_popular_request("<html></html>"))
+
+    def test_watch_page_unescapes_html_entities_in_title(self):
+        self.assertEqual(
+            parse.parse_youtube_watch_page(YT_WATCH_PAGE_ESCAPED_TITLE)["title"],
+            "Guess the Player | Spin & Swing",
+        )
+
+    def test_watch_page_missing_bits(self):
+        self.assertEqual(
+            parse.parse_youtube_watch_page("<html></html>"),
+            {"title": None, "views": None, "publishedAt": None},
         )
 
 
