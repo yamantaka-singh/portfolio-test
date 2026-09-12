@@ -6,3 +6,5 @@ dist/
 scraper/.venv/
 __pycache__/
 assets/clips/
+.vercel
+.env*
