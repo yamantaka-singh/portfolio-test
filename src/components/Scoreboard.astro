@@ -1,0 +1,104 @@
+---
+import { social } from '../lib/social.js';
+import { scoreboardStats } from '../lib/stats.js';
+import { compactCount, longDate } from '../lib/format.js';
+
+const s = scoreboardStats(social);
+---
+<div class="board">
+  <header>
+    <p class="kicker">Scoreboard</p>
+    <h2>The numbers</h2>
+  </header>
+  <dl class="tiles">
+    <div class="tile big">
+      <dt>Total followers</dt>
+      <dd data-count={s.totalReach}>{compactCount(s.totalReach)}</dd>
+    </div>
+    <div class="tile big">
+      <dt>Views on recent videos</dt>
+      <dd data-count={s.totalViews}>{compactCount(s.totalViews)}</dd>
+    </div>
+    {s.accounts.map((a) => (
+      <div class="tile">
+        <dt><a href={a.url} target="_blank" rel="noopener">{a.label}</a></dt>
+        <dd data-count={a.value}>{compactCount(a.value)}</dd>
+      </div>
+    ))}
+  </dl>
+  <p class="asof">Public counts as of {longDate(s.asOf)}</p>
+</div>
+
+<script>
+  import { compactCount } from '../lib/format.js';
+
+  const counters = [...document.querySelectorAll('.board [data-count]')];
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches && counters.length) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const { isIntersecting, target } of entries) {
+          if (!isIntersecting) continue;
+          io.unobserve(target);
+          const end = Number(target.dataset.count);
+          const start = performance.now();
+          const tick = (now) => {
+            const p = Math.min(1, (now - start) / 1200);
+            target.textContent = compactCount(Math.round(end * (1 - (1 - p) ** 3)));
+            if (p < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        }
+      },
+      { threshold: 0.6 },
+    );
+    counters.forEach((el) => io.observe(el));
+  }
+</script>
+
+<style>
+  .board {
+    display: grid;
+    gap: var(--space-m);
+  }
+  .tiles {
+    margin: 0;
+    display: grid;
+    gap: 1px;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    background: var(--color-line);
+    border: 1px solid var(--color-line);
+  }
+  .tile {
+    display: grid;
+    gap: var(--space-xs);
+    align-content: start;
+    padding: var(--space-m);
+    background: color-mix(in oklab, var(--color-surface) 88%, transparent);
+  }
+  @media (min-width: 40rem) {
+    .big {
+      grid-column: span 2;
+    }
+  }
+  dt {
+    font-size: var(--step--1);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--step-4);
+    font-weight: 800;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-highlight);
+    text-shadow: 0 0 24px color-mix(in oklab, var(--color-highlight) 45%, transparent);
+  }
+  .asof {
+    margin: 0;
+    font-size: var(--step--1);
+    color: var(--color-muted);
+  }
+</style>
