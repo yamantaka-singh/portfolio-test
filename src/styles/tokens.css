@@ -15,6 +15,7 @@
   --color-crimson: #FF3344;    /* Live REC / Umpire crimson -- unchanged, not part of the 5-swatch set */
   --color-gold: #E9C46A;       /* Jasmine -- trophy/premium accent (was gold) */
   --color-sand: #F4A261;       /* Sandy Brown -- used sparingly: gradient stop + "not yet accredited" status */
+  --color-blood: #8D0801;      /* Oxblood -- too dark for text (2.06:1 on bg, fails AA); used only as a fill with light text, or a hover border/glow tint */
   --color-highlight: var(--color-neon);
   --color-accent: var(--color-crimson);
   --color-line: rgba(250, 250, 248, 0.12);
