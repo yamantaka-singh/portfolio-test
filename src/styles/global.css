@@ -157,7 +157,11 @@ img {
 /* Continuous Marquee Tickers */
 .marquee-ribbon {
   position: relative;
-  width: 100%;
+  width: 100vw;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
   overflow: hidden;
   white-space: nowrap;
   user-select: none;

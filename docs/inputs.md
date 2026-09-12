@@ -5,7 +5,7 @@ keeps the `scope` gate FAIL while any box is unticked.
 
 - [x] Consent: Abhishek agreed on 2026-09-12 to his public Instagram, YouTube and LinkedIn content being scraped and republished on this site.
 - [x] WhatsApp number, country code + digits only (e.g. 919812345678): 919876543210
-- [x] Enquiry email: connect@abhishekpandey.in
+- [x] Enquiry email: abhishekpandey4432@gmail.com
 - [x] Tagline, one line in his voice: Spin, Swing, and Everything Cricket — Raw analysis, untold match stories, and pure passion.
 - [x] Bio facts filled in below (3–6 bullets).
 - [x] 2–4 high-res photos of Abhishek that he owns the rights to are in `src/assets/photos/`, named by what's in them (e.g. `abhishek-batting-nets.jpg`) — the file name becomes the photo's alt text.

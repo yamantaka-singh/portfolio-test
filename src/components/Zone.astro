@@ -34,18 +34,18 @@ const { id, label, still, eager = false, position = 'center' } = Astro.props;
     width: 100%;
     overflow: hidden;
   }
-  .zone-still,
-  .zone-content,
-  .zone::after {
-    grid-area: 1 / 1;
-  }
   .zone-still {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    min-width: 0;
     filter: brightness(0.55) contrast(1.18) saturate(1.05);
   }
   .zone::after {
+    position: absolute;
+    inset: 0;
     content: '';
     z-index: 1;
     pointer-events: none;
@@ -54,6 +54,7 @@ const { id, label, still, eager = false, position = 'center' } = Astro.props;
       linear-gradient(to bottom, var(--color-bg) 0%, transparent 12%, transparent 85%, var(--color-bg) 100%);
   }
   .zone-content {
+    grid-area: 1 / 1;
     position: relative;
     z-index: 2;
     align-self: center;

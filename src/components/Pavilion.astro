@@ -1,8 +1,7 @@
 ---
 import { Image } from 'astro:assets';
-import { site } from '../data/site.js';
 import { Content as Story } from '../data/story.md';
-import { BookOpen, Award, Compass, Radio, Mic, Flame, CheckCircle2 } from 'lucide-astro';
+import { BookOpen, Award, Compass, Radio, Mic, Flame } from 'lucide-astro';
 import photoMic from '../assets/photos/abhishek-podcast-mic.jpg';
 import photoStands from '../assets/photos/abhishek-india-stands.jpg';
 import photoRail from '../assets/photos/abhishek-stadium-gt.jpg';
@@ -36,18 +35,6 @@ const inningsTimeline = [
         <h3 class="card-heading">The Philosophy</h3>
         <div class="story-text">
           <Story />
-        </div>
-
-        <div class="facts-block">
-          <h4 class="facts-title">Verified Creator Specs</h4>
-          <ul class="facts-list" role="list">
-            {site.bio.map((fact) => (
-              <li>
-                <CheckCircle2 class="fact-icon" />
-                <span>{fact}</span>
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
 
@@ -225,47 +212,6 @@ const inningsTimeline = [
     font-size: var(--step-0);
     line-height: 1.65;
     color: var(--color-text);
-  }
-
-  .facts-block {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-xs);
-    padding-top: var(--space-xs);
-    border-top: 1px solid var(--color-line);
-  }
-
-  .facts-title {
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    text-transform: uppercase;
-    color: var(--color-muted);
-    letter-spacing: 0.1em;
-  }
-
-  .facts-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-xs);
-  }
-
-  .facts-list li {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-xs);
-    font-size: var(--step-0);
-    color: var(--color-text);
-  }
-
-  .fact-icon {
-    width: 1.1rem;
-    height: 1.1rem;
-    color: var(--color-neon);
-    flex-shrink: 0;
-    margin-top: 0.2rem;
   }
 
   /* Timeline */

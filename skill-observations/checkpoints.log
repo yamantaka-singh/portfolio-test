@@ -6,3 +6,9 @@
 2026-09-12 session-start scan: files=1 parsed=1
 2026-09-12 session-start scan: files=1 parsed=1
 2026-09-12 checkpoint (responsive and content fitting refactor complete): no observations
+2026-09-13 session-start scan: files=3 parsed=3
+2026-09-13 session-start scan: files=3 parsed=3
+2026-09-13 checkpoint: verified layout, marquees, email, hero and pavilion fixes
+2026-09-13 session-start scan: files=3 parsed=3
+2026-09-13 checkpoint: verified full-bleed viewport-width marquees across all screen sizes
+2026-09-13 session-start scan: files=3 parsed=3

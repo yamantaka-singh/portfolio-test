@@ -1,7 +1,7 @@
 export const site = {
   name: 'Abhishek Pandey',
   tagline: 'Spin, Swing, and Everything Cricket — Raw analysis, untold match stories, and pure passion.',
-  email: 'connect@abhishekpandey.in',
+  email: 'abhishekpandey4432@gmail.com',
   enquirySubject: 'Brand collaboration enquiry',
   bio: [
     'Host & creator of Spin & Swing and Abhishek Unseen, breaking down cricket from grassroots to international clashes.',
