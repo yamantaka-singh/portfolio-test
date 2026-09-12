@@ -2,6 +2,7 @@
 import '@fontsource-variable/big-shoulders-display';
 import '@fontsource-variable/hanken-grotesk';
 import '../styles/global.css';
+import Analytics from '@vercel/analytics/astro';
 
 interface Props {
   title: string;
@@ -17,6 +18,7 @@ const { title, description } = Astro.props;
     <title>{title}</title>
     <meta name="description" content={description} />
     <slot name="head" />
+    <Analytics />
   </head>
   <body>
     <slot />
