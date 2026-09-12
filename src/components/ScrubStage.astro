@@ -1,0 +1,30 @@
+---
+import frames from '../data/frames.json';
+---
+<canvas id="scrub" aria-hidden="true" data-frames={JSON.stringify(frames.transitions)}></canvas>
+
+<script>
+  import { initScrub } from '../scripts/scrub.js';
+  initScrub(document.querySelector('#scrub'));
+</script>
+
+<style>
+  #scrub {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100dvh;
+    display: none;
+    z-index: 0;
+    pointer-events: none;
+  }
+  :global(html.scrub-on) #scrub {
+    display: block;
+  }
+  /* ponytail: minimal reset until Task 11 moves it into global.css */
+  :global(body) {
+    margin: 0;
+    background: #0e1f17;
+    color: #f4f1e6;
+  }
+</style>

@@ -1,6 +1,25 @@
 ---
 import Base from '../layouts/Base.astro';
+import ScrubStage from '../components/ScrubStage.astro';
+import Zone from '../components/Zone.astro';
+import { ZONES, still } from '../lib/keyframes.js';
+
+const LABELS = {
+  tunnel: 'Intro',
+  pitch: 'The Pitch',
+  scoreboard: 'Scoreboard',
+  stands: 'The Stands',
+  pavilion: 'Pavilion',
+  boundary: 'Boundary Rope',
+};
 ---
 <Base title="Abhishek Pandey — Cricket Content Creator" description="Cricket content by Abhishek Pandey.">
-  <h1>Abhishek Pandey</h1>
+  <ScrubStage />
+  <main>
+    {ZONES.map((id, n) => (
+      <Zone id={id} label={LABELS[id]} still={still(n)} eager={n === 0}>
+        {n === 0 ? <h1>Abhishek Pandey</h1> : <h2>{LABELS[id]}</h2>}
+      </Zone>
+    ))}
+  </main>
 </Base>
