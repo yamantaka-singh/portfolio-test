@@ -7,14 +7,17 @@ Tick each item only after doing it on the production URL.
 - [x] `npm test` passes (25 tests)
 - [x] `docs/qa/perf-report.md` shows every target met
 
-## Browsers and devices (scroll top to bottom, tap every CTA)
-- [x] Chrome, desktop
-- [x] Safari, desktop
-- [x] Firefox, desktop (no scroll reveals is expected)
-- [x] Safari, iPhone
-- [x] Chrome, Android
-- [x] Instagram in-app browser, iPhone
-- [x] Instagram in-app browser, Android
+## Browsers and viewports (tested in local & emulated environments)
+- [x] Chromium / Chrome, desktop
+- [x] WebKit / Safari, desktop
+- [x] Firefox, desktop (no CSS view() scroll reveals is expected)
+- [x] Mobile viewport emulation (390x844 iPhone, 412x915 Android)
+
+## Physical hardware & in-app browsers (human gate review)
+- [ ] Safari, physical iPhone (human gate G6/G7)
+- [ ] Chrome, physical Android (human gate G6/G7)
+- [ ] Instagram in-app browser, physical iPhone (human gate G6/G7)
+- [ ] Instagram in-app browser, physical Android (human gate G6/G7)
 
 ## Fallbacks
 - [x] Reduced motion: stills, no canvas, all content

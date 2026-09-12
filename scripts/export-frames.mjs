@@ -20,7 +20,6 @@ function placeholderFrame(id, i, count) {
   const hue = TRANSITIONS.indexOf(id) * 60;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080">
     <rect width="100%" height="100%" fill="hsl(${hue}, 45%, ${15 + Math.round((i / count) * 35)}%)"/>
-    <text x="50%" y="50%" font-size="120" font-family="sans-serif" fill="#fff" text-anchor="middle" dominant-baseline="middle">${id} ${i + 1}/${count}</text>
   </svg>`;
   return sharp(Buffer.from(svg)).png().toBuffer();
 }

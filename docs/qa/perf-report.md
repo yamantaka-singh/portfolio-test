@@ -17,5 +17,6 @@
 ## Frame budget in use
 desktop: 60 frames @ 1600px q50 · mobile: 30 frames @ 720px q45
 
-## Real-device check
-Simulated Fast 4G / Desktop & Mobile: smooth 60fps scrubbing with 2-transition sliding preload buffer
+## Audit and Testing Environment
+- **Headless / Simulated Testing**: Evaluated via Lighthouse mobile audit and Chromium viewport simulation (Simulated Fast 4G, 4x CPU slowdown). Smooth 60fps scrubbing verified with 2-transition sliding preload buffer on emulated desktop and mobile viewports.
+- **Physical Device Disclosure**: Physical iPhone Safari, Android Chrome, and Instagram in-app browser manual checks require hands-on validation on physical hardware. The automated environment tests viewport emulation and does not claim unperformed physical hardware testing.

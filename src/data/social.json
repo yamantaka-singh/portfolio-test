@@ -370,7 +370,7 @@
       "likes": null,
       "isReel": false,
       "thumb": "ig-Dak8ZlsAVmz.jpg",
-      "featured": true
+      "featured": false
     },
     {
       "platform": "instagram",
@@ -403,7 +403,7 @@
       "likes": null,
       "isReel": false,
       "thumb": "ig-Dc-ffG4gfHl.jpg",
-      "featured": false
+      "featured": true
     },
     {
       "platform": "instagram",

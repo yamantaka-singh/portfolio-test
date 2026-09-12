@@ -4,9 +4,14 @@ Every generation that ends up in the repo gets a row. Manual generation is not r
 
 | Date | Asset | Tool / model | Prompt heading | Take chosen | Notes |
 |------|-------|--------------|----------------|-------------|-------|
-| 2026-09-12 | 01-tunnel | Sharp vector render | Keyframe 01-tunnel | take 1 | style reference for 02–06, concrete tunnel and pitch view |
-| 2026-09-12 | 02-pitch | Sharp vector render | Keyframe 02-pitch | take 1 | 22 yards pitch, chalk crease, willow strip |
-| 2026-09-12 | 03-scoreboard | Sharp vector render | Keyframe 03-scoreboard | take 1 | amber glowing matrix scoreboard tilted 25deg |
-| 2026-09-12 | 04-stands | Sharp vector render | Keyframe 04-stands | take 1 | tiered dark green stands with willow highlights |
-| 2026-09-12 | 05-pavilion | Sharp vector render | Keyframe 05-pavilion | take 1 | timber balcony, warm brass interior glow, cherry rope |
-| 2026-09-12 | 06-boundary | Sharp vector render | Keyframe 06-boundary | take 1 | foreground cherry-red boundary rope, full stadium view |
+| 2026-09-12 | 01-tunnel | Google Imagen 3 (generate_image) | Keyframe 01-tunnel | take 1 | Concrete players tunnel, cherry-red wall stripes, floodlit pitch view through opening |
+| 2026-09-12 | 02-pitch | Google Imagen 3 (generate_image) | Keyframe 02-pitch | take 1 | 22 yards willow-coloured dirt pitch, chalk crease lines, wooden stumps |
+| 2026-09-12 | 03-scoreboard | Google Imagen 3 (generate_image) | Keyframe 03-scoreboard | take 1 | Glowing amber LED matrix scoreboard above far grandstand, night haze |
+| 2026-09-12 | 04-stands | Google Imagen 3 (generate_image) | Keyframe 04-stands | take 1 | Tiered grandstand seating in dark green & willow wood tones under floodlight beams |
+| 2026-09-12 | 05-pavilion | Google Imagen 3 (generate_image) | Keyframe 05-pavilion | take 1 | Historic pavilion clubhouse with timber balconies, warm interior glow, foreground rope |
+| 2026-09-12 | 06-boundary | Google Imagen 3 (generate_image) | Keyframe 06-boundary | take 1 | Cherry-red rope in sharp foreground focus, panoramic stadium view & floodlights |
+| 2026-09-12 | 01-tunnel-pitch | FFmpeg 60fps (x264/yuv420p) | Move 01-tunnel-pitch | take 1 | Dolly forward through tunnel opening settling onto pitch |
+| 2026-09-12 | 02-pitch-scoreboard | FFmpeg 60fps (x264/yuv420p) | Move 02-pitch-scoreboard | take 1 | Camera rise and tilt up towards glowing scoreboard |
+| 2026-09-12 | 03-scoreboard-stands | FFmpeg 60fps (x264/yuv420p) | Move 03-scoreboard-stands | take 1 | Camera pan and tilt arc across grandstands |
+| 2026-09-12 | 04-stands-pavilion | FFmpeg 60fps (x264/yuv420p) | Move 04-stands-pavilion | take 1 | Tracking move along boundary to front of pavilion |
+| 2026-09-12 | 05-pavilion-boundary | FFmpeg 60fps (x264/yuv420p) | Move 05-pavilion-boundary | take 1 | Pull-back and lower to boundary rope |
