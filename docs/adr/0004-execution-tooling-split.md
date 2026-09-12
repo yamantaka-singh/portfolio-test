@@ -1,46 +1,76 @@
-# ADR-0004: Planning in Claude Code, execution in Gemini Antigravity
+# ADR-0004: Claude plans, Antigravity executes; parallel lanes between human gates; pinned skills with web fallback
 
 ## Status
-Accepted — 2026-09-12
+Accepted — 2026-09-12. Revises the earlier draft of this ADR.
 
 ## Context
-The user is using Claude Code for brainstorming and planning (this spec, the
-ADRs, and the phased implementation plan) but intends to execute the actual
-build with Gemini Antigravity, a separate agentic coding environment that
-supports MCP tools and skill-style invocation.
+Claude Code produces the spec, ADRs and implementation plan. Gemini
+Antigravity executes. Antigravity supports skills and MCP. On this machine it
+already has ~500 global skills in `~/.gemini/config/skills` plus the `motion`
+and `comfy-mcp` MCP servers.
+
+The user wants:
+- local skills named in the plan
+- the executing agent able to pull missing skills from the web
+- a model tier per task
+- **parallel agents for any task that doesn't need their confirmation**
 
 ## Decision
-This repo's planning artifacts (spec, ADRs, phased plan) are written to be
-tool-agnostic where they describe *what* to build, but explicitly name
-capabilities and — where a matching one exists — local skills for *how* to
-build it, per phase. Each phase in the spec states:
-- the capability needed (e.g. "3D scroll-driven camera work", "web
-  scraping", "image generation")
-- a local skill name if one matches
-- an explicit instruction that if the executing agent (Gemini Antigravity)
-  has no matching local skill or MCP tool, it should search the web or an
-  MCP/skill registry for an equivalent before building the capability from
-  scratch
+### Model routing
+Every plan task carries a tier label. The user maps each label to the
+matching model in Antigravity's picker. "Gemini 3.8 Flash High" is not a
+model name that could be verified from here.
 
-This keeps the plan usable by Gemini Antigravity without assuming it shares
-Claude Code's specific skill catalog, while still giving it concrete
-starting points rather than only abstract requirements.
+| Tier | Used for |
+|------|----------|
+| **Pro** | Style bible and camera path, scroll-scrub engine and frame loading, design system, performance work |
+| **Flash** | Scaffold, scraper, section components, SEO, accessibility fixes, frame export, deploy |
+
+### Agent flow
+- Each task runs in a **fresh agent** that gets the spec, the relevant ADRs
+  and only its own task.
+- Tasks with no human gate between them run **in parallel**, each in its own
+  git worktree, and merge when done.
+- Anything touching a **shared file** is done by one integration agent, never
+  in parallel. Shared files are the design tokens, the scroll timeline, and
+  the page that composes the sections.
+- Human gates:
+  - consent and inputs
+  - style lock
+  - keyframes
+  - data curation
+  - design tokens
+  - transition takes
+  - integrated page review
+  - launch
+- Every gate is reviewed on a Vercel preview URL (ADR-0005), and nothing past
+  a gate starts until the user approves it.
+
+### Skills
+- **Pinned into the repo.** Phase 0 runs `scripts/install-skills.sh`, which
+  installs the plan's skills into the project's `.agents/skills/` using
+  `npx skills add <source> --skill <name> -a antigravity -y`. Skills without
+  a public source are copied from local disk.
+- **Web fallback.** If a task needs a capability no installed skill covers,
+  the agent runs `npx skills find <keyword>` and installs the best match. It
+  adds that line to `install-skills.sh` in the same commit, so the next
+  machine gets it too.
+- Global Antigravity skills already on this machine may be used directly, but
+  anything the plan depends on must be pinned in the repo.
 
 ## Alternatives Considered
-- **Write the plan purely in Claude-Skill terms**: rejected — Gemini
-  Antigravity is a different environment; a plan that only makes sense in
-  Claude Code's skill vocabulary would need translation before use.
-- **Write the plan with zero tool/skill references, purely descriptive**:
-  rejected — the user explicitly wants both local skills named *and* a
-  mechanism for the executing agent to source ones it's missing from the
-  web; a purely descriptive plan discards useful, already-known starting
-  points.
+- **Fully sequential, one agent per section**: simpler, but it idles agents
+  while the user runs the manual art lane, and the user explicitly asked for
+  parallelism.
+- **One long-running agent**: its context bloats by later phases.
+- **Global skills only**: a fresh machine or teammate silently gets a
+  different skill set.
+- **Ad-hoc web search with no pinning**: not reproducible.
 
 ## Consequences
-- The phased plan (produced next, via the writing-plans skill) must
-  consistently apply this pattern: capability → local skill (if any) → web/
-  MCP fallback instruction, for every phase.
-- If Gemini Antigravity's actual skill/MCP catalog differs significantly
-  from what's assumed here, some named local skills will simply not exist
-  in that environment — the fallback instruction is what makes the plan
-  still executable in that case, not an optional nicety.
+- Worktree merges add some overhead. It stays cheap only because shared files
+  have a single owner.
+- `.agents/skills/` is committed, so skill updates are explicit diffs
+  (`npx skills update`), not silent drift.
+- Plan tasks must state their inputs, outputs, gate and tier explicitly,
+  because each agent starts with no memory of earlier ones.

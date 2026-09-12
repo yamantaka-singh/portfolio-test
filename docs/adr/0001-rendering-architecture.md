@@ -1,40 +1,50 @@
-# ADR-0001: Hybrid rendering — 3D hero + 2.5D layered scroll
+# ADR-0001: Scroll-scrubbed stadium video (image sequence on one canvas) + DOM sections
 
 ## Status
-Accepted — 2026-09-12
+Accepted — 2026-09-12. Replaces the earlier draft of this ADR (hybrid R3F 3D
+hero + 2.5D parallax), which was never built. Real-time 3D was dropped during
+the second grilling round.
 
 ## Context
-The site's concept is a scroll journey through a cricket stadium (tunnel →
-pitch → scoreboard → stands → pavilion → boundary rope). It needs to feel
-like an Awwwards-tier immersive experience while staying "very optimised"
-(explicit user requirement) and shippable by a single execution pass.
+The concept is a scroll journey through a cricket stadium across six zones
+(ADR-0006). The user dropped real-time 3D ("stick to the video of the 3D
+stadium"). Most traffic arrives from Instagram/YouTube bio links, i.e. phones
+inside in-app browsers, so weight and smoothness on mid-range phones decide
+whether the concept lands at all.
 
 ## Decision
-Use a **hybrid** rendering approach:
-- The hero section (tunnel-to-bowl entrance) is a real React Three Fiber 3D
-  scene, dynamically imported and rendered client-side only.
-- All five remaining sections are DOM + CSS transforms, animated with GSAP
-  ScrollTrigger and Lenis smooth scroll — layered 2D art (from ADR-0002)
-  creates parallax depth, not a real 3D scene.
-- Low-end devices and `prefers-reduced-motion` disable the R3F hero entirely
-  in favor of a static poster or looping video.
+- The stadium flythrough is a pre-made video (ADR-0002), exported as an
+  **image sequence** and drawn to a **single `<canvas>`** fixed behind the
+  page. GSAP ScrollTrigger maps scroll position to frame index (`scrub`), so
+  scrolling moves the camera forward and back.
+- All text, stats, thumbnails and CTAs are **real DOM** layered over the
+  canvas: crawlable, accessible, selectable.
+- **Frames load per zone**: only the current zone's sequence plus the next
+  one's are fetched. Starting budgets (tune on a real device):
+  - desktop: ~60 frames/transition, 1600px wide, AVIF, ~40KB each
+  - mobile: ~30 frames/transition, 720px wide, AVIF, ~15KB each
+- **Fallbacks** reuse the six approved keyframe stills (ADR-0002) as static
+  section backgrounds:
+  - `prefers-reduced-motion`
+  - no JS
+  - frame load failure
+- **LCP**: the first keyframe still ships as `<img fetchpriority="high">` and
+  the canvas takes over once frames are ready.
 
 ## Alternatives Considered
-- **Full 3D throughout**: most literal "walk through a stadium," but a full
-  3D stadium scene across every section multiplies asset budget, draw calls,
-  and mobile GPU risk — directly conflicts with the "very optimised"
-  requirement and with using AI-generated 2D art as the primary asset
-  source.
-- **2.5D only, no 3D at all**: safest for performance, cheapest to build, but
-  drops the one moment (the tunnel walk-out) most likely to read as
-  genuinely immersive rather than "a nice parallax site."
+- **Real-time R3F 3D stadium** (previous draft): rejected by the user. It
+  needed a 3D model, shader work and device tiering.
+- **Single `<video>` with `currentTime` scrubbing**: smaller download (one
+  MP4), but seeking stutters on iOS Safari and in-app browsers unless the
+  file is encoded all-intra, which makes it as heavy as frames anyway.
+  Fallback option if frame bandwidth proves too high.
+- **Clip plays once per section**: lighter, but scrolling back doesn't rewind,
+  so the "walking through the stadium" feel is lost.
 
 ## Consequences
-- Two rendering paradigms exist in the codebase (a canvas/WebGL layer and a
-  DOM/CSS layer); the transition between them (end of hero → start of Pitch
-  section) needs explicit choreography so it doesn't feel like two different
-  sites stitched together.
-- Performance budget is concentrated almost entirely in one component (the
-  hero); Phase 5's performance pass must specifically profile it.
-- The fallback path (no R3F mounted) is a first-class requirement, not an
-  edge case — Phase 3 is not complete until that path is verified.
+- The biggest performance risk moves from GPU to **bandwidth**. Frame
+  budgets are the calibration knob, not fixed numbers; Phase 4 measures on
+  a real mid-range Android over 4G.
+- Frame count is limited by Veo clip length and quality, so camera motion
+  must be designed at keyframe stage (ADR-0002), not fixed later in code.
+- No WebGL anywhere: no GPU tiering and no context-loss handling.

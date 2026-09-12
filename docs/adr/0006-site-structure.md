@@ -1,34 +1,69 @@
-# ADR-0006: Single-page, six-section structure
+# ADR-0006: One page, six stadium zones, Abhishek-led, built to get brand bookings
 
 ## Status
 Accepted — 2026-09-12
 
 ## Context
-The stadium concept is a continuous narrative (tunnel → pitch → scoreboard →
-stands → pavilion → boundary rope). The site needed a decision on whether
-that narrative is a single scrolling page or split across routed pages.
+Abhishek's presence is split across a personal brand (`@abhishekpandey_26`),
+a channel brand (Spin & Swing) and a second channel (Unseen). Grilling
+settled four things:
+- **Identity**: the site is about Abhishek the person.
+- **Goal**: the one visitor action is a brand booking him.
+- **Copy**: English UI with Hinglish-toned copy.
+- **Traffic**: mostly from mobile bio links.
 
 ## Decision
-Single page, six sections, no client-side routing:
-1. Hero (Tunnel → Bowl)
-2. Pitch (Highlights)
-3. Scoreboard (Stats)
-4. The Stands (Social feed)
-5. Pavilion (About)
-6. Boundary Rope (Contact)
+**Identity**
+- Hero headline is Abhishek Pandey.
+- Spin & Swing and Unseen are presented as his shows.
+- Schema.org `Person` with `sameAs` links to all five profiles.
+
+**Structure**: one page, no routing, six zones, in scroll order:
+
+| # | Zone | Content | Source |
+|---|------|---------|--------|
+| 1 | Tunnel (hero) | Name, one-line pitch, scroll cue | Keyframe still → canvas |
+| 2 | The Pitch | Featured YouTube videos (tap-to-play) | `social.json` videos |
+| 3 | Scoreboard | Followers/subs/views as a stadium jumbotron, "as of" date | `social.json` profiles |
+| 4 | The Stands | Featured Instagram posts/reels grid | `social.json` posts |
+| 5 | Pavilion | His story, real photos | Copy + photos he supplies |
+| 6 | Boundary Rope | "Book Abhishek": WhatsApp + email buttons, LinkedIn, footer | Static |
+
+**Conversion**
+- WhatsApp: a `wa.me` link with a prefilled brand-enquiry message.
+- Email: a `mailto:` link with a prefilled subject.
+- No form, no backend.
+
+**Copy**
+- English UI with Hinglish flavour where it fits his voice.
+- No i18n.
+- No Devanagari font requirement.
+
+**Imagery of Abhishek**
+- Real photos and clips he supplies only.
+- AI never generates his likeness.
 
 ## Alternatives Considered
-- **Multi-page** (Home, Reels, Stats, About, Contact as separate routes):
-  better suited to large content volume or per-page SEO targeting, but
-  breaks the continuous scroll-journey narrative that is the core of the
-  concept, and the current content volume (a handful of highlight videos, a
-  stats summary, a social grid) doesn't need separate routes.
+- **Spin & Swing-led or dual brand**: weaker story, harder SEO, and sponsors
+  book people.
+- **Fan-growth or career goal**: would change the climax to follow buttons or
+  a CV. Rejected in favour of brand bookings.
+- **Enquiry form (Resend)**: gives structured leads, but needs spam defence
+  and a server. WhatsApp matches how Indian brand managers actually reach
+  creators.
+- **Multi-page**: breaks the continuous scroll journey; the content volume
+  doesn't need routes.
 
 ## Consequences
-- All content for the page loads together; code-splitting (especially the
-  R3F hero, per ADR-0001) carries more weight than route-based splitting
-  would provide elsewhere.
-- SEO (Phase 5) has to work within a single-URL constraint — structured data
-  and meta tags describe one page, not per-section pages.
-- Deep-linking to a specific section (e.g. "the stats section") would need
-  in-page anchors/scroll-to, not real routes, if ever needed later.
+**Inputs needed before building** (Phase 0 checklist):
+- WhatsApp number
+- Enquiry email
+- Pavilion photos
+- Bio facts
+
+**Trade-offs accepted**
+- **No lead tracking**: WhatsApp/email clicks are the only conversion signal;
+  count them as analytics events.
+- **One URL**: SEO targets his name and "cricket content creator" on a
+  single page.
+- **Zone anchors**: deep links use `#pitch`, `#scoreboard`, etc.

@@ -1,25 +1,39 @@
-# ADR-0005: Vercel hosting
+# ADR-0005: Vercel static hosting on a vercel.app subdomain
 
 ## Status
 Accepted — 2026-09-12
 
 ## Context
-The site is a Next.js App Router application with a dynamically-imported,
-client-only R3F hero and otherwise static content sourced from a committed
-JSON file (ADR-0003). Deployment target needed to be decided to inform build
-configuration (image optimization, edge functions, etc.).
+The site has:
+- no forms (ADR-0006: enquiries go to WhatsApp and email)
+- no runtime data (ADR-0003: JSON is committed at build)
+- no server-rendered personalisation
+
+The user chose Vercel, and a free `vercel.app` subdomain until a domain is
+bought.
 
 ## Decision
-Deploy to Vercel.
+- Astro builds with `output: 'static'`. No server adapter is needed.
+- Deploy to Vercel via Git integration: every push gets a preview URL, and
+  `main` goes to production.
+- Production URL: `<project>.vercel.app` (e.g. `abhishek-pandey.vercel.app`),
+  set as `site` in `astro.config.mjs`. Canonical URLs, sitemap and Open Graph
+  URLs derive from that one value.
+- Preview URLs are the review surface for every human gate (ADR-0004).
 
 ## Alternatives Considered
-- **Undecided/generic Next.js hosting**: considered, but the user confirmed
-  Vercel directly when asked, so there's no ambiguity to preserve — building
-  "deployment-agnostic" here would be speculative generality with no second
-  target in view.
+- **Buy a domain now**: recommended during grilling for SEO from day one;
+  deferred by the user.
+- **Netlify / Cloudflare Pages**: equivalent for a static site, but the user
+  already chose Vercel and there's no second target to design for.
 
 ## Consequences
-- Can rely on Vercel's native Next.js image optimization and edge network
-  rather than configuring a generic Node host.
-- No self-hosting or alternative-platform concerns need to be designed for
-  in this plan.
+When a domain is bought, the move is a checklist, not a rebuild:
+1. Add the domain in Vercel.
+2. Change `site` in `astro.config.mjs`.
+3. Redeploy.
+4. Add the domain to Google Search Console and submit the sitemap.
+5. Keep the `vercel.app` URL redirecting to the new domain.
+
+Search ranking built on the subdomain partially resets after the move. That
+is accepted, since the site's main traffic is bio-link clicks, not search.

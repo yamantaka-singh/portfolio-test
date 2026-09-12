@@ -1,130 +1,205 @@
-# Abhishek Pandey — Cricket Content Creator Portfolio — Design Spec
+# Abhishek Pandey — Cricket Creator Portfolio — Design Spec
 
-Date: 2026-09-12
-Status: Draft, pending review
+Date: 2026-09-12 (rev 2, after the second grilling)
+Status: Draft, pending user review
+Planned in: Claude Code. Executed in: Gemini Antigravity (ADR-0004).
 
 ## 1. Goal
 
-An Awwwards-tier, single-page portfolio for Abhishek Pandey, a cricket content
-creator, structured as a scroll journey through a stadium — tunnel, pitch,
-scoreboard, stands, pavilion, boundary rope. Not a template site: bespoke
-palette, bespoke type, a real 3D hero moment, real content pulled from his
-own social accounts.
+A one-page, Awwwards-tier portfolio that gets **brands to book Abhishek
+Pandey**, a cricket content creator.
 
-Sources:
-- Instagram: `@abhishekpandey_26`, `@spinandswing26`
-- YouTube: `@spinandswing26`, `@abhishekunseen26`
-- LinkedIn: `linkedin.com/in/abhishek-pandey-26sep03`
+The page is a scroll journey through a stadium: scrolling scrubs a
+Gemini/Veo-made flythrough video frame by frame, while real content from his
+accounts sits on top.
 
-## 2. Narrative arc (six zones, one page)
+Accounts:
+- Instagram `@abhishekpandey_26`, `@spinandswing26`
+- YouTube `@spinandswing26`, `@abhishekunseen26`
+- LinkedIn `abhishek-pandey-26sep03`
 
-1. **Tunnel → Bowl (Hero)** — 3D flythrough, name/tagline reveal, scroll cue
-2. **The Pitch (Highlights)** — featured YouTube reels/highlights
-3. **Scoreboard (Stats)** — follower/subscriber/view counts as a jumbotron
-4. **The Stands (Social feed)** — Instagram grid + YouTube thumbnails
-5. **Pavilion (About)** — Abhishek's story
-6. **Boundary Rope (Contact)** — CTA, socials, LinkedIn badge, footer
+## 2. Decisions
 
-## 3. Architecture summary
+| Area | Decision | ADR |
+|------|----------|-----|
+| Rendering | Scroll-scrubbed image sequence on one canvas, DOM content on top, keyframe stills as fallback | [0001](../../adr/0001-rendering-architecture.md) |
+| Assets | Manual: Gemini app stills → Flow "Frames to Video" transitions → ffmpeg frame export | [0002](../../adr/0002-asset-generation-pipeline.md) |
+| Data | Scrapling seed for Instagram, YouTube and LinkedIn (public only); self-hosted thumbnails; tap-to-play; GitHub Actions refresh deferred | [0003](../../adr/0003-data-acquisition-pipeline.md) |
+| Execution | Claude plans, Antigravity executes; Pro/Flash tiers; parallel lanes between human gates; skills pinned in repo, web fallback | [0004](../../adr/0004-execution-tooling-split.md) |
+| Hosting | Vercel static, `*.vercel.app` until a domain is bought | [0005](../../adr/0005-hosting.md) |
+| Structure | One page, six zones, Abhishek-led, WhatsApp and email CTAs, English UI with Hinglish copy | [0006](../../adr/0006-site-structure.md) |
+| Stack | Astro 7 static, GSAP 3.15 ScrollTrigger, plain CSS tokens; web3d gate order without its checker | [0007](../../adr/0007-stack.md) |
 
-Full decisions are recorded as ADRs in `docs/adr/`. Summary:
+## 3. Gates and evidence
 
-- **Rendering**: hybrid — a real React Three Fiber 3D flythrough for the hero
-  only, everything else is DOM + GSAP/Lenis layered 2.5D parallax
-  ([ADR-0001](../../adr/0001-rendering-architecture.md))
-- **Assets**: Gemini generates 2D concept/style art per stadium zone; that
-  art both informs the 3D hero's look (textures/mood reference) and is used
-  directly as the 2.5D parallax layers for zones 2–6
-  ([ADR-0002](../../adr/0002-asset-generation-pipeline.md))
-- **Data**: Scrapling, one-time seed scrape of Instagram + YouTube + LinkedIn
-  into a committed `data/social.json`; a live re-scrape pipeline is
-  explicitly deferred to a later phase
-  ([ADR-0003](../../adr/0003-data-acquisition-pipeline.md))
-- **Execution split**: this repo's planning (spec + ADRs + phased plan) is
-  produced in Claude Code; actual implementation is executed by Gemini
-  Antigravity, which has its own MCP/skill-invocation support
-  ([ADR-0004](../../adr/0004-execution-tooling-split.md))
-- **Hosting**: Vercel ([ADR-0005](../../adr/0005-hosting.md))
-- **Structure**: single page, six sections, no routing
-  ([ADR-0006](../../adr/0006-site-structure.md))
+Gate order is borrowed from web3d-skills. A gate closes only when its
+evidence exists and the named reviewer approves it on the Vercel preview.
 
-Stack: Next.js (App Router) + React + TypeScript, React Three Fiber + drei
-(hero only, dynamically imported, SSR-disabled), GSAP ScrollTrigger + Lenis,
-Tailwind v4 with a custom token layer, Scrapling (Python) for data.
+| Gate | Evidence | Human gate(s) |
+|------|----------|---------------|
+| scope | `docs/inputs.md` complete (see §6) | G0: inputs and consent |
+| art | `assets/prompts/keyframes.md` + six approved stills in `assets/keyframes/` | G2: style lock, G3: all keyframes |
+| assets | `src/data/social.json` curated; frames in `public/frames/` | G1: data curation, G5: transition takes |
+| look | `src/styles/tokens.css`, hero zone styled on preview | G4: tokens |
+| motion | Scrub engine live on preview with real frames; sections pinned to timeline | G6: integrated page |
+| ux | Reduced-motion, no-JS and frame-failure fallbacks visible on preview; a11y report | (inside G6/G7) |
+| perf | `docs/qa/perf-report.md`: Lighthouse mobile + real mid-range Android on 4G | (inside G7) |
+| ship | `docs/qa/qa-checklist.md` complete; production URL live | G7: launch |
 
-## 4. Phases (by architecture layer)
+## 4. Phases
 
-Each phase is independently buildable and testable before the next starts.
-Per phase: goal, required capabilities, local skills to use, and the
-instruction to fall back to a web/MCP search if a needed capability has no
-matching local skill.
+Legend:
+- **[Pro]** / **[Flash]**: agent model tier
+- **[User]**: done by hand
+- **∥**: runs in parallel with its siblings, each in a fresh agent and its
+  own worktree
 
-### Phase 1 — Data & asset pipeline
-- Scrapling script scrapes Instagram, YouTube, LinkedIn → `data/social.json`
-  (reviewed/curated by hand before use, not auto-published)
-- Gemini generates the six zone concept-art pieces (style reference + usable
-  2.5D layer art)
-- Capabilities needed: web scraping (Scrapling), image generation (Gemini
-  API/MCP)
-- No frontend code yet
+Shared files, which only an integration agent touches:
+- `src/styles/tokens.css`
+- `src/pages/index.astro`
+- the scroll timeline module
 
-### Phase 2 — Design system
-- Palette, type pairing, spacing/motion tokens derived from the Gemini art
-  and real cricket-ground references (willow, turf, red-ball, floodlight) —
-  no default Tailwind theme
-- Local skills: `design-system`, `premium-web-design`
-- Output: a token spec + component inventory, not final pixel mockups
+### Phase 0: Setup (sequential)
+- **0.1 [User] Inputs and consent**
+  - Abhishek's OK to scrape and republish
+  - WhatsApp number and enquiry email
+  - Pavilion photos and bio facts
+  - Confirm the Flow plan exports clips without a visible watermark
+  - Gate **G0**
+- **0.2 [Flash] Scaffold**
+  - Astro 7 static, linked to a Vercel project, `site` set to the
+    `vercel.app` URL
+  - `brew install ffmpeg`; `pip install "scrapling[fetchers]"` +
+    `scrapling install`
+  - Run `scripts/install-skills.sh`
+  - Skills: `astro`, `vercel-deploy`
 
-### Phase 3 — Hero & core scroll mechanics
-- R3F tunnel-to-bowl flythrough, dynamically imported, SSR-disabled
-- Lenis smooth scroll + GSAP ScrollTrigger scaffolding for the whole page
-- `prefers-reduced-motion` / low-end fallback: static hero poster/video loop,
-  no R3F mounted
-- Local skills: `3d-web-experience`, `scroll-experience`
+### Phase 1: Three lanes, all ∥ after G0
+- **1A [Flash] Data**
+  - `scraper/scrape.py` → `social.json` + thumbnails
+  - zod content collection schema
+  - LinkedIn failure falls back to a plain link
+  - Skills: `scrapling-official`, `astro`
+  - Gate **G1**: user sets `featured` flags
+- **1B [Pro → User] Art**
+  - Agent writes the style bible, the continuous camera path, and six
+    keyframe prompts with the centre-third composition rule
+  - User generates keyframe 1 → **G2** → uses it as reference for 2–6 →
+    **G3**
+  - Skills: `web3d-art-direction`, `premium-web-design`, `ui-ux-pro-max`
+- **1C [Pro] Scrub engine**
+  - Canvas component driven by ScrollTrigger, fed placeholder frames
+    (ffmpeg `testsrc`)
+  - Loads frames per zone (current + next)
+  - Frame tiers: desktop and mobile
+  - LCP poster image
+  - Fallbacks: reduced-motion, no-JS and load-failure → static stills
+  - Skills: `scroll-experience`, `web3d-motion-choreography`,
+    `web3d-interaction-ux`, `modern-web-guidance`
 
-### Phase 4 — Remaining sections
-- Build Pitch, Scoreboard, Stands, Pavilion, Boundary Rope as independent
-  components consuming `data/social.json` and the Phase 1 art
-- Local skills: `frontend-design`, `nextjs-app-router-patterns`,
-  `react-best-practices`
+### Phase 2: Look and video (after G3)
+- **2.1 [Pro] Design tokens** ∥ with 2.2
+  - Palette sampled from the approved stills, contrast-verified
+  - Display and body type pairing (Latin only), spacing and motion tokens
+  - Applied to the hero zone only
+  - Skills: `design-system`, `ui-ux-pro-max`, `premium-web-design`,
+    `frontend-design`
+  - Gate **G4**
+- **2.2 [User] Five transition clips** in Flow Frames to Video
+  - Several takes each; audio stripped
+  - Gate **G5**
+- **2.3 [Flash] Frame export** (after G5)
+  - `scripts/export-frames.sh` → AVIF (SVT-AV1) at desktop and mobile tiers
+  - Replaces the placeholder frames
 
-### Phase 5 — SEO, accessibility, performance polish
-- Meta/OG tags, `Person` + `VideoObject` schema, sitemap
-- Contrast, reduced-motion, keyboard/focus pass on a visually loud page
-- Lighthouse budget pass on the finished build; bundle check on the R3F
-  hero specifically (it's the single biggest perf risk)
-- Local skills: `seo-optimizer`, `accessibility-auditor`,
-  `performance-optimizer`
+### Phase 3: Sections (after G1 + G4)
+- **3.1–3.5 [Flash]** ∥, one worktree each. Components read
+  `social.json` and the tokens but do not edit the tokens.
+  - **Pitch**: featured YouTube cards, `youtube-nocookie` tap-to-play facade
+  - **Scoreboard**: jumbotron counts (count-up, nullable-safe), "as of"
+    date
+  - **Stands**: featured Instagram grid, embed-on-tap facade
+  - **Pavilion**: real photos + story. Copy drafted with `copywriting` +
+    `humanizer` in Hinglish-toned English; user approves at G6.
+  - **Boundary Rope**: prefilled `wa.me` link + `mailto:`, LinkedIn,
+    footer, analytics click events
+  - Skills: `frontend-design`, `web-design-guidelines`, `astro`
+- **3.6 [Pro] Integration** (sequential, after 3.1–3.5)
+  - Compose `index.astro`, pin section reveals to the scrub timeline, add
+    zone anchors
+  - Gate **G6**: user reviews the preview on desktop and on a real phone,
+    **including Instagram's in-app browser**
 
-### Deferred (explicitly out of scope for this plan)
-- Live/scheduled re-scrape pipeline (Phase 1 is a one-time seed only)
-- LinkedIn scraping reliability is known-fragile (anti-bot); if it fails,
-  fall back to a manual badge/link rather than blocking Phase 1
+### Phase 4: Audit and fix (after G6)
+- **4.1–4.3 [Flash]** read-only audits ∥, no confirmation needed:
+  - **Accessibility** (`accessibility-auditor`)
+  - **SEO**: `Person` + `VideoObject` schema, Open Graph image =
+    keyframe 1, sitemap, robots (`seo`, `schema-markup`)
+  - **Performance**: Lighthouse mobile LCP < 2.5s, INP < 200ms, CLS < 0.1;
+    frame budget on a mid-range Android over 4G (`core-web-vitals`,
+    `web3d-performance-budget`)
+- **4.4 [Pro] Fix pass** (sequential): applies the findings and writes
+  `docs/qa/perf-report.md`
 
-## 5. Skill/tool sourcing rule (applies to every phase)
+### Phase 5: Ship
+- **5.1 [Flash]**
+  - Production deploy, Vercel Web Analytics on, `docs/qa/qa-checklist.md`
+  - Skills: `web3d-ship-deploy`, `vercel-deploy`,
+    `verification-before-completion`
+  - Gate **G7**: launch
 
-Gemini Antigravity supports MCP tools and skill-style invocation, so each
-phase above names the local skills it expects to use. If the executing agent
-lacks a matching local skill or MCP tool for a capability a phase needs, it
-should search the web (or an MCP/skill registry) for an equivalent before
-implementing that phase from scratch — this repo's skill list is a starting
-point, not the ceiling.
+### Deferred (each gets its own spec later)
+- GitHub Actions daily refresh (`github-actions-creator`); watch for
+  Instagram blocking runner IPs
+- Official Instagram/YouTube APIs once Abhishek grants access (unlocks
+  demographics for a real media kit)
+- Custom domain (ADR-0005 checklist)
+- Sound
+- Enquiry form
 
-## 6. Testing/QA
+## 5. Skills manifest (pinned into `.agents/skills/` by `scripts/install-skills.sh`)
 
-- Visual QA on real mobile + desktop devices (not just desktop Chrome),
-  given the 3D hero and heavy motion
-- Lighthouse CI thresholds for LCP/INP/CLS
-- Manual check: reduced-motion path and no-WebGL fallback both render
-  correctly with no missing content
-- Manual check: page remains crawlable/readable with JS/WebGL disabled
-  (all real copy lives in the DOM, never baked into canvas/images)
+**From public repos** (`npx skills add <source> --skill <name> -a antigravity -y`):
 
-## 7. Open risks
+| Source | Skills |
+|--------|--------|
+| `obra/superpowers` | `executing-plans`, `subagent-driven-development`, `dispatching-parallel-agents`, `using-git-worktrees`, `verification-before-completion`, `requesting-code-review` |
+| `D4Vinci/Scrapling` | `scrapling-official` |
+| `nextlevelbuilder/ui-ux-pro-max-skill` | `ui-ux-pro-max` |
+| `vercel-labs/agent-skills` | `frontend-design`, `web-design-guidelines` |
+| `DietrichGebert/ponytail` | `ponytail` |
 
-- LinkedIn scraping via Scrapling may simply fail (strong anti-bot) — see
-  Phase 1 fallback above
-- 3D hero is the main performance risk; Phase 3's fallback path is not
-  optional
-- Gemini-generated art style must stay consistent across six zones — worth
-  locking a style reference in Phase 1 before generating all six
+**Copied from local disk** (no public source found):
+
+| Local path | Skills |
+|------------|--------|
+| `~/projects/3d-design/web3d-skills/` | `web3d-art-direction`, `web3d-motion-choreography`, `web3d-interaction-ux`, `web3d-performance-budget`, `web3d-ship-deploy` |
+| `~/.gemini/config/skills/` (Antigravity global on this machine) | `astro`, `scroll-experience`, `premium-web-design`, `design-system`, `modern-web-guidance`, `seo`, `schema-markup`, `core-web-vitals`, `accessibility-auditor`, `copywriting`, `humanizer`, `vercel-deploy`, `architecture-decision-records` |
+
+**Fallback**: on a machine missing any of these, or for a capability not
+listed, run `npx skills find <keyword>`, install the match, and append it to
+`install-skills.sh` in the same commit.
+
+**Deliberately excluded**, because 3D, React and generation were removed:
+- R3F / `3d-web-experience`
+- Next.js / React skills
+- `imagegen` / `comfy-mcp`
+- database skills
+
+## 6. Inputs needed before Phase 1 (`docs/inputs.md`)
+- [ ] Abhishek's consent to scrape and republish his public content
+- [ ] WhatsApp number (for `wa.me`) and enquiry email
+- [ ] Pavilion photos (high-res) and bio facts / milestones
+- [ ] Flow plan tier confirmed to export without a visible watermark
+- [ ] Vercel project name, which sets the `vercel.app` URL
+
+## 7. Top risks
+1. **Style drift** across six manual keyframes. Mitigated by the style lock
+   (G2) plus reference-image reuse.
+2. **Scrapers break** on YouTube/Instagram layout changes. Fix in order: the
+   official YouTube API, then official APIs once access is granted.
+3. **Frame bandwidth on 4G.** Budgets in ADR-0001 are tuned in Phase 4;
+   fallback is all-intra `<video>` scrubbing.
+4. **Instagram in-app browser quirks.** Tested explicitly at G6.
+5. **The manual art lane is the bottleneck.** Lanes 1A and 1C and the
+   sections are arranged to run around it.
