@@ -1,0 +1,18 @@
+{
+  "name": "abhishek-portfolio",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "test": "node --test \"src/lib/*.test.js\"",
+    "verify": "node scripts/verify-pipeline.mjs"
+  },
+  "dependencies": {
+    "astro": "^7.3.2"
+  }
+}

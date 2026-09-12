@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.astro/
+.vercel/
+.env
+scraper/.venv/
+__pycache__/
+assets/clips/
