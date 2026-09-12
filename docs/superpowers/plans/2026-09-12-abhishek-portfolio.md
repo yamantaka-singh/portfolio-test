@@ -1,6 +1,6 @@
 # Abhishek Pandey Portfolio Implementation Plan
 
-> **For agentic workers (Gemini Antigravity):** REQUIRED SUB-SKILL: Use `subagent-driven-development` (recommended) or `executing-plans` to implement this plan task-by-task. Both are pinned in `.agents/skills/` by Task 2. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers (Gemini Antigravity):** `task-observer` governs this plan and every skill in it (ADR-0008). Load it and run its Session Start Protocol before your first tool call, as `AGENTS.md` and `.agents/rules/00-task-observer.md` require. Then REQUIRED SUB-SKILL: use `subagent-driven-development` (recommended) or `executing-plans` to implement this plan task-by-task. All skills are pinned in `.agents/skills/` by Tasks 1–2. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** A one-page Astro site where scrolling scrubs a stadium flythrough frame by frame, over real content from Abhishek Pandey's Instagram, YouTube and LinkedIn, ending in "book Abhishek" WhatsApp/email buttons.
 
@@ -8,10 +8,13 @@
 
 **Tech Stack:** Astro 7.3, GSAP 3.15 (ScrollTrigger), plain CSS custom properties, Fontsource variable fonts, sharp, ffmpeg, Python 3.10+ with Scrapling 0.4.15, Vercel (static, Hobby), `node --test`, Python `unittest`.
 
-**Spec:** `docs/superpowers/specs/2026-09-12-abhishek-portfolio-design.md` and `docs/adr/0001`–`0007`. Every agent reads the spec plus the ADRs its task header names.
+**Spec:** `docs/superpowers/specs/2026-09-12-abhishek-portfolio-design.md` and `docs/adr/0001`–`0008`. Every agent reads the spec plus the ADRs its task header names.
 
 ## Global Constraints
 
+- **task-observer rules them all (ADR-0008).** Every agent session invokes `task-observer` and runs its Session Start Protocol before the first tool call. Before applying any other skill, it greps the observation log for OPEN observations naming that skill and applies them. It ends every task with a one-line observation summary. Workspace: `/Users/kaalu/projects/abhishek-portfolio`, the main checkout, never a worktree.
+- **Precedence when instructions conflict:** the user's gate decisions > the spec, the ADRs and these Global Constraints > task-observer's protocol > every other skill. If a skill's rule contradicts a higher level (e.g. a taste skill defaulting to React or Tailwind), follow the higher level and log an observation against that skill.
+- **Skills change only through task-observer:** never edit `.agents/skills/` by hand. Observation → staged copy in `skill-updates/` → user approval at the next human gate → install. A skill found with `npx skills find` enters as a `proposes_skill` observation and is installed only after that approval.
 - Node `>=22.19.0` (Astro 7.3.2 needs 22.12; Lighthouse 13 in Task 21 needs 22.19). Package manager: npm.
 - `astro@^7.3.2`, `output` left at its static default, no server adapter.
 - `gsap@^3.15.0`. No React, no Tailwind, no Lenis, no R3F.
@@ -35,16 +38,37 @@
 
 1. **One fresh agent per task.** Give it: this plan's Global Constraints, its own task, the spec, and the ADRs in its header. Nothing else.
 2. **Model tier** in each header maps to Antigravity's picker: **Pro** = strongest available model, **Flash** = fast model.
-3. **Skills** in each header are loaded from `.agents/skills/`. If a task needs something none of them cover: `npx -y skills@1.5.26 find <keyword>`, install the best match with `-a antigravity --copy`, and append the install line to `scripts/install-skills.sh` in the same commit.
+3. **Skills** in each header are loaded from `.agents/skills/`, each one only after the OPEN-observation grep from `AGENTS.md`. If a task needs something none of them cover: `npx -y skills@1.5.26 find <keyword>`, then log the best match as a `proposes_skill` observation saying why. It is installed with `-a antigravity --copy` and appended to `scripts/install-skills.sh` only after the user approves it at the next gate.
 4. **Parallel lanes** (below) run at the same time, each in its own git worktree (`using-git-worktrees` skill), merged back to `main` when the task's checks pass.
-5. **Human gates (G0–G7):** the agent stops, posts the Vercel preview URL (or file path) and the exact question, and waits. No task that depends on a gate starts before the user approves it.
-6. **After every task**, a separate read-only verifier agent runs `node scripts/verify-pipeline.mjs` and pastes the table. It never edits, never retries, never asks; if a row that the task was meant to turn PASS is still FAIL, the task is not done.
+5. **Human gates (G0–G7):** the agent runs the *Gate review* below, then posts the Vercel preview URL (or file path), the exact gate question and the review, and waits. No task that depends on a gate starts before the user approves it.
+6. **After every task**, a separate read-only verifier agent runs `node scripts/verify-pipeline.mjs` and pastes the table. It never edits, never retries, never asks; if a row that the task was meant to turn PASS is still FAIL, the task is not done, and the task's own agent investigates with `diagnosing-bugs`.
+
+### Gate review (every human gate, G0–G7)
+
+task-observer's interactive review, run by the gate agent before it asks the gate question:
+
+1. Commit the shared log from the main checkout (skip if nothing changed):
+   ```bash
+   git -C /Users/kaalu/projects/abhishek-portfolio add skill-observations skill-updates
+   git -C /Users/kaalu/projects/abhishek-portfolio commit -m "chore(skills): observations up to <gate>"
+   ```
+2. Load `.agents/skills/task-observer/references/weekly-review.md` and run the review in **interactive** mode over all OPEN observations: read every body, bucket by skill, present counts plus one sentence per observation, and flag escalations (a new skill, a removal or restructure, uncertainty, two observations in conflict).
+3. Post the review together with the gate question, and wait. The user approves all, some or none.
+4. For each approved item: task-observer stages the updated skill in `skill-updates/<skill>/`, then:
+   ```bash
+   python3 .agents/skills/task-observer/scripts/validate-skill-bundle.py skill-updates/<skill>
+   rm -rf .agents/skills/<skill> && cp -R skill-updates/<skill> .agents/skills/<skill>
+   ```
+   The validator must exit 0 before the copy. Then update `skill-updates/PENDING.md` and set each applied observation to `status: actioned` with `resolved:` and `resolution:`. Use `writing-for-agents` for the skill edits themselves.
+5. Commit: `git add .agents/skills skill-observations skill-updates && git commit -m "chore(skills): apply approved observations at <gate>"`.
+
+Declined or unanswered items stay OPEN for the next gate. A declined prompt is never approval.
 
 ## Task map
 
 | # | Task | Tier | Owner | Lane | Depends on | Gate |
 |---|------|------|-------|------|------------|------|
-| 1 | Inputs and consent | Flash | Agent → **User** | — | — | **G0** |
+| 1 | Governance (task-observer) + inputs and consent | Pro | Agent → **User** | — | — | **G0** |
 | 2 | Scaffold, tooling, skills | Flash | Agent (+User for GitHub/Vercel) | — | G0 | — |
 | 3 | Scraper parsers | Flash | Agent | A | 2 | — |
 | 4 | Scraper runner → `social.json` | Flash | Agent → **User** | A | 3 | **G1** |
@@ -73,7 +97,11 @@ Lanes A, B and C all start after Task 2 and run together. Task 5 can start again
 ## File structure
 
 ```
-.agents/skills/                        Task 2   pinned skills (31)
+AGENTS.md, CLAUDE.md                   Task 1   task-observer activation block + precedence rules
+.agents/rules/00-task-observer.md      Task 1   always-on copy of AGENTS.md (trigger: always_on)
+.agents/skills/                        Tasks 1–2  pinned skills (38); changed only via approved staged updates
+skill-observations/                    Task 1+  task-observer log, one file per observation (at /Users/kaalu/projects/abhishek-portfolio)
+skill-updates/                         gates    staged skill updates + PENDING.md
 .gitignore, package.json,
 astro.config.mjs, tsconfig.json        Task 2
 docs/inputs.md                         Task 1   gate G0 form
@@ -127,20 +155,162 @@ public/robots.txt                      Task 20
 
 ## Phase 0 — Setup
 
-### Task 1: Inputs and consent
+### Task 1: Governance (task-observer) + inputs and consent
 
-**Tier:** Flash · **Owner:** Agent creates the form, **User** fills it · **Lane:** — · **Gate:** **G0** · **ADRs:** 0003, 0006
-**Skills:** none needed
+**Tier:** Pro · **Owner:** Agent sets up governance and the form; **User** answers task-observer's one-time question and fills the form · **Lane:** — · **Gate:** **G0** · **ADRs:** 0003, 0006, 0008
+**Skills:** `task-observer` (installed in Step 1), `writing-for-agents` (installed in Step 1)
 
 **Files:**
-- Create: `docs/inputs.md`
+- Create: `.agents/skills/task-observer/**`, `.agents/skills/writing-for-agents/**`, `AGENTS.md`, `CLAUDE.md`, `.agents/rules/00-task-observer.md`, `skill-observations/**` (by the Session Start Protocol), `docs/inputs.md`
+- Modify (with the user's OK, outside the repo): `~/.gemini/GEMINI.md`
 - User adds: `src/assets/photos/*.jpg`, optionally `scraper/instagram_posts.txt`
 
 **Interfaces:**
 - Consumes: nothing
-- Produces: `docs/inputs.md` with every box ticked. Tasks 2, 5, 17 and 18 read values from it: Vercel project name, WhatsApp digits, email, tagline, bio facts.
+- Produces: task-observer active in every later session through `AGENTS.md` + the always-on rule, with its log at `/Users/kaalu/projects/abhishek-portfolio/skill-observations/`; `docs/inputs.md` with every box ticked (Tasks 2, 5, 17 and 18 read the Vercel project name, WhatsApp digits, email, tagline and bio facts from it).
 
-- [ ] **Step 1: Create the form**
+Governance comes first so task-observer is already watching when the first real work happens.
+
+- [ ] **Step 1: Install task-observer and writing-for-agents**
+
+```bash
+mkdir -p .agents/skills
+npx -y skills@1.5.26 add rebelytics/one-skill-to-rule-them-all --skill task-observer -a antigravity -y --copy
+npx -y skills@1.5.26 add mattpocock/skills --skill writing-for-agents -a antigravity -y --copy
+ls .agents/skills/task-observer/SKILL.md .agents/skills/task-observer/references/weekly-review.md .agents/skills/task-observer/scripts/validate-skill-bundle.py .agents/skills/writing-for-agents/SKILL.md
+```
+
+Expected: all four paths print. If `references/` or `scripts/` is missing (only `SKILL.md` was copied), rebuild the bundle:
+
+```bash
+git clone --depth 1 https://github.com/rebelytics/one-skill-to-rule-them-all /tmp/task-observer
+rm -rf .agents/skills/task-observer && mkdir -p .agents/skills/task-observer
+cp -R /tmp/task-observer/SKILL.md /tmp/task-observer/references /tmp/task-observer/scripts .agents/skills/task-observer/
+```
+
+- [ ] **Step 2: Activation block in both project layers**
+
+`AGENTS.md` (section 1 is task-observer's v3 activation block verbatim, with this project's path filled in; use `writing-for-agents` if anything needs rewording, never section 1):
+
+```markdown
+# Agent rules for this repository
+
+## 1. task-observer rules every skill (ADR-0008)
+
+Before the first tool call of any session — and before writing or
+proposing a plan, not merely before executing one — invoke the
+task-observer skill AND execute its Session Start Protocol (storage
+check, frontmatter scan, review trigger). Loading the skill and running
+the protocol are separate steps; a session that loads the file and stops
+has activated nothing. Any turn that will involve a tool call counts; do
+not classify the session as "too simple" from its opening message.
+
+Select skills on the DECISION the request is about, not on the artefact it
+arrived as. Name what the user is deciding, then match the installed skill
+descriptions against that — a request handed over as a file to review
+still needs the skill whose description names its subject.
+
+After completing each task, check the observation records written this
+session and report a one-line summary (ids and titles, or "none logged
+and why"). This is the activation backstop: it forces a look at the log,
+so a session that silently skipped the protocol is discovered at the
+first task boundary instead of never.
+
+Loading a skill is not complete until you have queried the observation
+log for OPEN observations naming it and read their bodies:
+  grep -l "skill:.*<skill-name>" \
+    /Users/kaalu/projects/abhishek-portfolio/skill-observations/observation-log/*.md
+Apply their insights to the current work, even if the skill file hasn't
+been updated yet. Run this at every skill load, however many skills load
+in one session. The session-start scan does not cover it: that is a
+frontmatter sweep over every observation at session start, this is a
+body-level lookup for one skill at the moment its rules are applied.
+
+The task-observer workspace for this project is:
+  /Users/kaalu/projects/abhishek-portfolio
+Every path the skill uses derives from that root and nothing else:
+  /Users/kaalu/projects/abhishek-portfolio/skill-observations/observation-log/   (the log)
+  /Users/kaalu/projects/abhishek-portfolio/skill-observations/cross-cutting-principles.md
+  /Users/kaalu/projects/abhishek-portfolio/skill-updates/                        (staging root)
+  /Users/kaalu/projects/abhishek-portfolio/skill-updates/PENDING.md              (staging manifest)
+Never resolve any of them from the current working
+directory — a cwd inside an ephemeral checkout (a git worktree, a temporary
+clone) is torn down and takes the log with it. Never place the workspace
+inside a skills-discovery directory or any path linked into one. If this
+environment mints a separate project identity per checkout, or more than
+one agent works this project, the pinned path above is the single shared
+location; do not derive one per session, tool or project.
+
+## 2. Precedence when instructions conflict
+
+1. The user's decisions at human gates.
+2. `docs/superpowers/specs/2026-09-12-abhishek-portfolio-design.md`, `docs/adr/`, and the Global Constraints in `docs/superpowers/plans/2026-09-12-abhishek-portfolio.md`.
+3. task-observer's protocol (section 1).
+4. Every other skill in `.agents/skills/`.
+
+When a skill's rule contradicts a higher level (for example a taste skill defaulting to React or Tailwind while ADR-0007 fixes Astro and plain CSS), follow the higher level and log an observation against that skill. Never silently pick one.
+
+## 3. Skills change only through task-observer
+
+- Never edit `.agents/skills/` by hand. Changes arrive as observations, are staged in `skill-updates/`, pass `validate-skill-bundle.py`, and are installed only after the user approves them at a human gate (plan: *Gate review*).
+- A skill found with `npx skills find` is logged as a `proposes_skill` observation, not installed on the spot.
+```
+
+`CLAUDE.md` (so Claude Code, if it ever runs a task, obeys the same file):
+
+```markdown
+@AGENTS.md
+```
+
+The always-on Antigravity rule is generated from `AGENTS.md`, so the two can't drift:
+
+```bash
+mkdir -p .agents/rules
+{ printf -- '---\ntrigger: always_on\n---\n\n'; tail -n +2 AGENTS.md; } > .agents/rules/00-task-observer.md
+wc -c .agents/rules/00-task-observer.md
+head -4 .agents/rules/00-task-observer.md
+```
+
+Expected: under 12000 characters (Antigravity's per-rule limit); the file starts with the `trigger: always_on` frontmatter.
+
+- [ ] **Step 3: User-level layer (ask first)**
+
+Post exactly:
+
+> May I append one line to your global `~/.gemini/GEMINI.md` so every Antigravity session in this project starts task-observer even if the project files aren't loaded yet? The line: "In /Users/kaalu/projects/abhishek-portfolio or any worktree of it: before any other tool call, run `ls /Users/kaalu/projects/abhishek-portfolio/skill-observations`, invoke the task-observer skill, and follow that repository's AGENTS.md."
+
+On "yes":
+
+```bash
+printf '\nIn /Users/kaalu/projects/abhishek-portfolio or any worktree of it: before any other tool call, run `ls /Users/kaalu/projects/abhishek-portfolio/skill-observations`, invoke the task-observer skill, and follow that repository'"'"'s AGENTS.md.\n' >> ~/.gemini/GEMINI.md
+tail -2 ~/.gemini/GEMINI.md
+```
+
+On "no": skip; the two project layers still apply.
+
+- [ ] **Step 4: Run the Session Start Protocol for the first time**
+
+Invoke `task-observer` and execute its Session Start Protocol against `/Users/kaalu/projects/abhishek-portfolio`. It creates `skill-observations/observation-log/archive/`, `cross-cutting-principles.md` and `last-review-date.txt` (value `never`), and makes its one-time starter-principles offer. Relay that offer to the user verbatim and apply their answer; it writes `starter-principles-reviewed.txt`, so no later agent is ever asked again.
+
+```bash
+ls -d /Users/kaalu/projects/abhishek-portfolio/skill-observations/observation-log/archive
+cat /Users/kaalu/projects/abhishek-portfolio/skill-observations/last-review-date.txt
+cat /Users/kaalu/projects/abhishek-portfolio/skill-observations/starter-principles-reviewed.txt
+```
+
+Expected: the directory exists; `never`; a starter-set version line.
+
+- [ ] **Step 5: Commit governance**
+
+```bash
+git add AGENTS.md CLAUDE.md .agents skill-observations
+git commit -m "chore(governance): task-observer rules every skill (ADR-0008)"
+node scripts/verify-pipeline.mjs | head -1
+```
+
+Expected: first verifier row `governance PASS`.
+
+- [ ] **Step 6: Create the form**
 
 `docs/inputs.md`:
 
@@ -167,14 +337,16 @@ keeps the `scope` gate FAIL while any box is unticked.
 - ____
 ```
 
-- [ ] **Step 2: Commit the empty form**
+- [ ] **Step 7: Commit the empty form**
 
 ```bash
 git add docs/inputs.md
 git commit -m "docs: add inputs form for gate G0"
 ```
 
-- [ ] **Step 3: GATE G0 — stop and ask the user**
+- [ ] **Step 8: GATE G0 — stop and ask the user**
+
+Run the *Gate review* from *How to run this plan* first: commit the observation log, review OPEN observations with the user, install only what they approve.
 
 Post exactly:
 
@@ -182,7 +354,7 @@ Post exactly:
 
 Wait for "G0 done".
 
-- [ ] **Step 4: Verify and commit the user's inputs**
+- [ ] **Step 9: Verify and commit the user's inputs**
 
 Run: `grep -c -- "- \[ \]" docs/inputs.md`
 Expected: `0`
@@ -215,8 +387,9 @@ git commit -m "docs: record G0 inputs and consent"
 ```bash
 #!/usr/bin/env bash
 # Pins every skill this plan uses into .agents/skills/ (Antigravity project scope).
-# Need something not listed? `npx -y skills@1.5.26 find <keyword>`, install with
-# `-a antigravity --copy`, then add the line here in the same commit.
+# Skips skills that already exist, so approved task-observer updates (ADR-0008) are never overwritten.
+# Need something not listed? Propose it as a task-observer observation (AGENTS.md section 3);
+# add its line here only after the user approves it at a gate.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 DEST=.agents/skills
@@ -225,9 +398,12 @@ mkdir -p "$DEST"
 add() {
   local src=$1; shift
   local args=()
-  for s in "$@"; do args+=(--skill "$s"); done
+  for s in "$@"; do [ -d "$DEST/$s" ] || args+=(--skill "$s"); done
+  [ ${#args[@]} -eq 0 ] && return 0
   npx -y skills@1.5.26 add "$src" "${args[@]}" -a antigravity -y --copy
 }
+
+add rebelytics/one-skill-to-rule-them-all task-observer
 
 add obra/superpowers executing-plans subagent-driven-development dispatching-parallel-agents \
   using-git-worktrees test-driven-development verification-before-completion requesting-code-review
@@ -236,6 +412,8 @@ add nextlevelbuilder/ui-ux-pro-max-skill ui-ux-pro-max
 add anthropics/skills frontend-design
 add vercel-labs/agent-skills web-design-guidelines deploy-to-vercel
 add DietrichGebert/ponytail ponytail ponytail-review
+add leonxlnx/taste-skill design-taste-frontend high-end-visual-design full-output-enforcement
+add mattpocock/skills grilling writing-for-agents diagnosing-bugs
 
 copy_local() {
   local from=$1 name=$2
@@ -268,7 +446,7 @@ ls .agents/skills | wc -l
 ls .agents/skills/*/SKILL.md | wc -l
 ```
 
-Expected: both counts are `31`, and no `MISSING` lines. If a public install fails, re-run that one `add` line; if a local folder is missing, use the printed `skills find` command and add the result to the script.
+Expected: both counts are `38`, and no `MISSING` lines. If a public install fails, re-run that one `add` line; if a local folder is missing, use the printed `skills find` command and add the result to the script.
 
 - [ ] **Step 3: Write the project files**
 
@@ -390,7 +568,7 @@ Expected: `scrapling ok`; the grep prints `1` or more. Do **not** run `scrapling
 - [ ] **Step 6: Run the verifier**
 
 Run: `node scripts/verify-pipeline.mjs`
-Expected: `scope PASS`, `build PASS`, every other gate `FAIL`, exit code 1.
+Expected: `governance PASS`, `scope PASS`, `build PASS`, every other gate `FAIL`, exit code 1.
 
 - [ ] **Step 7: Commit**
 
@@ -870,6 +1048,8 @@ git commit -m "feat(scraper): seed social.json and thumbnails from public profil
 
 - [ ] **Step 6: GATE G1 — user curation**
 
+Run the *Gate review* from *How to run this plan* first: commit the observation log, review OPEN observations with the user, install only what they approve.
+
 Post exactly:
 
 > G1: open `src/data/social.json` and set `"featured": true` on 3–6 YouTube videos for The Pitch and 6–9 Instagram posts for The Stands. Want older Instagram posts? List their URLs in `scraper/instagram_posts.txt` and I'll re-run the scrape first (your flags are kept). Reply "G1 done".
@@ -1305,6 +1485,8 @@ printf 'assets/keyframes-raw/\n' >> .gitignore
 
 - [ ] **Step 2: GATE G2 — style lock on keyframe 01**
 
+Run the *Gate review* from *How to run this plan* first: commit the observation log, review OPEN observations with the user, install only what they approve.
+
 Post exactly:
 
 > G2: in the Gemini app, generate an image from the `## Keyframe 01-tunnel` prompt in `assets/prompts/keyframes.md` (ask for 16:9). Make 3–4 takes, pick the best, check the corners for a visible watermark, and save it as `assets/keyframes-raw/01-tunnel.png`. Reply "G2 done" — this image becomes the style reference for the other five.
@@ -1323,6 +1505,8 @@ sips -g pixelWidth -g pixelHeight src/assets/keyframes/01-tunnel.jpg
 Expected: output is 2560 wide and 1440 high (±2 px). If the source is not 16:9, crop it first: `sips --cropToHeightWidth <h> <w> "$f"` with `h = round(w × 9 / 16)`, then convert. Ask the user to confirm the converted file still looks right.
 
 - [ ] **Step 4: GATE G3 — keyframes 02–06**
+
+Run the *Gate review* from *How to run this plan* first: commit the observation log, review OPEN observations with the user, install only what they approve.
 
 Post exactly:
 
@@ -1610,7 +1794,7 @@ git commit -m "feat(scrub): tier, frame URL, cover-rect, preload and frame-picki
 ### Task 10: Page shell, scrub stage, fallbacks
 
 **Tier:** Pro · **Owner:** Agent · **Lane:** C (after Tasks 8 and 9) · **Gate:** — · **ADRs:** 0001, 0006, 0007
-**Skills:** `scroll-experience`, `web3d-motion-choreography`, `web3d-interaction-ux` (reduced motion, no-JS and load-failure fallbacks), `modern-web-guidance`, `astro`
+**Skills:** `scroll-experience`, `web3d-motion-choreography`, `web3d-interaction-ux` (reduced motion, no-JS and load-failure fallbacks), `modern-web-guidance`, `astro`, `full-output-enforcement`
 
 **Files:**
 - Create: `src/lib/keyframes.js`, `src/components/Zone.astro`, `src/components/ScrubStage.astro`, `src/scripts/scrub.js`
@@ -1898,7 +2082,7 @@ git commit -m "feat(scrub): canvas scroll-scrub stage with still fallbacks"
 ### Task 11: Design tokens, fonts, hero
 
 **Tier:** Pro · **Owner:** Agent → **User** approves · **Lane:** ∥ with Task 12 · **Gate:** **G4** · **ADRs:** 0006, 0007
-**Skills:** `design-system`, `ui-ux-pro-max` (contrast, type scale), `premium-web-design`, `frontend-design`, `web-design-guidelines`
+**Skills:** `design-system`, `ui-ux-pro-max` (contrast, type scale), `premium-web-design`, `frontend-design`, `web-design-guidelines`, `design-taste-frontend`, `high-end-visual-design`, `grilling` (only when the user asks for changes at G4)
 
 **Files:**
 - Create: `src/styles/tokens.css`, `src/styles/global.css`, `src/components/Hero.astro`
@@ -2174,6 +2358,8 @@ Expected: build `Complete!`; verifier `look PASS`.
 
 - [ ] **Step 7: GATE G4**
 
+Run the *Gate review* from *How to run this plan* first: commit the observation log, review OPEN observations with the user, install only what they approve.
+
 Push and post exactly:
 
 > G4: preview <URL>. To judge the tokens against the real art, open DevTools → Rendering → *prefers-reduced-motion: reduce* (the canvas still shows placeholder frames until Task 13). Check the hero on desktop and on your phone: name, tagline, colours, type. Reply "G4 approved" or tell me what to change.
@@ -2196,6 +2382,8 @@ Wait for "G4 approved". Apply requested changes to `tokens.css` / `Hero.astro` o
 - Produces: five MP4s at the exact paths above. Task 13 reads them.
 
 - [ ] **Step 1: GATE G5 — post the instructions**
+
+Run the *Gate review* from *How to run this plan* first: commit the observation log, review OPEN observations with the user, install only what they approve.
 
 Post exactly:
 
@@ -2281,7 +2469,7 @@ Rules for all of Tasks 14–18:
 ### Task 14: Pitch section
 
 **Tier:** Flash · **Owner:** Agent · **Lane:** D · **Gate:** — · **ADRs:** 0003, 0006
-**Skills:** `frontend-design`, `web-design-guidelines`, `astro`, `accessibility-auditor`
+**Skills:** `frontend-design`, `web-design-guidelines`, `astro`, `accessibility-auditor`, `design-taste-frontend`, `full-output-enforcement`
 
 **Files:**
 - Create: `src/components/Pitch.astro`, `src/pages/dev/pitch.astro`
@@ -2444,7 +2632,7 @@ git commit -m "feat(sections): Pitch with tap-to-play YouTube facades"
 ### Task 15: Scoreboard section
 
 **Tier:** Flash · **Owner:** Agent · **Lane:** D · **Gate:** — · **ADRs:** 0003, 0006
-**Skills:** `frontend-design`, `premium-web-design`, `test-driven-development`, `astro`
+**Skills:** `frontend-design`, `premium-web-design`, `test-driven-development`, `astro`, `high-end-visual-design`, `full-output-enforcement`
 
 **Files:**
 - Create: `src/lib/stats.js`, `src/lib/stats.test.js`, `src/components/Scoreboard.astro`, `src/pages/dev/scoreboard.astro`
@@ -2675,7 +2863,7 @@ Expected: tests pass; build `Complete!`; the grep prints the scrape date. On `/d
 ### Task 16: Stands section
 
 **Tier:** Flash · **Owner:** Agent · **Lane:** D · **Gate:** — · **ADRs:** 0003, 0006
-**Skills:** `frontend-design`, `web-design-guidelines`, `astro`, `accessibility-auditor`
+**Skills:** `frontend-design`, `web-design-guidelines`, `astro`, `accessibility-auditor`, `design-taste-frontend`, `full-output-enforcement`
 
 **Files:**
 - Create: `src/components/Stands.astro`, `src/pages/dev/stands.astro`
@@ -2847,7 +3035,7 @@ git commit -m "feat(sections): Stands grid of featured Instagram posts"
 ### Task 17: Pavilion section
 
 **Tier:** Flash · **Owner:** Agent (copy approved by **User** at G6) · **Lane:** D · **Gate:** — · **ADRs:** 0006
-**Skills:** `copywriting`, `humanizer`, `frontend-design`, `astro`
+**Skills:** `copywriting`, `humanizer`, `frontend-design`, `astro`, `design-taste-frontend`
 
 **Files:**
 - Create: `src/data/story.md`, `src/components/Pavilion.astro`, `src/pages/dev/pavilion.astro`
@@ -3009,7 +3197,7 @@ git commit -m "feat(sections): Pavilion story, facts and photos"
 ### Task 18: Boundary Rope + `/go/*` pages
 
 **Tier:** Flash · **Owner:** Agent · **Lane:** D · **Gate:** — · **ADRs:** 0005, 0006
-**Skills:** `frontend-design`, `web-design-guidelines`, `astro`, `accessibility-auditor`
+**Skills:** `frontend-design`, `web-design-guidelines`, `astro`, `accessibility-auditor`, `design-taste-frontend`, `full-output-enforcement`
 
 **Files:**
 - Create: `src/components/Boundary.astro`, `src/pages/go/whatsapp.astro`, `src/pages/go/email.astro`, `src/pages/dev/boundary.astro`
@@ -3238,7 +3426,7 @@ git commit -m "feat(sections): Boundary Rope CTAs with counted /go redirects"
 ### Task 19: Integration
 
 **Tier:** Pro · **Owner:** Agent → **User** reviews · **Lane:** — (after Tasks 13–18 are all merged) · **Gate:** **G6** · **ADRs:** 0001, 0006
-**Skills:** `scroll-experience`, `web3d-motion-choreography`, `web3d-interaction-ux`, `requesting-code-review`, `ponytail-review`
+**Skills:** `scroll-experience`, `web3d-motion-choreography`, `web3d-interaction-ux`, `requesting-code-review`, `ponytail-review`, `design-taste-frontend`, `grilling` (only when the user asks for changes at G6)
 
 **Files:**
 - Modify: `src/pages/index.astro`, `src/lib/keyframes.js`, `src/components/Zone.astro`
@@ -3339,7 +3527,7 @@ npm run build
 node scripts/verify-pipeline.mjs
 ```
 
-Expected: tests pass; build `Complete!`; verifier: `scope art assets look motion ux build` all PASS, `perf` and `ship` FAIL.
+Expected: tests pass; build `Complete!`; verifier: `governance scope art assets look motion ux build` all PASS, `perf` and `ship` FAIL.
 
 - [ ] **Step 5: Self-review before the gate**
 
@@ -3351,6 +3539,8 @@ git commit -m "feat(page): compose the six zones, drop placeholders, add scroll 
 ```
 
 - [ ] **Step 6: GATE G6 — integrated review**
+
+Run the *Gate review* from *How to run this plan* first: commit the observation log, review OPEN observations with the user, install only what they approve.
 
 Push and post exactly:
 
@@ -3629,7 +3819,7 @@ git commit -m "docs(qa): accessibility and performance audit reports"
 ### Task 22: Fix pass and perf report
 
 **Tier:** Pro · **Owner:** Agent · **Lane:** — (after Tasks 20 and 21) · **Gate:** — · **ADRs:** 0001, 0007
-**Skills:** `accessibility-auditor`, `core-web-vitals`, `web3d-performance-budget`, `verification-before-completion`, `ponytail`
+**Skills:** `accessibility-auditor`, `core-web-vitals`, `web3d-performance-budget`, `verification-before-completion`, `ponytail`, `diagnosing-bugs`
 
 **Files:**
 - Modify: whichever components the findings name; `scripts/export-frames.mjs` `TIERS` if frame weight is the problem
@@ -3695,7 +3885,7 @@ Expected: verifier `perf PASS`; only `ship` still FAIL.
 ### Task 23: Ship
 
 **Tier:** Flash · **Owner:** Agent → **User** approves launch · **Lane:** — · **Gate:** **G7** · **ADRs:** 0005, 0006
-**Skills:** `web3d-ship-deploy`, `deploy-to-vercel`, `verification-before-completion`
+**Skills:** `web3d-ship-deploy`, `deploy-to-vercel`, `verification-before-completion`, `task-observer` (full review of the whole build)
 
 **Files:**
 - Modify: `src/layouts/Base.astro` (analytics), `package.json`
@@ -3762,6 +3952,7 @@ Tick each item only after doing it on the production URL.
 - New stats/posts: `scraper/.venv/bin/python scraper/scrape.py`, re-flag `featured`, commit, push (Task 4)
 - Replace a transition: new clip in `assets/clips/`, `node scripts/export-frames.mjs`, commit, push (Task 13)
 - Edit the About copy: `src/data/story.md`, push
+- Change any skill: only through task-observer (AGENTS.md section 3); ask for "the task-observer review" any time
 ```
 
 - [ ] **Step 3: Deploy to production**
@@ -3792,10 +3983,16 @@ git commit -m "docs(qa): launch checklist complete"
 git push origin main
 ```
 
-- [ ] **Step 5: GATE G7 — launch**
+- [ ] **Step 5: Final task-observer review of the whole build**
+
+Load `.agents/skills/task-observer/references/weekly-review.md` and run the comprehensive review over every OPEN observation logged since Task 1, across every skill in `.agents/skills/`, including its cross-cutting-principles pass. Its result is what the G7 gate review presents; approved updates are installed exactly as in *Gate review* step 4, so the next project starts from the improved skills.
+
+- [ ] **Step 6: GATE G7 — launch**
+
+Run the *Gate review* from *How to run this plan* first: commit the observation log, review OPEN observations with the user, install only what they approve.
 
 Post exactly:
 
-> G7: https://VERCEL_PROJECT.vercel.app is live, the verifier is all green, and the QA checklist is fully ticked (`docs/qa/qa-checklist.md`). Approve launch? Once you do, add the link to Abhishek's Instagram and YouTube bios.
+> G7: https://VERCEL_PROJECT.vercel.app is live, the verifier is all green, and the QA checklist is fully ticked (`docs/qa/qa-checklist.md`). Approve launch? The final task-observer review is below: approve the skill updates to keep. Once you approve launch, add the link to Abhishek's Instagram and YouTube bios.
 
 Wait for "G7 approved". The plan is complete.

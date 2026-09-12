@@ -52,9 +52,9 @@ model name that could be verified from here.
   `npx skills add <source> --skill <name> -a antigravity -y`. Skills without
   a public source are copied from local disk.
 - **Web fallback.** If a task needs a capability no installed skill covers,
-  the agent runs `npx skills find <keyword>` and installs the best match. It
-  adds that line to `install-skills.sh` in the same commit, so the next
-  machine gets it too.
+  the agent runs `npx skills find <keyword>` and proposes the best match as a
+  task-observer observation. It is installed, and added to
+  `install-skills.sh`, only after the user approves it at a gate (ADR-0008).
 - Global Antigravity skills already on this machine may be used directly, but
   anything the plan depends on must be pinned in the repo.
 

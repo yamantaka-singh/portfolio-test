@@ -22,6 +22,18 @@ function anyFileMatches(dir, re) {
 }
 
 const GATES = {
+  // ADR-0008: task-observer must be activated in both config layers and log to the pinned main checkout, not the cwd
+  governance: () => {
+    const agents = has("AGENTS.md") ? readFileSync("AGENTS.md", "utf8") : "";
+    const pinned = agents.match(/task-observer workspace for this project is:\s*\n\s*(\/\S+)/)?.[1];
+    if (!agents.includes("invoke the\ntask-observer skill") || !pinned) return "AGENTS.md missing the task-observer activation block";
+    if (pinned.includes("/worktrees/")) return `task-observer workspace ${pinned} is inside a worktree`;
+    const rule = has(".agents/rules/00-task-observer.md") ? readFileSync(".agents/rules/00-task-observer.md", "utf8") : "";
+    if (!/^---\s*\ntrigger:\s*always_on\s*\n---/.test(rule) || !rule.includes(pinned)) return ".agents/rules/00-task-observer.md missing, not always_on, or pinned to a different path";
+    if (!has(".agents/skills/task-observer/SKILL.md")) return "task-observer not installed in .agents/skills/";
+    if (!has(`${pinned}/skill-observations/observation-log`)) return `no observation log at ${pinned}/skill-observations/ (Session Start Protocol never ran)`;
+    return true;
+  },
   scope: () =>
     has("docs/inputs.md") && !readFileSync("docs/inputs.md", "utf8").includes("- [ ]")
       ? true

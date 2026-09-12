@@ -29,6 +29,7 @@ Accounts:
 | Hosting | Vercel static, `*.vercel.app` until a domain is bought | [0005](../../adr/0005-hosting.md) |
 | Structure | One page, six zones, Abhishek-led, WhatsApp and email CTAs counted via `/go/*` page views, English UI with Hinglish copy | [0006](../../adr/0006-site-structure.md) |
 | Stack | Astro 7 static, GSAP 3.15 ScrollTrigger, plain CSS tokens; web3d gate order without its checker | [0007](../../adr/0007-stack.md) |
+| Governance | task-observer (One Skill to Rule Them All) rules every skill: always-on activation, one pinned observation log, skills change only via staged updates the user approves at gates | [0008](../../adr/0008-task-observer-governance.md) |
 
 ## 3. Gates and evidence
 
@@ -39,6 +40,7 @@ automatically, read-only, and exits non-zero on any failure.
 
 | Gate | Evidence | Human gate(s) |
 |------|----------|---------------|
+| governance | `AGENTS.md` + `.agents/rules/00-task-observer.md` (always on) + `task-observer` installed + observation log at the pinned path | Gate review at every gate |
 | scope | `docs/inputs.md` complete (see §6) | G0: inputs and consent |
 | art | `assets/prompts/keyframes.md` + six approved stills in `src/assets/keyframes/` | G2: style lock, G3: all keyframes |
 | assets | `src/data/social.json` curated; `src/data/frames.json` + frames in `public/frames/` | G1: data curation, G5: transition takes |
@@ -64,7 +66,7 @@ Shared files (`tokens.css`, `global.css`, `index.astro`, `Zone.astro`,
 is in the plan's Global Constraints.
 
 ### Phase 0: Setup (sequential)
-- **0.1 [User] Inputs and consent** → `docs/inputs.md`. Gate **G0**.
+- **0.1 [Pro → User] Governance + inputs** → task-observer installed and activated (`AGENTS.md`, always-on rule, pinned log), then `docs/inputs.md`. Gate **G0**.
 - **0.2 [Flash] Scaffold**
   - Astro 7 static (Node ≥ 22.19), linked to a Vercel project, `site` set
     to the `vercel.app` URL
@@ -168,6 +170,9 @@ Skill names below were checked against each repo's `skills/` folder on
 | `anthropics/skills` | `frontend-design` |
 | `vercel-labs/agent-skills` | `web-design-guidelines`, `deploy-to-vercel` |
 | `DietrichGebert/ponytail` | `ponytail`, `ponytail-review` |
+| `rebelytics/one-skill-to-rule-them-all` | `task-observer` — installed first, governs all others (ADR-0008) |
+| `leonxlnx/taste-skill` (install name = frontmatter `name`) | `design-taste-frontend`, `high-end-visual-design`, `full-output-enforcement` |
+| `mattpocock/skills` | `grilling`, `writing-for-agents`, `diagnosing-bugs` |
 
 **Copied from local disk** (no public source found):
 
@@ -176,15 +181,19 @@ Skill names below were checked against each repo's `skills/` folder on
 | `~/projects/3d-design/web3d-skills/` (each folder's single top-level `*.md` is renamed to `SKILL.md` on copy) | `web3d-art-direction`, `web3d-motion-choreography`, `web3d-interaction-ux`, `web3d-performance-budget`, `web3d-ship-deploy` |
 | `~/.gemini/config/skills/` (Antigravity global on this machine) | `astro`, `scroll-experience`, `premium-web-design`, `design-system`, `modern-web-guidance`, `seo`, `schema-markup`, `core-web-vitals`, `accessibility-auditor`, `copywriting`, `humanizer`, `architecture-decision-records` |
 
-**Fallback**: on a machine missing any of these, or for a capability not
-listed, run `npx skills find <keyword>`, install the match, and append it to
-`install-skills.sh` in the same commit.
+**Fallback**: for a capability not listed, run `npx skills find <keyword>`
+and log the match as a task-observer `proposes_skill` observation; it is
+installed and added to `install-skills.sh` only after approval at a gate
+(ADR-0008). Everything above is committed in `.agents/skills/`, so a fresh
+clone needs no install at all.
 
 **Deliberately excluded**, because 3D, React and generation were removed:
 - R3F / `3d-web-experience`
 - Next.js / React skills
 - `imagegen` / `comfy-mcp`
 - database skills
+- `gpt-taste` (mandates React, Tailwind, a nav bar and AIDA sections, against ADR-0006/0007)
+- mattpocock `code-review` (needs its setup skill's issue-tracker file) and `tdd` (duplicates superpowers)
 
 ## 6. Inputs needed before Phase 1 (`docs/inputs.md`)
 - [ ] Abhishek's consent to scrape and republish his public content
