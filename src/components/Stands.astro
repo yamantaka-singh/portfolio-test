@@ -6,9 +6,10 @@ import { Instagram, Heart, Eye, Play, Flame, Sparkles, ExternalLink } from 'luci
 
 const accounts = profilesBy('instagram');
 
-// Sort strictly by real view count to surface the most-viewed reels first
+// Featured posts (manually curated, e.g. no scraped view count available) lead;
+// the rest are sorted by real view count.
 const topPosts = [...social.posts]
-  .sort((a, b) => (b.views ?? 0) - (a.views ?? 0))
+  .sort((a, b) => Number(b.featured) - Number(a.featured) || (b.views ?? 0) - (a.views ?? 0))
   .slice(0, 6);
 ---
 <div class="stands-container">
