@@ -13,6 +13,8 @@
     "verify": "node scripts/verify-pipeline.mjs"
   },
   "dependencies": {
-    "astro": "^7.3.2"
+    "astro": "^7.3.2",
+    "gsap": "^3.15.0",
+    "sharp": "^0.35.4"
   }
 }

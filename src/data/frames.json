@@ -1,0 +1,29 @@
+{
+  "transitions": [
+    {
+      "id": "01-tunnel-pitch",
+      "desktop": 60,
+      "mobile": 30
+    },
+    {
+      "id": "02-pitch-scoreboard",
+      "desktop": 60,
+      "mobile": 30
+    },
+    {
+      "id": "03-scoreboard-stands",
+      "desktop": 60,
+      "mobile": 30
+    },
+    {
+      "id": "04-stands-pavilion",
+      "desktop": 60,
+      "mobile": 30
+    },
+    {
+      "id": "05-pavilion-boundary",
+      "desktop": 60,
+      "mobile": 30
+    }
+  ]
+}
