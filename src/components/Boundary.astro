@@ -1,0 +1,93 @@
+---
+import { site } from '../data/site.js';
+
+const handle = (url) => url.split('/').filter(Boolean).pop().replace('@', '');
+const socials = [
+  ...site.profiles.instagram.map((url) => ({ url, label: `Instagram @${handle(url)}` })),
+  ...site.profiles.youtube.map((url) => ({ url, label: `YouTube @${handle(url)}` })),
+  { url: site.profiles.linkedin, label: 'LinkedIn' },
+];
+---
+<div class="boundary">
+  <header>
+    <p class="kicker">Boundary Rope</p>
+    <h2>Book {site.name.split(' ')[0]}</h2>
+  </header>
+  <p class="lede">Brand collaborations and sponsorships: message directly and hear back from {site.name.split(' ')[0]} himself.</p>
+  <div class="ctas">
+    <a class="cta primary" href="/go/whatsapp">WhatsApp</a>
+    <a class="cta" href="/go/email">Email</a>
+  </div>
+  <p class="plain">Email: <span class="email">{site.email}</span></p>
+  <footer class="footer">
+    <ul class="socials" role="list">
+      {socials.map((s) => (
+        <li><a href={s.url} target="_blank" rel="noopener">{s.label}</a></li>
+      ))}
+    </ul>
+    <p class="small">© {new Date().getFullYear()} {site.name}</p>
+  </footer>
+</div>
+
+<style>
+  .boundary {
+    display: grid;
+    gap: var(--space-m);
+  }
+  .lede {
+    margin: 0;
+    max-width: 40ch;
+    font-size: var(--step-1);
+  }
+  .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-s);
+  }
+  .cta {
+    min-width: 11rem;
+    padding: var(--space-s) var(--space-l);
+    border: 2px solid var(--color-text);
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    font-weight: 800;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+  .cta:hover {
+    transform: translateY(-2px);
+  }
+  .primary {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+  }
+  .plain {
+    margin: 0;
+    color: var(--color-muted);
+  }
+  .email {
+    user-select: all;
+  }
+  .footer {
+    display: grid;
+    gap: var(--space-s);
+    margin-top: var(--space-xl);
+    padding-top: var(--space-m);
+    border-top: 1px solid var(--color-line);
+  }
+  .socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-s) var(--space-m);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .small {
+    margin: 0;
+    font-size: var(--step--1);
+    color: var(--color-muted);
+  }
+</style>

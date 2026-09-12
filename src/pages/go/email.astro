@@ -1,0 +1,30 @@
+---
+import Base from '../../layouts/Base.astro';
+import { site } from '../../data/site.js';
+import { mailtoUrl } from '../../lib/links.js';
+
+const target = mailtoUrl(site.email, site.enquirySubject);
+---
+<Base title="Opening email…" description={`Email ${site.name}.`}>
+  <meta slot="head" name="robots" content="noindex" />
+  <main class="go">
+    <p>Opening your email app…</p>
+    <p>If nothing happens, write to <strong>{site.email}</strong>.</p>
+    <p><a href="/#boundary">Back to the site</a></p>
+  </main>
+  <script is:inline define:vars={{ target }}>
+    // ponytail: 1s lets the analytics page view send before leaving; lower it if it feels slow
+    setTimeout(() => location.replace(target), 1000);
+  </script>
+</Base>
+
+<style>
+  .go {
+    display: grid;
+    place-content: center;
+    gap: var(--space-xs);
+    min-height: 100dvh;
+    padding: var(--space-m);
+    text-align: center;
+  }
+</style>
