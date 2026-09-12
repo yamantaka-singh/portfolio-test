@@ -1,32 +1,562 @@
 ---
+import { Image } from 'astro:assets';
 import { site } from '../data/site.js';
+import { Play, Radio, ArrowUpRight, Flame, ShieldCheck } from 'lucide-astro';
+import heroPortrait from '../assets/photos/abhishek-stadium-gt.jpg';
 ---
-<div class="hero">
-  <p class="kicker">Cricket content creator · Spin &amp; Swing · Unseen</p>
-  <h1>{site.name}</h1>
-  <p class="tagline">{site.tagline}</p>
-  <a class="cue" href="#pitch">Walk out <span aria-hidden="true">↓</span></a>
+<div class="hero-wrapper">
+  <!-- Looping 1080p Cricket Stadium Video Background -->
+  <div class="video-bg" aria-hidden="true">
+    <video
+      class="video-element"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="auto"
+    >
+      <source src="/assets/cricket-stadium-loop.mp4" type="video/mp4" />
+    </video>
+    <div class="video-overlay"></div>
+  </div>
+
+  <div class="hero-container">
+    <!-- Top Telemetry & Broadcast Bar -->
+    <div class="telemetry-bar">
+      <div class="telemetry-right">
+        <span class="hud-pill neon">
+          <Flame class="icon-tiny" /> 180K+ CRICKET PURISTS
+        </span>
+      </div>
+    </div>
+
+    <!-- Main Maximalist Grid -->
+    <div class="hero-grid">
+      <!-- Left Content Column -->
+      <div class="hero-content">
+        <p class="kicker reveal-text">
+          <span class="kicker-badge">HOST // SPIN &amp; SWING</span>
+          CRICKET CREATOR &amp; TACTICAL ANALYST
+        </p>
+        
+        <h1 class="hero-title reveal-text">
+          <span class="first-name">ABHISHEK</span>
+          <span class="last-name">PANDEY</span>
+        </h1>
+
+        <p class="hero-lede reveal-text">
+          {site.tagline} Deconstructing every seam movement, spin trajectory, and high-pressure tactical shift across international cricket.
+        </p>
+
+        <div class="cta-cluster">
+          <a class="cta-primary magnetic" href="#pitch" data-cursor-text="WATCH">
+            <span>Watch Top Intel</span>
+            <span class="icon-bubble"><Play class="icon-small" /></span>
+          </a>
+          <a class="cta-secondary magnetic" href="#pavilion" data-cursor-text="STORY">
+            <span>The Dossier</span>
+            <ArrowUpRight class="icon-small" />
+          </a>
+        </div>
+
+        <!-- Metric Mini Grid -->
+        <div class="metric-ribbon">
+          <div class="metric-cell">
+            <span class="metric-num">180K+</span>
+            <span class="metric-lbl">Audience Reach</span>
+          </div>
+          <div class="metric-cell">
+            <span class="metric-num">50M+</span>
+            <span class="metric-lbl">Total Impressions</span>
+          </div>
+          <div class="metric-cell">
+            <span class="metric-num">CRICKET</span>
+            <span class="metric-lbl">Deep-Dive Specialty</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Pitchside Accreditation Dossier Card -->
+      <div class="hero-card-col">
+        <div class="accreditation-card tilt-card" data-cursor-text="ABHISHEK">
+          <div class="card-header">
+            <div class="card-chip">
+              <ShieldCheck class="icon-tiny" />
+              <span>ACCREDITATION // AP-2026</span>
+            </div>
+            <span class="card-loc">PITCHSIDE ACCESS</span>
+          </div>
+
+          <div class="card-image-wrap">
+            <Image 
+              src={heroPortrait} 
+              alt="Abhishek Pandey at Narendra Modi Stadium pitchside" 
+              class="card-img" 
+              widths={[480, 800]} 
+              sizes="(min-width: 64rem) 380px, 85vw"
+              priority
+            />
+            <div class="card-overlay-badge">
+              <span class="badge-match">AHMEDABAD PITCHSIDE</span>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <div class="telemetry-readout">
+              <span class="lbl">CONDITION</span>
+              <span class="val">HARD TURF · DRY SEAM</span>
+            </div>
+            <div class="barcode" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Marquee Ticker -->
+  <div class="marquee-ribbon" aria-hidden="true">
+    <div class="marquee-track">
+      <div class="marquee-content">
+        <span>SPIN &amp; SWING</span>
+        <span class="sep">///</span>
+        <span class="highlight">44.2K SUBSCRIBERS</span>
+        <span class="sep">///</span>
+        <span class="highlight">50,000,000+ IMPRESSIONS</span>
+        <span class="sep">///</span>
+        <span>IPL TACTICAL DRILLS</span>
+        <span class="sep">///</span>
+        <span class="highlight">UNFILTERED CRICKET INTEL</span>
+        <span class="sep">///</span>
+      </div>
+      <div class="marquee-content">
+        <span>SPIN &amp; SWING</span>
+        <span class="sep">///</span>
+        <span class="highlight">44.2K SUBSCRIBERS</span>
+        <span class="sep">///</span>
+        <span class="highlight">50,000,000+ IMPRESSIONS</span>
+        <span class="sep">///</span>
+        <span>IPL TACTICAL DRILLS</span>
+        <span class="sep">///</span>
+        <span class="highlight">UNFILTERED CRICKET INTEL</span>
+        <span class="sep">///</span>
+      </div>
+    </div>
+  </div>
 </div>
 
 <style>
-  .hero {
-    display: grid;
-    gap: var(--space-s);
+  .hero-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    padding-top: clamp(var(--space-m), 4vw, var(--space-xl));
   }
-  .tagline {
+
+  @media (max-width: 30rem) {
+    .hero-wrapper {
+      padding-top: var(--space-xs);
+    }
+  }
+
+  .video-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .video-element {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.6) contrast(1.15) saturate(1.1);
+  }
+
+  .video-overlay {
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(circle at 75% 45%, rgba(0, 240, 255, 0.08) 0%, transparent 60%),
+      radial-gradient(circle at 25% 65%, rgba(230, 75, 107, 0.06) 0%, transparent 60%),
+      linear-gradient(to top, var(--color-bg) 0%, rgba(7, 9, 14, 0.75) 40%, rgba(7, 9, 14, 0.5) 100%);
+    z-index: 1;
+  }
+
+  .hero-container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 86rem;
+    margin: 0 auto;
+    padding: var(--space-s) clamp(1rem, 3.5vw, var(--space-xl));
+    display: flex;
+    flex-direction: column;
+    gap: clamp(var(--space-m), 3vw, var(--space-l));
+  }
+
+  @media (max-width: 30rem) {
+    .hero-container {
+      padding-top: var(--space-2xs);
+      padding-bottom: var(--space-2xs);
+      gap: var(--space-xs);
+    }
+  }
+
+  .telemetry-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    width: 100%;
+  }
+
+  @media (max-width: 40rem) {
+    .telemetry-bar {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2xs);
+    }
+  }
+
+  .telemetry-left,
+  .telemetry-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    flex-wrap: wrap;
+  }
+
+  .icon-tiny {
+    width: 0.85rem;
+    height: 0.85rem;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(var(--space-l), 4vw, var(--space-2xl));
+    align-items: center;
+    width: 100%;
+  }
+
+  @media (min-width: 62rem) {
+    .hero-grid {
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.85fr);
+      gap: var(--space-2xl);
+    }
+  }
+
+  .hero-content {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(var(--space-xs), 2vw, var(--space-m));
+  }
+
+  .kicker-badge {
+    color: var(--color-neon);
+    font-weight: 700;
+  }
+
+  .hero-title {
+    display: flex;
+    flex-direction: column;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    font-size: clamp(2.5rem, 8vw, 8.5rem);
+    word-break: break-word;
+  }
+
+  @media (max-width: 30rem) {
+    .hero-title {
+      font-size: clamp(2.25rem, 12vw, 3.25rem);
+    }
+  }
+
+  .first-name {
+    color: var(--color-text);
+  }
+
+  .last-name {
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--color-neon);
+    text-shadow: var(--glow-neon);
+  }
+
+  .hero-lede {
     margin: 0;
-    max-width: 36ch;
-    font-size: var(--step-1);
+    max-width: 46ch;
+    font-size: var(--step-0);
+    color: var(--color-muted);
+    line-height: 1.5;
+  }
+
+  .cta-cluster {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-s);
+    margin-top: var(--space-2xs);
+  }
+
+  @media (max-width: 32rem) {
+    .cta-cluster {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .cta-primary, .cta-secondary {
+      justify-content: center;
+      width: 100%;
+    }
+  }
+
+  .cta-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-s);
+    padding: var(--space-xs) var(--space-l);
+    border-radius: 9999px;
+    background: var(--gradient-neon);
+    color: #FFF;
+    font-family: var(--font-display);
+    font-size: var(--step-0);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: transform 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out);
+    box-shadow: 0 0 24px rgba(230, 75, 107, 0.4);
+    min-height: 44px;
+  }
+
+  .cta-primary:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 0 36px rgba(230, 75, 107, 0.65);
+  }
+
+  .icon-bubble {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.85rem;
+    height: 1.85rem;
+    border-radius: 50%;
+    background: var(--color-bg);
+    color: var(--color-neon);
+  }
+
+  .cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-m);
+    border-radius: 9999px;
+    border: 1px solid var(--color-line-bright);
+    background: rgba(17, 20, 29, 0.7);
+    backdrop-filter: blur(10px);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text);
+    transition: border-color 0.25s ease, background 0.25s ease;
+    min-height: 44px;
+  }
+
+  .cta-secondary:hover {
+    border-color: var(--color-neon);
+    background: rgba(230, 75, 107, 0.1);
+  }
+
+  .metric-ribbon {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(var(--space-2xs), 2vw, var(--space-s));
+    padding-top: var(--space-s);
+    border-top: 1px solid var(--color-line);
+    margin-top: var(--space-xs);
+  }
+
+  @media (max-width: 30rem) {
+    .metric-ribbon {
+      padding-top: var(--space-2xs);
+      margin-top: 0;
+    }
+  }
+
+  .metric-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .metric-num {
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 3.5vw, var(--step-3));
+    font-weight: 800;
+    line-height: 1;
+    color: var(--color-neon);
+  }
+
+  .metric-lbl {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    text-transform: uppercase;
+    color: var(--color-muted);
+    letter-spacing: 0.08em;
+  }
+
+  /* Accreditation Pass Card */
+  .hero-card-col {
+    display: flex;
+    justify-content: center;
+    perspective: 1000px;
+  }
+
+  .accreditation-card {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+    background: linear-gradient(145deg, rgba(24, 28, 40, 0.85), rgba(13, 16, 24, 0.95));
+    border: 1px solid var(--color-line-bright);
+    border-radius: 12px;
+    padding: var(--space-s);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 240, 255, 0.12);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .accreditation-card:hover {
+    box-shadow: 0 32px 70px rgba(0, 0, 0, 0.85), 0 0 45px rgba(230, 75, 107, 0.25);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: 0.1em;
+    padding-bottom: var(--space-2xs);
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .card-chip {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    color: var(--color-cyan);
+    font-weight: 700;
+  }
+
+  .card-loc {
     color: var(--color-muted);
   }
-  .cue {
-    justify-self: start;
-    margin-top: var(--space-l);
-    padding-bottom: var(--space-2xs);
-    border-bottom: 2px solid var(--color-accent);
-    font-family: var(--font-display);
-    font-size: var(--step-1);
-    text-transform: uppercase;
-    text-decoration: none;
+
+  .card-image-wrap {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    aspect-ratio: 4 / 5;
+    background: var(--color-surface);
+  }
+
+  .card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+    filter: contrast(1.08) brightness(1.02);
+    transition: transform 0.5s var(--ease-out);
+  }
+
+  .accreditation-card:hover .card-img {
+    transform: scale(1.04);
+  }
+
+  .card-overlay-badge {
+    position: absolute;
+    bottom: var(--space-xs);
+    left: var(--space-xs);
+    right: var(--space-xs);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-2xs) var(--space-xs);
+    border-radius: 6px;
+    background: rgba(7, 9, 14, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--color-line);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+  }
+
+  .badge-role {
+    color: var(--color-neon);
+    font-weight: 700;
+  }
+
+  .badge-match {
+    color: var(--color-text);
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--space-2xs);
+  }
+
+  .telemetry-readout {
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    line-height: 1.2;
+  }
+
+  .telemetry-readout .lbl {
+    color: var(--color-muted);
+  }
+
+  .telemetry-readout .val {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .barcode {
+    display: flex;
+    gap: 3px;
+    height: 24px;
+    align-items: center;
+  }
+
+  .barcode span {
+    display: block;
+    height: 100%;
+    background-color: var(--color-line-bright);
+    width: 2px;
+  }
+
+  .barcode span:nth-child(even) {
+    width: 3px;
+    background-color: var(--color-muted);
+  }
+
+  .barcode span:nth-child(3),
+  .barcode span:nth-child(7) {
+    width: 1px;
   }
 </style>

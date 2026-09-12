@@ -1,93 +1,455 @@
 ---
 import { site } from '../data/site.js';
+import { Mail, ExternalLink, Sparkles, Clock, CheckCircle, ArrowUpRight, Instagram, Youtube, Linkedin } from 'lucide-astro';
 
-const handle = (url) => url.split('/').filter(Boolean).pop().replace('@', '');
+const handle = (url: string) => url.split('/').filter(Boolean).pop()?.replace('@', '') || '';
 const socials = [
-  ...site.profiles.instagram.map((url) => ({ url, label: `Instagram @${handle(url)}` })),
-  ...site.profiles.youtube.map((url) => ({ url, label: `YouTube @${handle(url)}` })),
-  { url: site.profiles.linkedin, label: 'LinkedIn' },
+  ...site.profiles.instagram.map((url) => ({ url, icon: Instagram, handle: `@${handle(url)}` })),
+  ...site.profiles.youtube.map((url) => ({ url, icon: Youtube, handle: `@${handle(url)}` })),
+  { url: site.profiles.linkedin, icon: Linkedin, handle: 'abhishek-pandey' },
+];
+
+const collaborationPillars = [
+  { id: '01', title: 'Title Series Sponsorship', desc: 'Pre-roll and mid-roll integration across Spin & Swing YouTube deep-dives.' },
+  { id: '02', title: 'Pitchside Brand Activation', desc: 'On-ground brand features during IPL, DPL, and international matchdays.' },
+  { id: '03', title: 'Custom Tactical Breakdown', desc: 'Data-driven technical analysis tailored to your brand narrative.' },
+  { id: '04', title: 'Live Panels & Masterclasses', desc: 'Cricket analytics keynote, podcast appearances, and purist workshops.' },
 ];
 ---
-<div class="boundary">
-  <header>
-    <p class="kicker">Boundary Rope</p>
-    <h2>Book {site.name.split(' ')[0]}</h2>
-  </header>
-  <p class="lede">Brand collaborations and sponsorships: message directly and hear back from {site.name.split(' ')[0]} himself.</p>
-  <div class="ctas">
-    <a class="cta primary" href="/go/whatsapp">WhatsApp</a>
-    <a class="cta" href="/go/email">Email</a>
+<div class="boundary-container">
+  <!-- Top Marquee Banner -->
+  <div class="boundary-marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <div class="marquee-content">
+        <span>NOW BOOKING 2026 COMMERCIAL PARTNERSHIPS</span>
+        <span class="sep">★</span>
+        <span class="highlight">DIRECT EMAIL LINE OPEN</span>
+        <span class="sep">★</span>
+        <span>BRAND COLLABORATIONS WELCOME</span>
+        <span class="sep">★</span>
+      </div>
+      <div class="marquee-content">
+        <span>NOW BOOKING 2026 COMMERCIAL PARTNERSHIPS</span>
+        <span class="sep">★</span>
+        <span class="highlight">DIRECT EMAIL LINE OPEN</span>
+        <span class="sep">★</span>
+        <span>BRAND COLLABORATIONS WELCOME</span>
+        <span class="sep">★</span>
+      </div>
+    </div>
   </div>
-  <p class="plain">Email: <span class="email">{site.email}</span></p>
-  <footer class="footer">
-    <ul class="socials" role="list">
-      {socials.map((s) => (
-        <li><a href={s.url} target="_blank" rel="noopener">{s.label}</a></li>
+
+  <div class="boundary-main">
+    <header class="boundary-header">
+      <p class="kicker reveal-text">
+        <span class="hud-pill neon"><Sparkles class="icon-tiny" /> COLLABORATION TERMINAL</span>
+        THE BOUNDARY // PARTNERSHIPS &amp; ENQUIRIES
+      </p>
+      <h2 class="massive-headline reveal-text">LET'S BUILD SOMETHING ICONIC.</h2>
+      <p class="boundary-lede reveal-text">
+        Partner with India's premier technical cricket creator. We connect serious sports brands with passionate purists through high-impact, high-credibility storytelling.
+      </p>
+    </header>
+
+    <!-- Commercial Services Grid -->
+    <div class="pillars-grid">
+      {collaborationPillars.map((p) => (
+        <div class="pillar-card tilt-card" data-cursor-text="PACKAGE">
+          <span class="pillar-num">{p.id}</span>
+          <h3 class="pillar-title">{p.title}</h3>
+          <p class="pillar-desc">{p.desc}</p>
+        </div>
       ))}
-    </ul>
-    <p class="small">© {new Date().getFullYear()} {site.name}</p>
-  </footer>
+    </div>
+
+    <!-- Action Center & Social Ledger -->
+    <div class="action-grid">
+      <!-- Direct Contact Action -->
+      <div class="action-card primary-action">
+        <div class="action-header">
+          <span class="hud-pill live">
+            <span class="live-rec-dot"></span>
+            PRIORITY CHANNEL
+          </span>
+          <span class="resp-time"><Clock class="icon-tiny" /> Avg. response: &lt; 2h</span>
+        </div>
+
+        <h3 class="action-title">Start a Conversation</h3>
+        <p class="action-desc">
+          Drop a brief with your matchday vision or campaign scope. We reply swiftly.
+        </p>
+
+        <div class="cta-stack">
+          <a class="contact-cta cta-email magnetic" href="/go/email" data-cursor-text="EMAIL">
+            <Mail class="cta-icon" />
+            <span>Send Email Brief</span>
+            <ArrowUpRight class="icon-small" />
+          </a>
+        </div>
+
+        <div class="direct-email-row">
+          <span class="lbl">DIRECT ADDRESS:</span>
+          <span class="email-val">{site.email}</span>
+        </div>
+      </div>
+
+      <!-- Social Channels Registry -->
+      <div class="action-card registry-card">
+        <h3 class="registry-title">Official Channels Registry</h3>
+        <ul class="socials-list" role="list">
+          {socials.map((s) => (
+            <li>
+              <a class="social-row magnetic" href={s.url} target="_blank" rel="noopener" data-cursor-text="VISIT">
+                <span class="social-name"><s.icon class="icon-small" /> {s.handle}</span>
+                <ExternalLink class="icon-tiny" />
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <div class="accreditation-seal">
+          <CheckCircle class="icon-seal" />
+          <span>DPL FIELD-OF-PLAY ACCREDITED MEDIA</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Colophon Footer -->
+    <footer class="colophon-bar">
+      <div class="colophon-left">
+        <span class="brand-wordmark">{site.name}</span>
+        <span class="copyright-text">© {new Date().getFullYear()} · All rights reserved</span>
+      </div>
+      <div class="colophon-right">
+        <span class="sign-off">DESIGNED FOR UNCOMPROMISED IMPACT</span>
+      </div>
+    </footer>
+  </div>
 </div>
 
 <style>
-  .boundary {
-    display: grid;
-    gap: var(--space-m);
-  }
-  .lede {
-    margin: 0;
-    max-width: 40ch;
-    font-size: var(--step-1);
-  }
-  .ctas {
+  .boundary-container {
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-s);
-  }
-  .cta {
-    min-width: 11rem;
-    padding: var(--space-s) var(--space-l);
-    border: 2px solid var(--color-text);
-    font-family: var(--font-display);
-    font-size: var(--step-2);
-    font-weight: 800;
-    text-align: center;
-    text-decoration: none;
-    text-transform: uppercase;
-    transition: transform var(--dur-fast) var(--ease-out);
-  }
-  .cta:hover {
-    transform: translateY(-2px);
-  }
-  .primary {
-    border-color: var(--color-accent);
-    background: var(--color-accent);
-  }
-  .plain {
-    margin: 0;
-    color: var(--color-muted);
-  }
-  .email {
-    user-select: all;
-  }
-  .footer {
-    display: grid;
-    gap: var(--space-s);
+    flex-direction: column;
+    gap: var(--space-xl);
+    width: 100%;
     margin-top: var(--space-xl);
-    padding-top: var(--space-m);
-    border-top: 1px solid var(--color-line);
   }
-  .socials {
+
+  .boundary-marquee {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    margin-left: -50vw;
+    overflow: hidden;
+    padding: var(--space-xs) 0;
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-line-bright);
+    border-bottom: 1px solid var(--color-line-bright);
+  }
+
+  .boundary-main {
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-s) var(--space-m);
-    margin: 0;
-    padding: 0;
-    list-style: none;
+    flex-direction: column;
+    gap: var(--space-2xl);
+    max-width: 86rem;
+    margin: 0 auto;
+    width: 100%;
+    padding: 0 var(--space-m);
   }
-  .small {
+
+  .boundary-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-s);
+    max-width: 65ch;
+  }
+
+  .massive-headline {
+    font-size: clamp(2.25rem, 6.5vw, 7.5rem);
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    word-break: break-word;
+  }
+
+  .boundary-lede {
+    margin: 0;
+    font-size: var(--step-1);
+    color: var(--color-muted);
+    line-height: 1.5;
+  }
+
+  /* Commercial Pillars */
+  .pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+    gap: var(--space-m);
+    width: 100%;
+  }
+
+  .pillar-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-m);
+    background: var(--color-card);
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    backdrop-filter: blur(12px);
+    transition: transform 0.3s var(--ease-out), border-color 0.3s var(--ease-out);
+  }
+
+  .pillar-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--color-neon);
+  }
+
+  .pillar-num {
+    font-family: var(--font-mono);
+    font-size: var(--step-0);
+    font-weight: 700;
+    color: var(--color-neon);
+  }
+
+  .pillar-title {
+    font-family: var(--font-body);
+    font-size: var(--step-1);
+    font-weight: 700;
+    color: var(--color-text);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .pillar-desc {
     margin: 0;
     font-size: var(--step--1);
     color: var(--color-muted);
+    line-height: 1.45;
+  }
+
+  /* Action Grid */
+  .action-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-l);
+    width: 100%;
+  }
+
+  @media (min-width: 58rem) {
+    .action-grid {
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    }
+  }
+
+  .action-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+    padding: clamp(var(--space-m), 4vw, var(--space-xl));
+    background: var(--color-card);
+    border: 1px solid var(--color-line);
+    border-radius: 16px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .primary-action {
+    border-color: rgba(230, 75, 107, 0.3);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  }
+
+  .action-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .resp-time {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    color: var(--color-muted);
+  }
+
+  .action-title {
+    font-size: var(--step-3);
+    color: var(--color-text);
+  }
+
+  .action-desc {
+    margin: 0;
+    font-size: var(--step-0);
+    color: var(--color-muted);
+    line-height: 1.5;
+  }
+
+  .cta-stack {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-xs);
+  }
+
+  .contact-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-m);
+    min-height: 44px;
+    border-radius: 9999px;
+    font-family: var(--font-display);
+    font-size: var(--step-0);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    transition: transform 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out);
+  }
+
+  .cta-email {
+    background: var(--gradient-neon);
+    color: #FFF;
+    box-shadow: 0 0 20px rgba(230, 75, 107, 0.3);
+  }
+
+  .cta-email:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 32px rgba(230, 75, 107, 0.55);
+  }
+
+  .cta-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .direct-email-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    padding-top: var(--space-xs);
+    border-top: 1px solid var(--color-line);
+  }
+
+  .lbl {
+    flex-shrink: 0;
+  }
+
+  .email-val {
+    color: var(--color-neon);
+    user-select: all;
+    word-break: break-all;
+  }
+
+  /* Registry Card */
+  .registry-title {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    color: var(--color-muted);
+    letter-spacing: 0.1em;
+    padding-bottom: var(--space-xs);
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .socials-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .social-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+    min-height: 44px;
+    padding: var(--space-2xs) 0;
+    border-bottom: 1px solid var(--color-line);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--color-text);
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .social-row:hover {
+    color: var(--color-neon);
+    border-color: var(--color-neon);
+  }
+
+  .social-name {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  .accreditation-seal {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs);
+    border-radius: 8px;
+    background: rgba(0, 240, 255, 0.06);
+    border: 1px solid rgba(0, 240, 255, 0.2);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    color: var(--color-cyan);
+    letter-spacing: 0.05em;
+  }
+
+  .icon-seal {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  /* Colophon */
+  .colophon-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-m);
+    padding: var(--space-l) 0 var(--space-2xl);
+    border-top: 1px solid var(--color-line);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    color: var(--color-muted);
+    letter-spacing: 0.05em;
+  }
+
+  .colophon-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-m);
+  }
+
+  .brand-wordmark {
+    font-family: var(--font-display);
+    font-size: var(--step-0);
+    font-weight: 800;
+    color: var(--color-text);
+  }
+
+  .icon-tiny {
+    width: 0.85rem;
+    height: 0.85rem;
+  }
+
+  .icon-small {
+    width: 1.1rem;
+    height: 1.1rem;
   }
 </style>

@@ -1,102 +1,409 @@
 ---
 import { Image } from 'astro:assets';
-import { featuredVideos, thumb } from '../lib/social.js';
+import { social, thumb } from '../lib/social.js';
 import { compactCount, longDate } from '../lib/format.js';
+import { Play, Eye, Sparkles, Flame, Trophy, ExternalLink } from 'lucide-astro';
+
+// Sort videos strictly by views descending to surface the most viral hits first
+const topVideos = [...social.videos]
+  .sort((a, b) => b.views - a.views)
+  .slice(0, 6);
+
+const videoTags = [
+  { tag: 'VIRAL HIT', badgeClass: 'neon' },
+  { tag: 'STORY EXCLUSIVE', badgeClass: 'cyan' },
+  { tag: 'DPL TIGER', badgeClass: 'gold' },
+  { tag: 'IPL SPOTLIGHT', badgeClass: 'neon' },
+  { tag: 'INTERVIEW', badgeClass: 'cyan' },
+  { tag: 'MATCHDAY INTEL', badgeClass: 'gold' },
+];
 ---
-<div class="pitch">
-  <header>
-    <p class="kicker">The Pitch</p>
-    <h2>Highlights</h2>
+<div class="pitch-container">
+  <header class="pitch-header">
+    <div class="header-left">
+      <p class="kicker reveal-text">
+        <span class="hud-pill neon"><Flame class="icon-tiny" /> VIRAL ARCHIVE</span>
+        THE PITCH // MATCHDAY HIGHLIGHTS
+      </p>
+      <h2 class="pitch-title reveal-text">UNFILTERED INTEL.</h2>
+      <p class="pitch-subtitle reveal-text">
+        The most viewed cricket breakdowns, player feature stories, and matchday tactical analyses.
+      </p>
+    </div>
+    <div class="header-right">
+      <a class="channel-btn magnetic" href="https://www.youtube.com/@spinandswing26" target="_blank" rel="noopener" data-cursor-text="YOUTUBE">
+        <span>Channel Archive</span>
+        <ExternalLink class="icon-tiny" />
+      </a>
+    </div>
   </header>
-  <ul class="grid" role="list">
-    {featuredVideos.map((v) => (
-      <li class="card">
-        <a class="facade" href={`https://www.youtube.com/watch?v=${v.id}`} data-yt={v.id} data-title={v.title} aria-label={`Play video: ${v.title}`}>
-          <Image class="thumb" src={thumb(v.thumb)} alt="" widths={[480, 960]} sizes="(min-width: 64rem) 30vw, 90vw" />
-          <span class="play" aria-hidden="true">▶</span>
-        </a>
-        <h3 class="title">{v.title}</h3>
-        <p class="meta">{compactCount(v.views)} views · {longDate(v.publishedAt)}</p>
-      </li>
-    ))}
-  </ul>
+
+  <!-- Video Grid Matrix with Smooth Horizontal Carousel on Touch / Grid on Desktop -->
+  <div class="carousel-wrapper" data-lenis-prevent>
+    <div class="video-grid" role="list">
+      {topVideos.map((v, i) => (
+        <article class="video-card tilt-card" role="listitem" data-cursor-text="PLAY">
+          <div class="card-media">
+            <a 
+              class="video-link magnetic" 
+              href={`https://www.youtube.com/watch?v=${v.id}`} 
+              data-yt={v.id} 
+              data-title={v.title}
+              aria-label={`Play video: ${v.title}`}
+            >
+              <Image 
+                class="video-thumb" 
+                src={thumb(v.thumb)} 
+                alt={v.title} 
+                widths={[400, 720]} 
+                sizes="(min-width: 64rem) 360px, 85vw" 
+              />
+              <div class="thumb-overlay"></div>
+              <span class="play-trigger" aria-hidden="true">
+                <Play class="play-icon" />
+              </span>
+            </a>
+
+            <!-- Badge Overlays -->
+            <div class="media-badges">
+              <span class={`badge-tag ${videoTags[i]?.badgeClass || 'neon'}`}>
+                {videoTags[i]?.tag || 'FEATURED'}
+              </span>
+              <span class="views-pill">
+                <Eye class="icon-micro" />
+                {compactCount(v.views)}
+              </span>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="meta-row">
+              <span class="index-num">#{i + 1 < 10 ? `0${i + 1}` : i + 1}</span>
+              <span class="pub-date">{longDate(v.publishedAt)}</span>
+            </div>
+            <h3 class="video-heading">
+              <a href={`https://www.youtube.com/watch?v=${v.id}`} target="_blank" rel="noopener">
+                {v.title}
+              </a>
+            </h3>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
 </div>
 
 <script>
+  // Instant YouTube Player Injection
   document.querySelectorAll('a[data-yt]').forEach((link) => {
     link.addEventListener('click', (event) => {
       event.preventDefault();
+      const ytId = (link as HTMLElement).dataset.yt;
+      const title = (link as HTMLElement).dataset.title || 'YouTube video';
       const iframe = document.createElement('iframe');
-      iframe.src = `https://www.youtube-nocookie.com/embed/${link.dataset.yt}?autoplay=1&playsinline=1&rel=0`;
-      iframe.title = link.dataset.title ?? 'YouTube video';
+      iframe.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&playsinline=1&rel=0`;
+      iframe.title = title;
       iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
       iframe.allowFullscreen = true;
-      iframe.className = 'player';
-      link.replaceWith(iframe);
+      iframe.className = 'player-embed';
+      link.parentElement?.replaceChild(iframe, link);
       iframe.focus();
     });
   });
 </script>
 
 <style>
-  .pitch {
-    display: grid;
+  .pitch-container {
+    display: flex;
+    flex-direction: column;
     gap: var(--space-l);
+    width: 100%;
+    max-width: 86rem;
+    margin: 0 auto;
   }
-  .grid {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
+
+  .pitch-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
     gap: var(--space-m);
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    padding-bottom: var(--space-s);
+    border-bottom: 1px solid var(--color-line);
   }
-  .card {
-    display: grid;
+
+  .header-left {
+    display: flex;
+    flex-direction: column;
     gap: var(--space-xs);
-    align-content: start;
+    max-width: 54ch;
   }
-  .facade,
-  .card :global(.player) {
+
+  .pitch-title {
+    font-size: clamp(2.5rem, 6vw, 5.5rem);
+    color: var(--color-text);
+  }
+
+  .pitch-subtitle {
+    margin: 0;
+    font-size: var(--step-0);
+    color: var(--color-muted);
+    line-height: 1.5;
+  }
+
+  .channel-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-m);
+    border-radius: 9999px;
+    border: 1px solid var(--color-line-bright);
+    background: rgba(17, 20, 29, 0.75);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text);
+    transition: all 0.25s var(--ease-out);
+  }
+
+  .channel-btn:hover {
+    border-color: var(--color-neon);
+    color: var(--color-neon);
+    background: rgba(230, 75, 107, 0.1);
+  }
+
+  .carousel-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding-bottom: var(--space-m);
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    padding-inline: 4px;
+  }
+
+  .carousel-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    gap: var(--space-m);
+    width: 100%;
+  }
+
+  @media (max-width: 48rem) {
+    .video-grid {
+      display: flex;
+      width: max-content;
+      gap: var(--space-m);
+      padding-right: var(--space-m);
+    }
+  }
+
+  .video-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    background: var(--color-card);
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    padding: var(--space-xs);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: transform 0.3s var(--ease-out), border-color 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
+  }
+
+  @media (max-width: 48rem) {
+    .video-card {
+      width: clamp(260px, 78vw, 340px);
+      flex: 0 0 auto;
+      scroll-snap-align: start;
+    }
+  }
+
+  .video-card:hover {
+    border-color: var(--color-neon);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 24px rgba(230, 75, 107, 0.2);
+    transform: translateY(-4px);
+  }
+
+  .card-media {
     position: relative;
-    display: block;
     width: 100%;
     aspect-ratio: 16 / 9;
+    border-radius: 8px;
     overflow: hidden;
-    border: 0;
     background: var(--color-surface);
   }
-  .thumb {
+
+  .video-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  .video-thumb {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform var(--dur-fast) var(--ease-out);
+    filter: contrast(1.08) brightness(0.95);
+    transition: transform 0.6s var(--ease-out), filter 0.4s ease;
   }
-  .facade:hover .thumb {
-    transform: scale(1.03);
+
+  .video-card:hover .video-thumb {
+    transform: scale(1.06);
+    filter: contrast(1.15) brightness(1.05);
   }
-  .play {
+
+  .thumb-overlay {
     position: absolute;
-    left: var(--space-s);
-    bottom: var(--space-s);
+    inset: 0;
+    background: linear-gradient(to top, rgba(7, 9, 14, 0.85) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .play-trigger {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
+    background: rgba(7, 9, 14, 0.85);
+    border: 1px solid var(--color-neon);
+    color: var(--color-neon);
     display: grid;
     place-items: center;
-    width: 3rem;
-    height: 3rem;
-    border-radius: 50%;
-    background: var(--color-accent);
-    color: var(--color-text);
+    box-shadow: 0 0 20px rgba(230, 75, 107, 0.4);
+    transition: transform 0.3s var(--ease-out), background 0.3s ease, color 0.3s ease;
   }
-  .title {
+
+  .video-card:hover .play-trigger {
+    transform: translate(-50%, -50%) scale(1.1);
+    background: var(--gradient-neon);
+    color: #FFF;
+  }
+
+  .play-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-left: 2px;
+  }
+
+  .media-badges {
+    position: absolute;
+    top: var(--space-xs);
+    left: var(--space-xs);
+    right: var(--space-xs);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+  }
+
+  .badge-tag {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: var(--space-3xs) var(--space-xs);
+    border-radius: 4px;
+    background: rgba(7, 9, 14, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid;
+  }
+
+  .badge-tag.neon {
+    color: var(--color-neon);
+    border-color: rgba(230, 75, 107, 0.4);
+  }
+
+  .badge-tag.cyan {
+    color: var(--color-cyan);
+    border-color: rgba(0, 240, 255, 0.4);
+  }
+
+  .badge-tag.gold {
+    color: var(--color-gold);
+    border-color: rgba(246, 224, 94, 0.4);
+  }
+
+  .views-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    font-weight: 600;
+    color: #FFF;
+    background: rgba(7, 9, 14, 0.85);
+    padding: var(--space-3xs) var(--space-xs);
+    border-radius: 4px;
+    border: 1px solid var(--color-line);
+  }
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    padding: var(--space-2xs);
+  }
+
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+  }
+
+  .index-num {
+    color: var(--color-neon);
+    font-weight: 700;
+  }
+
+  .pub-date {
+    color: var(--color-muted);
+  }
+
+  .video-heading {
     font-family: var(--font-body);
     font-size: var(--step-0);
     font-weight: 600;
-    line-height: 1.3;
+    line-height: 1.35;
     text-transform: none;
+    letter-spacing: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
-  .meta {
-    margin: 0;
-    font-size: var(--step--1);
-    color: var(--color-muted);
+
+  .video-heading a:hover {
+    color: var(--color-neon);
+  }
+
+  :global(.player-embed) {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 8px;
+  }
+
+  .icon-tiny {
+    width: 0.85rem;
+    height: 0.85rem;
+  }
+
+  .icon-micro {
+    width: 0.75rem;
+    height: 0.75rem;
+    color: var(--color-cyan);
   }
 </style>

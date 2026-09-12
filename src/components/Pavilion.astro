@@ -2,95 +2,470 @@
 import { Image } from 'astro:assets';
 import { site } from '../data/site.js';
 import { Content as Story } from '../data/story.md';
+import { BookOpen, Award, Compass, Radio, Mic, Flame, CheckCircle2 } from 'lucide-astro';
+import photoMic from '../assets/photos/abhishek-podcast-mic.jpg';
+import photoStands from '../assets/photos/abhishek-india-stands.jpg';
+import photoRail from '../assets/photos/abhishek-stadium-gt.jpg';
 
-// alt text comes from the file name: "abhishek-batting-nets.jpg" -> "abhishek batting nets"
-const photos = Object.entries(
-  import.meta.glob('../assets/photos/*.{jpg,jpeg,png,webp}', { eager: true, import: 'default' }),
-)
-  .slice(0, 4)
-  .map(([path, src]) => ({ src, alt: path.split('/').pop().replace(/\.\w+$/, '').replace(/[-_]+/g, ' ') }));
+const inningsTimeline = [
+  { era: '2021 · INNINGS 01', title: 'The Technical Spark', desc: 'Dissecting wrist positions and seam angles from local club matches.' },
+  { era: '2025 · INNINGS 02', title: 'Spin & Swing Launch', desc: 'Grew from 1K to 10K purists in 15 days; established the unfiltered broadcast tone.' },
+  { era: '2025 · INNINGS 03', title: 'Pitchside & DPL Access', desc: 'Covering Delhi Premier League from the field of play and interviewing international stars.' },
+  { era: '2026 · INNINGS 04', title: 'The Premier Voice', desc: '50M+ impressions, premier technical cricket creator in India.' },
+];
 ---
-<div class="pavilion">
-  <header>
-    <p class="kicker">Pavilion</p>
-    <h2>The story</h2>
-  </header>
-  <div class="layout">
-    <div class="text">
-      <div class="story"><Story /></div>
-      <ul class="facts" role="list">
-        {site.bio.map((fact) => <li>{fact}</li>)}
-      </ul>
+<div class="pavilion-container">
+  <header class="pavilion-header">
+    <div class="header-left">
+      <p class="kicker reveal-text">
+        <span class="hud-pill neon"><Mic class="icon-tiny" /> THE DOSSIER</span>
+        PAVILION // THE STORY &amp; INNINGS
+      </p>
+      <h2 class="pavilion-title reveal-text">CRICKET WITH SOUL.</h2>
+      <p class="pavilion-subtitle reveal-text">
+        From recording technical videos in a small room to pitchside field access with international stars.
+      </p>
     </div>
-    <div class="photos">
-      {photos.map((p) => (
-        <Image class="photo" src={p.src} alt={p.alt} widths={[480, 960, 1440]} sizes="(min-width: 64rem) 22vw, 50vw" />
-      ))}
+  </header>
+
+  <div class="pavilion-layout">
+    <!-- Left Column: Story & Career Innings -->
+    <div class="story-column">
+      <div class="editorial-card story-body">
+        <h3 class="card-heading">The Philosophy</h3>
+        <div class="story-text">
+          <Story />
+        </div>
+
+        <div class="facts-block">
+          <h4 class="facts-title">Verified Creator Specs</h4>
+          <ul class="facts-list" role="list">
+            {site.bio.map((fact) => (
+              <li>
+                <CheckCircle2 class="fact-icon" />
+                <span>{fact}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <!-- Career Innings Timeline -->
+      <div class="editorial-card innings-card">
+        <h3 class="card-heading">Career Innings</h3>
+        <div class="timeline">
+          {inningsTimeline.map((item, idx) => (
+            <div class="timeline-step">
+              <span class="step-num">0{idx + 1}</span>
+              <div class="step-content">
+                <span class="step-era">{item.era}</span>
+                <h4 class="step-title">{item.title}</h4>
+                <p class="step-desc">{item.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Editorial Photo Magazine Spread -->
+    <div class="gallery-column">
+      <!-- Feature 1: Broadcast Mic Photo -->
+      <figure class="editorial-photo-card primary-photo tilt-card" data-cursor-text="STUDIO">
+        <div class="photo-inner">
+          <Image 
+            src={photoMic} 
+            alt="Abhishek Pandey hosting Spin & Swing podcast on microphone" 
+            class="photo-img" 
+            widths={[500, 900]} 
+            sizes="(min-width: 64rem) 420px, 90vw" 
+          />
+          <div class="photo-tape top-right"></div>
+          <div class="photo-hud-stamp">
+            <span class="stamp-id">EPISODES // STUDIO</span>
+            <span class="stamp-lbl">BROADCASTER PASS</span>
+          </div>
+        </div>
+        <figcaption class="photo-caption">
+          <span class="caption-num">FIG 01</span>
+          <span class="caption-text">Behind the microphone for Spin &amp; Swing technical breakdowns.</span>
+        </figcaption>
+      </figure>
+
+      <!-- Dual Sub-Photo Row -->
+      <div class="photo-subgrid">
+        <!-- Feature 2: Indian Jersey Stands Photo -->
+        <figure class="editorial-photo-card sub-photo tilt-card" data-cursor-text="STANDS">
+          <div class="photo-inner">
+            <Image 
+              src={photoStands} 
+              alt="Abhishek Pandey smiling in Indian team jersey in stadium stands" 
+              class="photo-img" 
+              widths={[400, 700]} 
+              sizes="(min-width: 64rem) 220px, 45vw" 
+            />
+            <div class="photo-badge-chip neon">STANDS TO STAGE</div>
+          </div>
+          <figcaption class="photo-caption">
+            <span class="caption-num">FIG 02</span>
+            <span class="caption-text">With the fans in the national stands.</span>
+          </figcaption>
+        </figure>
+
+        <!-- Feature 3: Stadium Railing Gujarat Titans Photo -->
+        <figure class="editorial-photo-card sub-photo tilt-card" data-cursor-text="TACTICS">
+          <div class="photo-inner">
+            <Image 
+              src={photoRail} 
+              alt="Abhishek Pandey leaning on pitchside railing overlooking match" 
+              class="photo-img" 
+              widths={[400, 700]} 
+              sizes="(min-width: 64rem) 220px, 45vw" 
+            />
+            <div class="photo-badge-chip cyan">FIELD OF PLAY</div>
+          </div>
+          <figcaption class="photo-caption">
+            <span class="caption-num">FIG 03</span>
+            <span class="caption-text">Pitchside tactical surveillance.</span>
+          </figcaption>
+        </figure>
+      </div>
     </div>
   </div>
 </div>
 
 <style>
-  .pavilion {
-    display: grid;
+  .pavilion-container {
+    display: flex;
+    flex-direction: column;
     gap: var(--space-l);
+    width: 100%;
+    max-width: 86rem;
+    margin: 0 auto;
   }
-  .layout {
-    display: grid;
-    gap: var(--space-l);
+
+  .pavilion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: var(--space-s);
+    border-bottom: 1px solid var(--color-line);
   }
-  @media (min-width: 64rem) {
-    .layout {
-      grid-template-columns: 1fr 1fr;
-      align-items: center;
-    }
+
+  .header-left {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    max-width: 58ch;
   }
-  .text {
-    display: grid;
-    gap: var(--space-m);
-    padding: var(--space-m);
-    background: color-mix(in oklab, var(--color-surface) 85%, transparent);
+
+  .pavilion-title {
+    font-size: clamp(2.5rem, 6vw, 5.5rem);
+    color: var(--color-text);
   }
-  .story :global(p) {
-    margin: 0 0 var(--space-s);
-    max-width: 60ch;
-    font-size: var(--step-1);
+
+  .pavilion-subtitle {
+    margin: 0;
+    font-size: var(--step-0);
+    color: var(--color-muted);
     line-height: 1.5;
   }
-  .facts {
+
+  .pavilion-layout {
     display: grid;
-    gap: var(--space-xs);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    counter-reset: fact;
-  }
-  .facts li {
-    counter-increment: fact;
-    display: grid;
-    grid-template-columns: 2.5rem 1fr;
-    align-items: baseline;
-    color: var(--color-muted);
-  }
-  .facts li::before {
-    content: counter(fact, decimal-leading-zero);
-    font-family: var(--font-display);
-    font-size: var(--step-1);
-    color: var(--wood);
-  }
-  .photos {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-s);
-  }
-  .photo {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-xl);
+    align-items: start;
     width: 100%;
-    aspect-ratio: 4 / 5;
-    object-fit: cover;
   }
-  .photo:first-child {
-    grid-row: span 2;
-    aspect-ratio: auto;
+
+  @media (min-width: 62rem) {
+    .pavilion-layout {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      gap: var(--space-2xl);
+    }
+  }
+
+  .story-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+  }
+
+  .editorial-card {
+    background: var(--color-card);
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    padding: clamp(var(--space-m), 4vw, var(--space-l));
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  }
+
+  .card-heading {
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    color: var(--color-neon);
+    letter-spacing: 0.02em;
+    padding-bottom: var(--space-2xs);
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .story-text :global(p) {
+    margin: 0 0 var(--space-s);
+    font-size: var(--step-0);
+    line-height: 1.65;
+    color: var(--color-text);
+  }
+
+  .facts-block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding-top: var(--space-xs);
+    border-top: 1px solid var(--color-line);
+  }
+
+  .facts-title {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    color: var(--color-muted);
+    letter-spacing: 0.1em;
+  }
+
+  .facts-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .facts-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-xs);
+    font-size: var(--step-0);
+    color: var(--color-text);
+  }
+
+  .fact-icon {
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--color-neon);
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+  }
+
+  /* Timeline */
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+    position: relative;
+    padding-left: var(--space-s);
+    border-left: 2px solid var(--color-line-bright);
+  }
+
+  .timeline-step {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-s);
+    position: relative;
+  }
+
+  .step-num {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--color-neon);
+    font-weight: 700;
+  }
+
+  .step-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .step-era {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    color: var(--color-cyan);
+    letter-spacing: 0.08em;
+  }
+
+  .step-title {
+    font-family: var(--font-body);
+    font-size: var(--step-0);
+    font-weight: 700;
+    color: var(--color-text);
+    text-transform: none;
+  }
+
+  .step-desc {
+    margin: 0;
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    line-height: 1.4;
+  }
+
+  /* Gallery Column */
+  .gallery-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+  }
+
+  .editorial-photo-card {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    background: var(--color-card);
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    padding: var(--space-xs);
+    backdrop-filter: blur(12px);
+    transition: transform 0.3s var(--ease-out), border-color 0.3s var(--ease-out);
+  }
+
+  .editorial-photo-card:hover {
+    border-color: var(--color-neon);
+  }
+
+  .photo-inner {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--color-surface);
+  }
+
+  .primary-photo .photo-inner {
+    aspect-ratio: 4 / 5;
+  }
+
+  .photo-subgrid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-m);
+  }
+
+  @media (max-width: 30rem) {
+    .photo-subgrid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .sub-photo .photo-inner {
+    aspect-ratio: 3 / 4;
+  }
+
+  .photo-img {
+    width: 100%;
     height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+    filter: contrast(1.08) brightness(1.02);
+    transition: transform 0.5s var(--ease-out);
+  }
+
+  .editorial-photo-card:hover .photo-img {
+    transform: scale(1.04);
+  }
+
+  .photo-tape {
+    position: absolute;
+    width: 60px;
+    height: 20px;
+    background: rgba(246, 224, 94, 0.4);
+    backdrop-filter: blur(4px);
+    border: 1px dashed rgba(246, 224, 94, 0.6);
+    pointer-events: none;
+  }
+
+  .photo-tape.top-right {
+    top: -5px;
+    right: 15px;
+    transform: rotate(12deg);
+  }
+
+  .photo-hud-stamp {
+    position: absolute;
+    bottom: var(--space-xs);
+    left: var(--space-xs);
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-3xs) var(--space-xs);
+    background: rgba(7, 9, 14, 0.85);
+    border: 1px solid var(--color-line-bright);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+  }
+
+  .stamp-id {
+    font-size: var(--step--2);
+    font-weight: 700;
+    color: var(--color-neon);
+  }
+
+  .stamp-lbl {
+    font-size: 0.65rem;
+    color: var(--color-muted);
+    letter-spacing: 0.06em;
+  }
+
+  .photo-badge-chip {
+    position: absolute;
+    top: var(--space-xs);
+    left: var(--space-xs);
+    padding: var(--space-3xs) var(--space-xs);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    background: rgba(7, 9, 14, 0.85);
+    border: 1px solid;
+  }
+
+  .photo-badge-chip.neon {
+    color: var(--color-neon);
+    border-color: rgba(230, 75, 107, 0.5);
+  }
+
+  .photo-badge-chip.cyan {
+    color: var(--color-cyan);
+    border-color: rgba(0, 240, 255, 0.5);
+  }
+
+  .photo-caption {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    color: var(--color-muted);
+    padding: 0 var(--space-2xs);
+  }
+
+  .caption-num {
+    color: var(--color-neon);
+    font-weight: 700;
+  }
+
+  .caption-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .icon-tiny {
+    width: 0.85rem;
+    height: 0.85rem;
   }
 </style>

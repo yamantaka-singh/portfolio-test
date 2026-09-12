@@ -1,33 +1,49 @@
 :root {
-  /* primitives: sampled from src/assets/keyframes (G3) */
-  --turf-950: #0e1f17;
-  --willow-300: #d9b98a;
-  --cherry-600: #b3261e;
-  --flood-50: #f4f1e6;
-  --chalk-100: #e9e4d4;
-  --amber-400: #ffb020;
+  /* Maximalist Floodlit Stadium Palette */
+  --color-bg: #07090E;
+  --color-surface: #11141D;
+  --color-surface-elevated: #181C28;
+  --color-card: rgba(17, 20, 29, 0.82);
+  --color-text: #FAFAF8;
+  --color-muted: #8E96A6;
+  --color-faint: #444B59;
+  
+  /* High-Octane Stadium Accents */
+  --color-neon: #E64B6B;       /* Floodlight maroon-rose (was electric lime); 4.5:1+ on both bg and card */
+  --gradient-neon: linear-gradient(135deg, #E0457A, #7A1030); /* maroon gradient for solid fills */
+  --color-cyan: #00F0FF;       /* Broadcast telemetry cyan */
+  --color-crimson: #FF3344;    /* Live REC / Umpire crimson */
+  --color-gold: #F6E05E;       /* Pitch trophy gold */
+  --color-highlight: var(--color-neon);
+  --color-accent: var(--color-crimson);
+  --color-line: rgba(250, 250, 248, 0.12);
+  --color-line-bright: rgba(250, 250, 248, 0.28);
+  --wood: #2D3748;
 
-  /* semantic: components use only these */
-  --color-bg: var(--turf-950);
-  --color-surface: color-mix(in oklab, var(--turf-950) 75%, black);
-  --color-text: var(--flood-50);
-  --color-muted: var(--chalk-100);
-  --color-accent: var(--cherry-600); /* fills only, with --color-text on top */
-  --color-highlight: var(--amber-400); /* numbers, focus ring, one kicker per view */
-  --color-line: color-mix(in oklab, var(--flood-50) 18%, transparent);
-  --wood: var(--willow-300);
+  /* Tactical Neon Glows */
+  --glow-neon: 0 0 24px rgba(230, 75, 107, 0.35);
+  --glow-cyan: 0 0 24px rgba(0, 240, 255, 0.35);
+  --glow-crimson: 0 0 24px rgba(255, 51, 68, 0.45);
+  --glow-gold: 0 0 24px rgba(246, 224, 94, 0.35);
 
+  /* Typography */
   --font-display: 'Big Shoulders Display Variable', 'Arial Narrow', sans-serif;
   --font-body: 'Hanken Grotesk Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 
-  --step--1: clamp(0.83rem, 0.8rem + 0.15vw, 0.9rem);
-  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
-  --step-1: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
-  --step-2: clamp(1.6rem, 1.4rem + 1vw, 2.25rem);
-  --step-3: clamp(2.2rem, 1.8rem + 2vw, 3.5rem);
-  --step-4: clamp(3rem, 2.2rem + 4vw, 6rem);
-  --step-5: clamp(4rem, 2.5rem + 8vw, 10rem);
+  /* Fluid Scale - strictly calibrated for mobile-to-desktop fit without overflow */
+  --step--2: clamp(0.6875rem, 0.65rem + 0.15vw, 0.75rem);
+  --step--1: clamp(0.78rem, 0.74rem + 0.2vw, 0.875rem);
+  --step-0: clamp(0.9375rem, 0.88rem + 0.25vw, 1.125rem);
+  --step-1: clamp(1.0625rem, 0.98rem + 0.4vw, 1.35rem);
+  --step-2: clamp(1.25rem, 1.12rem + 0.65vw, 1.75rem);
+  --step-3: clamp(1.5rem, 1.3rem + 1.2vw, 2.45rem);
+  --step-4: clamp(1.85rem, 1.5rem + 1.8vw, 3.75rem);
+  --step-5: clamp(2.25rem, 1.8rem + 3.5vw, 6.25rem);
+  --step-6: clamp(2.75rem, 2.1rem + 5.5vw, 9.5rem);
 
+  /* Spacing */
+  --space-3xs: 0.15rem;
   --space-2xs: 0.25rem;
   --space-xs: 0.5rem;
   --space-s: 1rem;
@@ -35,8 +51,12 @@
   --space-l: 2.5rem;
   --space-xl: 4rem;
   --space-2xl: 6rem;
+  --space-3xl: 9rem;
 
+  /* Motion & Easing */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --dur-fast: 180ms;
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 160ms;
+  --dur-med: 320ms;
   --dur-reveal: 600ms;
 }

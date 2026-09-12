@@ -1,118 +1,367 @@
 ---
 import { Image } from 'astro:assets';
-import { featuredPosts, profilesBy, thumb } from '../lib/social.js';
+import { social, profilesBy, thumb } from '../lib/social.js';
 import { compactCount } from '../lib/format.js';
+import { Instagram, Heart, Play, Flame, Sparkles, ExternalLink } from 'lucide-astro';
 
 const accounts = profilesBy('instagram');
+
+// Sort posts by highest likes / engagement first
+const topPosts = [...social.posts]
+  .sort((a, b) => (b.likes ?? 0) - (a.likes ?? 0))
+  .slice(0, 6);
 ---
-<div class="stands">
-  <header>
-    <p class="kicker">The Stands</p>
-    <h2>On Instagram</h2>
-  </header>
-  <ul class="grid" role="list">
-    {featuredPosts.map((p) => (
-      <li>
-        <a
-          class="post"
-          href={p.url}
-          target="_blank"
-          rel="noopener"
-          aria-label={p.caption ? undefined : `Instagram ${p.isReel ? 'reel' : 'post'} by @${p.account}`}
-        >
-          <Image class="thumb" src={thumb(p.thumb)} alt="" widths={[360, 720]} sizes="(min-width: 64rem) 22vw, 45vw" />
-          {p.isReel && <span class="badge">Reel</span>}
-          <span class="info">
-            {p.likes != null && <span class="likes">{compactCount(p.likes)} likes</span>}
-            {p.caption && <span class="caption">{p.caption}</span>}
-          </span>
+<div class="stands-container">
+  <header class="stands-header">
+    <div class="header-left">
+      <p class="kicker reveal-text">
+        <span class="hud-pill neon"><Instagram class="icon-tiny" /> FAN STANDS</span>
+        THE STANDS // INSTAGRAM REELS &amp; MOMENTS
+      </p>
+      <h2 class="stands-title reveal-text">PULSE OF THE CROWD.</h2>
+      <p class="stands-subtitle reveal-text">
+        Short-form viral reels, pitchside encounters with star players, and fan milestones.
+      </p>
+    </div>
+    <div class="header-right">
+      {accounts.map((a) => (
+        <a class="follow-pill magnetic" href={a.url} target="_blank" rel="noopener" data-cursor-text="FOLLOW">
+          <Instagram class="icon-small" />
+          <span>@{a.handle}</span>
+          {a.followers != null && <span class="badge-count">{compactCount(a.followers)}</span>}
         </a>
-      </li>
-    ))}
-  </ul>
-  <p class="follow">
-    {accounts.map((a) => (
-      <a class="follow-link" href={a.url} target="_blank" rel="noopener">
-        Follow @{a.handle}{a.followers != null && ` · ${compactCount(a.followers)}`}
-      </a>
-    ))}
-  </p>
+      ))}
+    </div>
+  </header>
+
+  <!-- Horizontal Scrollable Reel Track -->
+  <div class="carousel-wrapper" data-lenis-prevent>
+    <div class="reels-track" role="list">
+      {topPosts.map((p, idx) => (
+        <div class="reel-card tilt-card" role="listitem" data-cursor-text="VIEW">
+          <a
+            class="reel-anchor"
+            href={p.url}
+            target="_blank"
+            rel="noopener"
+            aria-label={p.caption || `Instagram post by @${p.account}`}
+          >
+            <div class="thumb-frame">
+              <Image 
+                class="reel-thumb" 
+                src={thumb(p.thumb)} 
+                alt="" 
+                widths={[360, 640]} 
+                sizes="(min-width: 64rem) 260px, 60vw" 
+              />
+              <div class="frame-vignette"></div>
+
+              <!-- Badges -->
+              <div class="reel-top-badges">
+                {p.isReel ? (
+                  <span class="type-pill reel-pill"><Play class="icon-micro" /> REEL</span>
+                ) : (
+                  <span class="type-pill post-pill"><Sparkles class="icon-micro" /> MOMENT</span>
+                )}
+                <span class="index-pill">#0{idx + 1}</span>
+              </div>
+
+              <!-- Bottom Content Overlay -->
+              <div class="reel-bottom-info">
+                {p.likes != null && (
+                  <div class="likes-chip">
+                    <Heart class="icon-heart" />
+                    <span>{compactCount(p.likes)} LIKES</span>
+                  </div>
+                )}
+                {p.caption && <p class="caption-text">{p.caption}</p>}
+              </div>
+            </div>
+          </a>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Community Quote Ribbon -->
+  <div class="community-ribbon" aria-hidden="true">
+    <div class="marquee-track reverse">
+      <div class="marquee-content">
+        <span class="dim">"The sharpest technical analysis on YouTube"</span>
+        <span class="sep">★</span>
+        <span class="highlight">"Dissects seam angles like no other creator"</span>
+        <span class="sep">★</span>
+        <span class="dim">"From the West Stand to the Field of Play"</span>
+        <span class="sep">★</span>
+        <span class="highlight">"180,000+ passionate cricket purists"</span>
+        <span class="sep">★</span>
+      </div>
+      <div class="marquee-content">
+        <span class="dim">"The sharpest technical analysis on YouTube"</span>
+        <span class="sep">★</span>
+        <span class="highlight">"Dissects seam angles like no other creator"</span>
+        <span class="sep">★</span>
+        <span class="dim">"From the West Stand to the Field of Play"</span>
+        <span class="sep">★</span>
+        <span class="highlight">"180,000+ passionate cricket purists"</span>
+        <span class="sep">★</span>
+      </div>
+    </div>
+  </div>
 </div>
 
 <style>
-  .stands {
-    display: grid;
+  .stands-container {
+    display: flex;
+    flex-direction: column;
     gap: var(--space-l);
+    width: 100%;
+    max-width: 86rem;
+    margin: 0 auto;
   }
-  .grid {
-    list-style: none;
+
+  .stands-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: var(--space-m);
+    padding-bottom: var(--space-s);
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .header-left {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    max-width: 54ch;
+  }
+
+  .stands-title {
+    font-size: clamp(2.5rem, 6vw, 5.5rem);
+    color: var(--color-text);
+  }
+
+  .stands-subtitle {
     margin: 0;
-    padding: 0;
-    display: grid;
-    gap: var(--space-s);
-    grid-template-columns: repeat(auto-fill, minmax(min(45%, 14rem), 1fr));
+    font-size: var(--step-0);
+    color: var(--color-muted);
+    line-height: 1.5;
   }
-  .post {
-    position: relative;
-    display: grid;
-    aspect-ratio: 4 / 5;
-    overflow: hidden;
+
+  .follow-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-m);
+    border-radius: 9999px;
+    border: 1px solid var(--color-line-bright);
+    background: rgba(17, 20, 29, 0.75);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--color-text);
+    transition: all 0.25s var(--ease-out);
+  }
+
+  .follow-pill:hover {
+    border-color: var(--color-neon);
+    color: var(--color-neon);
+    background: rgba(230, 75, 107, 0.1);
+  }
+
+  .badge-count {
+    padding: 2px 6px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.12);
+    font-size: var(--step--2);
+    color: #FFF;
+  }
+
+  .carousel-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding-bottom: var(--space-m);
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    padding-inline: 4px;
+  }
+
+  .carousel-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+  .reels-track {
+    display: flex;
+    gap: var(--space-m);
+    width: max-content;
+    padding-right: var(--space-m);
+  }
+
+  .reel-card {
+    width: clamp(190px, 48vw, 260px);
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    background: var(--color-card);
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    padding: var(--space-2xs);
+    backdrop-filter: blur(12px);
+    transition: transform 0.3s var(--ease-out), border-color 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
+  }
+
+  .reel-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--color-neon);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 24px rgba(230, 75, 107, 0.2);
+  }
+
+  .reel-anchor {
+    display: block;
+    width: 100%;
+    height: 100%;
     text-decoration: none;
+  }
+
+  .thumb-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    border-radius: 8px;
+    overflow: hidden;
     background: var(--color-surface);
   }
-  .thumb,
-  .info {
-    grid-area: 1 / 1;
-  }
-  .thumb {
+
+  .reel-thumb {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform var(--dur-fast) var(--ease-out);
+    filter: contrast(1.08) brightness(0.95);
+    transition: transform 0.6s var(--ease-out);
   }
-  .post:hover .thumb {
-    transform: scale(1.04);
+
+  .reel-card:hover .reel-thumb {
+    transform: scale(1.06);
+    filter: contrast(1.15) brightness(1.02);
   }
-  .info {
-    align-self: end;
-    display: grid;
+
+  .frame-vignette {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(7, 9, 14, 0.95) 0%, rgba(7, 9, 14, 0.2) 50%, transparent 100%);
+    pointer-events: none;
+  }
+
+  .reel-top-badges {
+    position: absolute;
+    top: var(--space-xs);
+    left: var(--space-xs);
+    right: var(--space-xs);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .type-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    padding: var(--space-3xs) var(--space-xs);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    backdrop-filter: blur(8px);
+  }
+
+  .reel-pill {
+    background: rgba(255, 51, 68, 0.85);
+    color: #FFF;
+  }
+
+  .post-pill {
+    background: rgba(0, 240, 255, 0.85);
+    color: var(--color-bg);
+  }
+
+  .index-pill {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--color-neon);
+    background: rgba(7, 9, 14, 0.85);
+    padding: var(--space-3xs) var(--space-xs);
+    border-radius: 4px;
+    border: 1px solid var(--color-line);
+  }
+
+  .reel-bottom-info {
+    position: absolute;
+    bottom: var(--space-xs);
+    left: var(--space-xs);
+    right: var(--space-xs);
+    display: flex;
+    flex-direction: column;
     gap: var(--space-2xs);
-    padding: var(--space-s);
-    background: linear-gradient(to top, rgb(14 31 23 / 0.9), transparent);
   }
-  .likes {
-    font-family: var(--font-display);
-    font-size: var(--step-1);
-    color: var(--color-highlight);
+
+  .likes-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    align-self: flex-start;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(7, 9, 14, 0.85);
+    border: 1px solid rgba(255, 51, 68, 0.4);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    font-weight: 700;
+    color: var(--color-crimson);
   }
-  .caption {
+
+  .icon-heart {
+    width: 0.8rem;
+    height: 0.8rem;
+    fill: var(--color-crimson);
+  }
+
+  .caption-text {
+    margin: 0;
+    font-size: var(--step--2);
+    color: var(--color-text);
+    line-height: 1.35;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    font-size: var(--step--1);
   }
-  .badge {
-    position: absolute;
-    top: var(--space-xs);
-    right: var(--space-xs);
-    padding: var(--space-2xs) var(--space-xs);
-    font-size: var(--step--1);
-    text-transform: uppercase;
-    background: var(--color-accent);
+
+  .community-ribbon {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    margin-left: -50vw;
+    overflow: hidden;
+    padding: var(--space-xs) 0;
+    border-top: 1px solid var(--color-line);
+    border-bottom: 1px solid var(--color-line);
+    background: rgba(17, 20, 29, 0.5);
   }
-  .follow {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-s);
-    margin: 0;
+
+  .icon-tiny {
+    width: 0.85rem;
+    height: 0.85rem;
   }
-  .follow-link {
-    padding: var(--space-xs) var(--space-m);
-    border: 1px solid var(--color-line);
-    text-decoration: none;
-    font-family: var(--font-display);
-    font-size: var(--step-1);
-    text-transform: uppercase;
+
+  .icon-small {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .icon-micro {
+    width: 0.75rem;
+    height: 0.75rem;
   }
 </style>

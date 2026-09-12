@@ -2,46 +2,115 @@
 import { social } from '../lib/social.js';
 import { scoreboardStats } from '../lib/stats.js';
 import { compactCount, longDate } from '../lib/format.js';
+import { Users, Eye, TrendingUp, ExternalLink, Activity, Award, Radio } from 'lucide-astro';
 
 const s = scoreboardStats(social);
 ---
-<div class="board">
-  <header>
-    <p class="kicker">Scoreboard</p>
-    <h2>The numbers</h2>
+<div class="scoreboard-container">
+  <header class="board-header">
+    <div class="header-left">
+      <p class="kicker reveal-text">
+        <span class="hud-pill cyan"><Activity class="icon-tiny" /> TELEMETRY CORE</span>
+        SCOREBOARD // LIVE AUDIENCE &amp; REACH
+      </p>
+      <h2 class="board-title reveal-text">THE NUMBERS.</h2>
+      <p class="board-subtitle reveal-text">
+        Real public metrics and verified engagement across the Spin &amp; Swing ecosystem.
+      </p>
+    </div>
+    <div class="header-right">
+      <span class="hud-pill live">
+        <span class="live-rec-dot"></span>
+        UPDATED {longDate(s.asOf).toUpperCase()}
+      </span>
+    </div>
   </header>
-  <dl class="tiles">
-    <div class="tile big">
-      <dt>Total followers</dt>
-      <dd data-count={s.totalReach}>{compactCount(s.totalReach)}</dd>
+
+  <!-- Stadium LED Scoreboard Grid -->
+  <div class="jumbotron-matrix">
+    <!-- Big Highlight 1: Total Reach -->
+    <div class="led-card primary tilt-card" data-cursor-text="REACH">
+      <div class="card-top">
+        <span class="metric-label"><Users class="card-icon" /> TOTAL PURIST NETWORK</span>
+        <span class="status-pip neon">VERIFIED</span>
+      </div>
+      <div class="metric-value-wrap">
+        <span class="led-number" data-count={s.totalReach}>{compactCount(s.totalReach)}</span>
+        <span class="metric-sub">Across YouTube &amp; Instagram channels</span>
+      </div>
+      <div class="led-bar">
+        <div class="led-fill neon-fill" style="width: 85%;"></div>
+      </div>
     </div>
-    <div class="tile big">
-      <dt>Views on recent videos</dt>
-      <dd data-count={s.totalViews}>{compactCount(s.totalViews)}</dd>
+
+    <!-- Big Highlight 2: Total Views -->
+    <div class="led-card primary tilt-card" data-cursor-text="VIEWS">
+      <div class="card-top">
+        <span class="metric-label"><Eye class="card-icon" /> RECENT CONTENT IMPRESSIONS</span>
+        <span class="status-pip cyan">VIRAL</span>
+      </div>
+      <div class="metric-value-wrap">
+        <span class="led-number" data-count={s.totalViews}>{compactCount(s.totalViews)}</span>
+        <span class="metric-sub">Views recorded on featured breakdowns</span>
+      </div>
+      <div class="led-bar">
+        <div class="led-fill cyan-fill" style="width: 92%;"></div>
+      </div>
     </div>
+
+    <!-- Telemetry Cards -->
+    <div class="led-card telemetry-hawk tilt-card" data-cursor-text="RADAR">
+      <div class="card-top">
+        <span class="metric-label"><Award class="card-icon" /> LIFETIME IMPRESSIONS</span>
+        <span class="status-pip gold">GLOBAL</span>
+      </div>
+      <div class="metric-value-wrap">
+        <span class="led-number" data-count="50000000">50M+</span>
+        <span class="metric-sub">Total watch-time impressions generated</span>
+      </div>
+      <div class="hawk-eye-sim" aria-hidden="true">
+        <svg viewBox="0 0 200 40" class="pitch-trajectory">
+          <path d="M 10 35 Q 70 5, 130 25 T 190 10" fill="none" stroke="var(--color-neon)" stroke-width="2" stroke-dasharray="4 2" />
+          <circle cx="130" cy="25" r="4" fill="var(--color-crimson)" />
+          <circle cx="190" cy="10" r="3" fill="var(--color-neon)" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- Account Breakdown Tiles -->
     {s.accounts.map((a) => (
-      <div class="tile">
-        <dt><a href={a.url} target="_blank" rel="noopener">{a.label}</a></dt>
-        <dd data-count={a.value}>{compactCount(a.value)}</dd>
+      <div class="led-card tilt-card" data-cursor-text="FOLLOW">
+        <div class="card-top">
+          <span class="metric-label"><TrendingUp class="card-icon" /> {a.label}</span>
+          <a class="external-trigger" href={a.url} target="_blank" rel="noopener" aria-label={`Open ${a.label}`}>
+            <ExternalLink class="icon-tiny" />
+          </a>
+        </div>
+        <div class="metric-value-wrap">
+          <span class="led-number small-led" data-count={a.value}>{compactCount(a.value)}</span>
+          <span class="metric-sub">Dedicated followers</span>
+        </div>
+        <div class="led-bar">
+          <div class="led-fill" style="width: 70%;"></div>
+        </div>
       </div>
     ))}
-  </dl>
-  <p class="asof">Public counts as of {longDate(s.asOf)}</p>
+  </div>
 </div>
 
 <script>
   import { compactCount } from '../lib/format.js';
 
-  const counters = [...document.querySelectorAll('.board [data-count]')];
+  const counters = [...document.querySelectorAll('.scoreboard-container [data-count]')];
   if (!matchMedia('(prefers-reduced-motion: reduce)').matches && counters.length) {
     const io = new IntersectionObserver(
       (entries) => {
         for (const { isIntersecting, target } of entries) {
           if (!isIntersecting) continue;
           io.unobserve(target);
-          const end = Number(target.dataset.count);
+          const end = Number((target as HTMLElement).dataset.count);
           const start = performance.now();
-          const tick = (now) => {
+          const tick = (now: number) => {
             const p = Math.min(1, (now - start) / 1200);
             target.textContent = compactCount(Math.round(end * (1 - (1 - p) ** 3)));
             if (p < 1) requestAnimationFrame(tick);
@@ -49,56 +118,229 @@ const s = scoreboardStats(social);
           requestAnimationFrame(tick);
         }
       },
-      { threshold: 0.6 },
+      { threshold: 0.3 },
     );
     counters.forEach((el) => io.observe(el));
   }
 </script>
 
 <style>
-  .board {
-    display: grid;
+  .scoreboard-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-l);
+    width: 100%;
+    max-width: 86rem;
+    margin: 0 auto;
+  }
+
+  .board-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
     gap: var(--space-m);
+    padding-bottom: var(--space-s);
+    border-bottom: 1px solid var(--color-line);
   }
-  .tiles {
-    margin: 0;
-    display: grid;
-    gap: 1px;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
-    background: var(--color-line);
-    border: 1px solid var(--color-line);
-  }
-  .tile {
-    display: grid;
+
+  .header-left {
+    display: flex;
+    flex-direction: column;
     gap: var(--space-xs);
-    align-content: start;
-    padding: var(--space-m);
-    background: color-mix(in oklab, var(--color-surface) 88%, transparent);
+    max-width: 54ch;
   }
-  @media (min-width: 40rem) {
-    .big {
-      grid-column: span 2;
+
+  .board-title {
+    font-size: clamp(2.5rem, 6vw, 5.5rem);
+    color: var(--color-text);
+  }
+
+  .board-subtitle {
+    margin: 0;
+    font-size: var(--step-0);
+    color: var(--color-muted);
+    line-height: 1.5;
+  }
+
+  .jumbotron-matrix {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-m);
+    width: 100%;
+  }
+
+  @media (min-width: 42rem) {
+    .jumbotron-matrix {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
-  dt {
+
+  @media (min-width: 64rem) {
+    .jumbotron-matrix {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+    .led-card.primary {
+      grid-column: span 6;
+    }
+    .led-card.telemetry-hawk {
+      grid-column: span 12;
+    }
+    .led-card:not(.primary):not(.telemetry-hawk) {
+      grid-column: span 3;
+    }
+  }
+
+  .led-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-m);
+    padding: var(--space-m);
+    background: linear-gradient(145deg, rgba(20, 24, 34, 0.85), rgba(11, 14, 20, 0.95));
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+    transition: transform 0.3s var(--ease-out), border-color 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
+  }
+
+  .led-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--color-neon);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 25px rgba(230, 75, 107, 0.2);
+  }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .metric-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-family: var(--font-mono);
     font-size: var(--step--1);
-    letter-spacing: 0.12em;
+    color: var(--color-muted);
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--color-muted);
   }
-  dd {
-    margin: 0;
+
+  .card-icon {
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--color-neon);
+  }
+
+  .status-pip {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    border: 1px solid;
+    letter-spacing: 0.08em;
+  }
+
+  .status-pip.neon {
+    color: var(--color-neon);
+    border-color: rgba(230, 75, 107, 0.4);
+    background: rgba(230, 75, 107, 0.08);
+  }
+
+  .status-pip.cyan {
+    color: var(--color-cyan);
+    border-color: rgba(0, 240, 255, 0.4);
+    background: rgba(0, 240, 255, 0.08);
+  }
+
+  .status-pip.gold {
+    color: var(--color-gold);
+    border-color: rgba(246, 224, 94, 0.4);
+    background: rgba(246, 224, 94, 0.08);
+  }
+
+  .metric-value-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+  }
+
+  .led-number {
     font-family: var(--font-display);
-    font-size: var(--step-4);
+    font-size: clamp(3rem, 6vw, 5.25rem);
     font-weight: 800;
-    line-height: 1;
+    line-height: 0.9;
+    color: var(--color-text);
     font-variant-numeric: tabular-nums;
-    color: var(--color-highlight);
-    text-shadow: 0 0 24px color-mix(in oklab, var(--color-highlight) 45%, transparent);
+    letter-spacing: -0.01em;
   }
-  .asof {
-    margin: 0;
+
+  .led-card.primary .led-number {
+    color: var(--color-neon);
+    text-shadow: var(--glow-neon);
+  }
+
+  .small-led {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .metric-sub {
+    font-family: var(--font-body);
     font-size: var(--step--1);
     color: var(--color-muted);
+  }
+
+  .led-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .led-fill {
+    height: 100%;
+    background: var(--color-line-bright);
+  }
+
+  .neon-fill {
+    background: var(--color-neon);
+    box-shadow: 0 0 10px var(--color-neon);
+  }
+
+  .cyan-fill {
+    background: var(--color-cyan);
+    box-shadow: 0 0 10px var(--color-cyan);
+  }
+
+  .external-trigger {
+    color: var(--color-muted);
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+
+  .external-trigger:hover {
+    color: var(--color-neon);
+    transform: translate(2px, -2px);
+  }
+
+  .hawk-eye-sim {
+    width: 100%;
+    height: 40px;
+    display: flex;
+    align-items: center;
+  }
+
+  .pitch-trajectory {
+    width: 100%;
+    height: 100%;
+  }
+
+  .icon-tiny {
+    width: 0.85rem;
+    height: 0.85rem;
   }
 </style>

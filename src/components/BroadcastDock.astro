@@ -1,0 +1,316 @@
+---
+import { Radio, Volume2, ArrowUp, Send, Flame } from 'lucide-astro';
+---
+<aside class="broadcast-dock" aria-label="Broadcast Navigation Dock">
+  <div class="dock-inner">
+    <!-- Left: Live Clock & Broadcast Telemetry -->
+    <div class="dock-left">
+      <div class="ist-clock" id="dock-clock">
+        <span class="clock-label">IST</span>
+        <span class="clock-time">
+          <span class="clock-hm">--:--</span><span class="clock-sec">:--</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Center: Stadium Zone Navigation -->
+    <nav class="dock-nav" aria-label="Quick Jump">
+      <a href="#pitch" class="nav-chip magnetic" data-cursor-text="PITCH">
+        <span class="chip-idx">01</span>
+        <span class="chip-name">PITCH</span>
+      </a>
+      <a href="#scoreboard" class="nav-chip magnetic" data-cursor-text="STATS">
+        <span class="chip-idx">02</span>
+        <span class="chip-name">SCORE</span>
+      </a>
+      <a href="#stands" class="nav-chip magnetic" data-cursor-text="STANDS">
+        <span class="chip-idx">03</span>
+        <span class="chip-name">STANDS</span>
+      </a>
+      <a href="#pavilion" class="nav-chip magnetic" data-cursor-text="STORY">
+        <span class="chip-idx">04</span>
+        <span class="chip-name">STORY</span>
+      </a>
+    </nav>
+
+    <!-- Right: Audio Atmosphere & Direct Collab CTA -->
+    <div class="dock-right">
+      <div class="sound-wave" aria-hidden="true" title="Stadium Atmosphere Active">
+        <span class="bar bar-1"></span>
+        <span class="bar bar-2"></span>
+        <span class="bar bar-3"></span>
+        <span class="bar bar-4"></span>
+      </div>
+
+      <a href="#boundary" class="dock-cta magnetic" data-cursor-text="BOOK">
+        <Flame class="icon-tiny" />
+        <span>COLLABORATE</span>
+      </a>
+
+      <button type="button" class="back-to-top magnetic" id="dock-scroll-top" aria-label="Scroll back to top" data-cursor-text="TOP">
+        <ArrowUp class="icon-tiny" />
+      </button>
+    </div>
+  </div>
+</aside>
+
+<script>
+  // Live IST Clock update
+  function updateDockClock() {
+    const hmEl = document.querySelector('#dock-clock .clock-hm');
+    const secEl = document.querySelector('#dock-clock .clock-sec');
+    if (!hmEl || !secEl) return;
+    const now = new Date();
+    const options: Intl.DateTimeFormatOptions = {
+      timeZone: 'Asia/Kolkata',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    };
+    const formatted = new Intl.DateTimeFormat('en-GB', options).format(now);
+    const parts = formatted.split(':');
+    if (parts.length >= 3) {
+      hmEl.textContent = `${parts[0]}:${parts[1]}`;
+      secEl.textContent = `:${parts[2]}`;
+    }
+  }
+  updateDockClock();
+  setInterval(updateDockClock, 1000);
+
+  // Smooth Scroll-to-Top Handler
+  const topBtn = document.getElementById('dock-scroll-top');
+  topBtn?.addEventListener('click', () => {
+    const win = window as any;
+    if (win.__lenis) {
+      win.__lenis.scrollTo(0, { duration: 1.2 });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  });
+</script>
+
+<style>
+  .broadcast-dock {
+    position: fixed;
+    bottom: max(var(--space-xs), env(safe-area-inset-bottom, 12px));
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 900;
+    width: min(96vw, 54rem);
+    pointer-events: none;
+  }
+
+  .dock-inner {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs);
+    padding: 6px var(--space-s);
+    border-radius: 9999px;
+    background: rgba(14, 17, 24, 0.92);
+    border: 1px solid var(--color-line-bright);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75), 0 0 24px rgba(230, 75, 107, 0.12);
+    transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
+  }
+
+  @media (max-width: 32rem) {
+    .dock-inner {
+      padding: 4px 8px;
+      gap: 6px;
+    }
+  }
+
+  .dock-inner:hover {
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 32px rgba(230, 75, 107, 0.22);
+  }
+
+  /* Left */
+  .dock-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+  }
+
+  .ist-clock {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--color-muted);
+  }
+
+  .clock-label {
+    color: var(--color-cyan);
+    font-weight: 700;
+  }
+
+  .clock-time {
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 34rem) {
+    .clock-sec {
+      display: none;
+    }
+  }
+
+  @media (max-width: 26rem) {
+    .clock-label {
+      display: none;
+    }
+  }
+
+  /* Center Navigation */
+  .dock-nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .nav-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 10px;
+    min-height: 36px;
+    border-radius: 9999px;
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    color: var(--color-muted);
+    transition: all 0.2s ease;
+  }
+
+  .chip-idx {
+    font-size: 0.65rem;
+    color: var(--color-faint);
+  }
+
+  .nav-chip:hover {
+    color: var(--color-neon);
+    background: rgba(230, 75, 107, 0.1);
+  }
+
+  .nav-chip:hover .chip-idx {
+    color: var(--color-neon);
+  }
+
+  @media (max-width: 38rem) {
+    .dock-nav a:nth-child(2),
+    .dock-nav a:nth-child(3) {
+      display: none;
+    }
+  }
+
+  @media (max-width: 24rem) {
+    .dock-nav {
+      display: none;
+    }
+  }
+
+  /* Right */
+  .dock-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    flex-shrink: 0;
+  }
+
+  .sound-wave {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 14px;
+    padding: 0 4px;
+  }
+
+  @media (max-width: 42rem) {
+    .sound-wave {
+      display: none;
+    }
+  }
+
+  .sound-wave .bar {
+    width: 2px;
+    border-radius: 1px;
+    background: var(--color-neon);
+    animation: wave-bounce 1.2s ease-in-out infinite alternate;
+  }
+
+  .bar-1 { height: 6px; animation-delay: 0.1s; }
+  .bar-2 { height: 12px; animation-delay: 0.3s; }
+  .bar-3 { height: 8px; animation-delay: 0.2s; }
+  .bar-4 { height: 14px; animation-delay: 0.4s; }
+
+  @keyframes wave-bounce {
+    0% { height: 3px; }
+    100% { height: 14px; }
+  }
+
+  .dock-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    min-height: 36px;
+    border-radius: 9999px;
+    background: var(--gradient-neon);
+    color: #FFF;
+    font-family: var(--font-display);
+    font-size: var(--step--1);
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .dock-cta:hover {
+    transform: scale(1.04);
+    box-shadow: 0 0 16px var(--color-neon);
+  }
+
+  @media (max-width: 29rem) {
+    .dock-cta span {
+      display: none;
+    }
+    .dock-cta {
+      padding: 6px;
+      width: 36px;
+      height: 36px;
+      justify-content: center;
+    }
+  }
+
+  .back-to-top {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--color-line-bright);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .back-to-top:hover {
+    background: var(--gradient-neon);
+    border-color: var(--color-neon);
+    color: #FFF;
+  }
+
+  .icon-tiny {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+</style>
