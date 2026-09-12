@@ -1,0 +1,102 @@
+---
+import { Image } from 'astro:assets';
+import { featuredVideos, thumb } from '../lib/social.js';
+import { compactCount, longDate } from '../lib/format.js';
+---
+<div class="pitch">
+  <header>
+    <p class="kicker">The Pitch</p>
+    <h2>Highlights</h2>
+  </header>
+  <ul class="grid" role="list">
+    {featuredVideos.map((v) => (
+      <li class="card">
+        <a class="facade" href={`https://www.youtube.com/watch?v=${v.id}`} data-yt={v.id} data-title={v.title} aria-label={`Play video: ${v.title}`}>
+          <Image class="thumb" src={thumb(v.thumb)} alt="" widths={[480, 960]} sizes="(min-width: 64rem) 30vw, 90vw" />
+          <span class="play" aria-hidden="true">▶</span>
+        </a>
+        <h3 class="title">{v.title}</h3>
+        <p class="meta">{compactCount(v.views)} views · {longDate(v.publishedAt)}</p>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<script>
+  document.querySelectorAll('a[data-yt]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube-nocookie.com/embed/${link.dataset.yt}?autoplay=1&playsinline=1&rel=0`;
+      iframe.title = link.dataset.title ?? 'YouTube video';
+      iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+      iframe.allowFullscreen = true;
+      iframe.className = 'player';
+      link.replaceWith(iframe);
+      iframe.focus();
+    });
+  });
+</script>
+
+<style>
+  .pitch {
+    display: grid;
+    gap: var(--space-l);
+  }
+  .grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-m);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  }
+  .card {
+    display: grid;
+    gap: var(--space-xs);
+    align-content: start;
+  }
+  .facade,
+  .card :global(.player) {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border: 0;
+    background: var(--color-surface);
+  }
+  .thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+  .facade:hover .thumb {
+    transform: scale(1.03);
+  }
+  .play {
+    position: absolute;
+    left: var(--space-s);
+    bottom: var(--space-s);
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: var(--color-accent);
+    color: var(--color-text);
+  }
+  .title {
+    font-family: var(--font-body);
+    font-size: var(--step-0);
+    font-weight: 600;
+    line-height: 1.3;
+    text-transform: none;
+  }
+  .meta {
+    margin: 0;
+    font-size: var(--step--1);
+    color: var(--color-muted);
+  }
+</style>
