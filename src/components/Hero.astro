@@ -202,7 +202,7 @@ import lordsHero from '../assets/photos/lords-cricket-ground-hero.jpg';
     height: 100%;
     object-fit: cover;
     object-position: center 38%;
-    filter: brightness(0.68) contrast(1.15) saturate(1.1);
+    filter: brightness(0.88) contrast(1.12) saturate(1.15);
     pointer-events: none;
     transform-origin: center center;
   }
@@ -228,7 +228,7 @@ import lordsHero from '../assets/photos/lords-cricket-ground-hero.jpg';
     background: 
       radial-gradient(circle at 75% 45%, rgba(42, 157, 143, 0.08) 0%, transparent 60%),
       radial-gradient(circle at 25% 65%, rgba(231, 111, 81, 0.06) 0%, transparent 60%),
-      linear-gradient(to top, var(--color-bg) 0%, rgba(7, 9, 14, 0.75) 40%, rgba(7, 9, 14, 0.5) 100%);
+      linear-gradient(to top, var(--color-bg) 0%, rgba(7, 9, 14, 0.52) 42%, rgba(7, 9, 14, 0.28) 100%);
     z-index: 1;
     pointer-events: none;
   }
@@ -332,12 +332,13 @@ import lordsHero from '../assets/photos/lords-cricket-ground-hero.jpg';
 
   .first-name {
     color: var(--color-text);
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.75);
   }
 
   .last-name {
     color: transparent;
     -webkit-text-stroke: 1.5px var(--color-neon);
-    text-shadow: var(--glow-neon);
+    text-shadow: var(--glow-neon), 0 4px 20px rgba(0, 0, 0, 0.75);
   }
 
   .hero-lede {
@@ -346,6 +347,7 @@ import lordsHero from '../assets/photos/lords-cricket-ground-hero.jpg';
     font-size: var(--step-0);
     color: var(--color-muted);
     line-height: 1.5;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85);
   }
 
   .cta-cluster {
