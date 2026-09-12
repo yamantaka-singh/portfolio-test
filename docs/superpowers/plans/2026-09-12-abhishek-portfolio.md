@@ -99,7 +99,7 @@ Lanes A, B and C all start after Task 2 and run together. Task 5 can start again
 ```
 AGENTS.md, CLAUDE.md                   Task 1   task-observer activation block + precedence rules
 .agents/rules/00-task-observer.md      Task 1   always-on copy of AGENTS.md (trigger: always_on)
-.agents/skills/                        Tasks 1–2  pinned skills (38); changed only via approved staged updates
+.agents/skills/                        Tasks 1–2  pinned skills (40); changed only via approved staged updates
 skill-observations/                    Task 1+  task-observer log, one file per observation (at /Users/kaalu/projects/abhishek-portfolio)
 skill-updates/                         gates    staged skill updates + PENDING.md
 .gitignore, package.json,
@@ -414,6 +414,7 @@ add vercel-labs/agent-skills web-design-guidelines deploy-to-vercel
 add DietrichGebert/ponytail ponytail ponytail-review
 add leonxlnx/taste-skill design-taste-frontend high-end-visual-design full-output-enforcement
 add mattpocock/skills grilling writing-for-agents diagnosing-bugs
+add ConardLi/garden-skills web-design-engineer gpt-image-2
 
 copy_local() {
   local from=$1 name=$2
@@ -446,7 +447,7 @@ ls .agents/skills | wc -l
 ls .agents/skills/*/SKILL.md | wc -l
 ```
 
-Expected: both counts are `38`, and no `MISSING` lines. If a public install fails, re-run that one `add` line; if a local folder is missing, use the printed `skills find` command and add the result to the script.
+Expected: both counts are `40`, and no `MISSING` lines. If a public install fails, re-run that one `add` line; if a local folder is missing, use the printed `skills find` command and add the result to the script.
 
 - [ ] **Step 3: Write the project files**
 
@@ -1355,7 +1356,7 @@ git commit -m "feat(data): parse social.json at build and add site constants"
 ### Task 6: Style bible and keyframe prompts
 
 **Tier:** Pro · **Owner:** Agent · **Lane:** B · **Gate:** — (feeds G2) · **ADRs:** 0001, 0002, 0006
-**Skills:** `web3d-art-direction` (concept sentence, palette, lighting mood, section blueprint), `premium-web-design`, `ui-ux-pro-max` (contrast of the palette anchors), `scroll-experience` (pacing of the five moves)
+**Skills:** `web3d-art-direction` (concept sentence, palette, lighting mood, section blueprint), `premium-web-design`, `ui-ux-pro-max` (contrast of the palette anchors), `scroll-experience` (pacing of the five moves), `gpt-image-2` (advisor mode only, for its cinematic storyboard prompt templates: prompts go only into `assets/prompts/keyframes.md`; never run its `generate.js` or set `ENABLE_GARDEN_IMAGEGEN`, because images are made by hand in Gemini per ADR-0002)
 
 **Files:**
 - Create: `assets/prompts/keyframes.md`, `assets/prompts/log.md`
@@ -2082,7 +2083,7 @@ git commit -m "feat(scrub): canvas scroll-scrub stage with still fallbacks"
 ### Task 11: Design tokens, fonts, hero
 
 **Tier:** Pro · **Owner:** Agent → **User** approves · **Lane:** ∥ with Task 12 · **Gate:** **G4** · **ADRs:** 0006, 0007
-**Skills:** `design-system`, `ui-ux-pro-max` (contrast, type scale), `premium-web-design`, `frontend-design`, `web-design-guidelines`, `design-taste-frontend`, `high-end-visual-design`, `grilling` (only when the user asks for changes at G4)
+**Skills:** `design-system`, `ui-ux-pro-max` (contrast, type scale), `premium-web-design`, `frontend-design`, `web-design-guidelines`, `design-taste-frontend`, `high-end-visual-design`, `web-design-engineer` (critique only; the direction is already fixed by the keyframes, so skip its "propose 3 directions" step), `grilling` (only when the user asks for changes at G4)
 
 **Files:**
 - Create: `src/styles/tokens.css`, `src/styles/global.css`, `src/components/Hero.astro`
@@ -3426,7 +3427,7 @@ git commit -m "feat(sections): Boundary Rope CTAs with counted /go redirects"
 ### Task 19: Integration
 
 **Tier:** Pro · **Owner:** Agent → **User** reviews · **Lane:** — (after Tasks 13–18 are all merged) · **Gate:** **G6** · **ADRs:** 0001, 0006
-**Skills:** `scroll-experience`, `web3d-motion-choreography`, `web3d-interaction-ux`, `requesting-code-review`, `ponytail-review`, `design-taste-frontend`, `grilling` (only when the user asks for changes at G6)
+**Skills:** `scroll-experience`, `web3d-motion-choreography`, `web3d-interaction-ux`, `requesting-code-review`, `ponytail-review`, `design-taste-frontend`, `web-design-engineer` (browser acceptance QA of the integrated page before G6), `grilling` (only when the user asks for changes at G6)
 
 **Files:**
 - Modify: `src/pages/index.astro`, `src/lib/keyframes.js`, `src/components/Zone.astro`

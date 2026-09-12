@@ -173,6 +173,7 @@ Skill names below were checked against each repo's `skills/` folder on
 | `rebelytics/one-skill-to-rule-them-all` | `task-observer` — installed first, governs all others (ADR-0008) |
 | `leonxlnx/taste-skill` (install name = frontmatter `name`) | `design-taste-frontend`, `high-end-visual-design`, `full-output-enforcement` |
 | `mattpocock/skills` | `grilling`, `writing-for-agents`, `diagnosing-bugs` |
+| `ConardLi/garden-skills` | `web-design-engineer`, `gpt-image-2` (prompt-advisor mode only; images stay manual per ADR-0002) |
 
 **Copied from local disk** (no public source found):
 
@@ -194,6 +195,7 @@ clone needs no install at all.
 - database skills
 - `gpt-taste` (mandates React, Tailwind, a nav bar and AIDA sections, against ADR-0006/0007)
 - mattpocock `code-review` (needs its setup skill's issue-tracker file) and `tdd` (duplicates superpowers)
+- garden-skills `beautiful-article` and `kb-retriever` (not this project's job) and `web-video-presentation` (builds a Vite + React app, against ADR-0007)
 
 ## 6. Inputs needed before Phase 1 (`docs/inputs.md`)
 - [ ] Abhishek's consent to scrape and republish his public content
