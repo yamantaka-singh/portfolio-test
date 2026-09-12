@@ -94,6 +94,11 @@ class Instagram(unittest.TestCase):
         og = '12 comments - spinandswing26 on March 3, 2026: "Nets session"'
         self.assertEqual(parse.parse_instagram_post(og), {"account": "spinandswing26", "likes": None, "caption": "Nets session"})
 
+    def test_post_meta_no_caption(self):
+        # Instagram omits the ": caption" part entirely for a post with no caption text.
+        og = "abhishekpandey_26 on July 9, 2026"
+        self.assertEqual(parse.parse_instagram_post(og), {"account": "abhishekpandey_26", "likes": None, "caption": ""})
+
 
 class YouTube(unittest.TestCase):
     def test_channel_page_picks_own_handle(self):

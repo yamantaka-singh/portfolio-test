@@ -23,7 +23,7 @@ LINKEDIN = "abhishek-pandey-26sep03"
 
 
 def get(url, **kw):
-    time.sleep(2)  # ponytail: fixed politeness delay; ~45 requests total, no need for a rate limiter
+    time.sleep(2)  # ponytail: fixed politeness delay; ~70 requests total, no need for a rate limiter
     page = Fetcher.get(url, impersonate="chrome", stealthy_headers=True, timeout=30, **kw)
     if page.status != 200:
         raise RuntimeError(f"HTTP {page.status} for {url}")
@@ -53,41 +53,63 @@ def profile_row(platform, handle, url):
             "followers": None, "postCount": None, "name": None, "headline": None}
 
 
-def scrape_instagram(featured):
-    profiles, candidates = [], []
+def scrape_instagram(featured, pool_size=5):
+    """Ranks by likes, not upload recency.
+
+    Instagram exposes no view/play count on a logged-out reel or post page -- checked
+    live, only like_count and comment_count are present -- so likes is the only real
+    engagement signal available without login. The profile grid's static HTML caps at
+    12 items -- verified live on both accounts -- but parse_instagram_shortcodes used
+    to only look at the first 5 of those (recency order), so a more-liked reel sitting
+    at position 6-12 was structurally invisible. Now every available candidate gets
+    fetched and each account's own results are ranked by likes before slicing.
+    """
+    def fetch_post(c):
+        kind = "reel" if c["isReel"] else "p"
+        url = f"https://www.instagram.com/{kind}/{c['shortcode']}/"
+        page = get(url)
+        image = meta(page, "og:image")
+        if not image:
+            raise RuntimeError(f"no og:image for {url}")
+        info = parse.parse_instagram_post(meta(page, "og:description"))
+        thumb = save_image(image, f"ig-{c['shortcode']}.jpg")
+        return {"platform": "instagram", "account": info["account"] or "unknown",
+                "shortcode": c["shortcode"], "url": url, "caption": info["caption"],
+                "likes": info["likes"], "isReel": c["isReel"], "thumb": thumb,
+                "featured": c["shortcode"] in featured}
+
+    profiles, per_account = [], []
     for handle in IG_ACCOUNTS:
         url = f"https://www.instagram.com/{handle}/"
         row = profile_row("instagram", handle, url)
+        shortcodes = []
         try:
             page = get(url)
             row.update(parse.parse_instagram_profile(meta(page, "og:description")))
-            candidates += parse.parse_instagram_shortcodes(page.body.decode("utf-8", "ignore"))
+            shortcodes = parse.parse_instagram_shortcodes(page.body.decode("utf-8", "ignore"), limit=12)
         except Exception as err:
             print("WARN IG profile", err)
         profiles.append(row)
-
-    if OVERRIDE.exists():
-        urls = [line.strip() for line in OVERRIDE.read_text().splitlines() if line.strip()]
-        candidates = [c for c in map(parse.parse_instagram_post_url, urls) if c]
+        per_account.append(shortcodes)
 
     posts = []
-    for c in candidates:
-        kind = "reel" if c["isReel"] else "p"
-        url = f"https://www.instagram.com/{kind}/{c['shortcode']}/"
-        try:
-            page = get(url)
-            image = meta(page, "og:image")
-            if not image:
-                raise RuntimeError(f"no og:image for {url}")
-            info = parse.parse_instagram_post(meta(page, "og:description"))
-            thumb = save_image(image, f"ig-{c['shortcode']}.jpg")
-        except Exception as err:
-            print("WARN IG post", err)
-            continue
-        posts.append({"platform": "instagram", "account": info["account"] or "unknown",
-                      "shortcode": c["shortcode"], "url": url, "caption": info["caption"],
-                      "likes": info["likes"], "isReel": c["isReel"], "thumb": thumb,
-                      "featured": c["shortcode"] in featured})
+    if OVERRIDE.exists():
+        urls = [line.strip() for line in OVERRIDE.read_text().splitlines() if line.strip()]
+        for c in filter(None, map(parse.parse_instagram_post_url, urls)):
+            try:
+                posts.append(fetch_post(c))
+            except Exception as err:
+                print("WARN IG post", err)
+    else:
+        for shortcodes in per_account:
+            fetched = []
+            for c in shortcodes:
+                try:
+                    fetched.append(fetch_post(c))
+                except Exception as err:
+                    print("WARN IG post", err)
+            fetched.sort(key=lambda p: p["likes"] or 0, reverse=True)
+            posts += fetched[:pool_size]
     return profiles, posts
 
 

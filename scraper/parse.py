@@ -11,8 +11,10 @@ _SHORTS_ITEM = re.compile(r'"entityId":"shorts-shelf-item-([\w-]{11})"[^}]*?"acc
 # response -- \D* (any non-digits) bridges either without caring which.
 _SHORTS_VIEWS = re.compile(r"^.*,\s*([\d.,]+)\s*(thousand|million|billion)?\s*views?\D*play Short$")
 _POST_URL = re.compile(r"instagram\.com/(p|reel)/([A-Za-z0-9_-]{8,})")
+# The trailing ": caption" is itself optional -- a post with no caption text leaves
+# og:description as just "<account> on <date>", with no colon at all.
 _POST_META = re.compile(
-    rf"^(?:({_NUM}) likes?, )?(?:{_NUM} comments?\s*-\s*)?(\S+) on [A-Z][a-z]+ \d{{1,2}}, \d{{4}}:\s*\"?(.*?)\"?\s*$",
+    rf"^(?:({_NUM}) likes?, )?(?:{_NUM} comments?\s*-\s*)?(\S+) on [A-Z][a-z]+ \d{{1,2}}, \d{{4}}(?::\s*\"?(.*?)\"?\s*)?$",
     re.S,
 )
 
@@ -50,7 +52,7 @@ def parse_instagram_post(og_description):
     m = _POST_META.match(og_description or "")
     if not m:
         return {"account": None, "likes": None, "caption": ""}
-    return {"account": m.group(2), "likes": parse_count(m.group(1)), "caption": m.group(3).strip()}
+    return {"account": m.group(2), "likes": parse_count(m.group(1)), "caption": (m.group(3) or "").strip()}
 
 
 def parse_youtube_channel(html, handle):

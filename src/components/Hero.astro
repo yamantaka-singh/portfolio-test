@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import { site } from '../data/site.js';
 import { Play, Radio, ArrowUpRight, Flame, ShieldCheck } from 'lucide-astro';
-import heroPortrait from '../assets/photos/abhishek-stadium-gt.jpg';
+import heroPortrait from '../assets/photos/abhishek-tata-ipl.jpg';
 ---
 <div class="hero-wrapper">
   <!-- Looping 1080p Cricket Stadium Video Background -->
@@ -34,9 +34,9 @@ import heroPortrait from '../assets/photos/abhishek-stadium-gt.jpg';
     <div class="hero-grid">
       <!-- Left Content Column -->
       <div class="hero-content">
-        <p class="kicker reveal-text">
+        <p class="kicker hero-kicker reveal-text">
           <span class="kicker-badge">HOST // SPIN &amp; SWING</span>
-          CRICKET CREATOR &amp; TACTICAL ANALYST
+          <span>CRICKET CREATOR &amp; TACTICAL ANALYST</span>
         </p>
         
         <h1 class="hero-title reveal-text">
@@ -88,16 +88,16 @@ import heroPortrait from '../assets/photos/abhishek-stadium-gt.jpg';
           </div>
 
           <div class="card-image-wrap">
-            <Image 
-              src={heroPortrait} 
-              alt="Abhishek Pandey at Narendra Modi Stadium pitchside" 
-              class="card-img" 
-              widths={[480, 800]} 
+            <Image
+              src={heroPortrait}
+              alt="Abhishek Pandey at a Tata IPL event"
+              class="card-img"
+              widths={[480, 800]}
               sizes="(min-width: 64rem) 380px, 85vw"
               priority
             />
             <div class="card-overlay-badge">
-              <span class="badge-match">AHMEDABAD PITCHSIDE</span>
+              <span class="badge-match">TATA IPL EVENT</span>
             </div>
           </div>
 
@@ -259,6 +259,12 @@ import heroPortrait from '../assets/photos/abhishek-stadium-gt.jpg';
     display: flex;
     flex-direction: column;
     gap: clamp(var(--space-xs), 2vw, var(--space-m));
+  }
+
+  .hero-kicker {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3xs);
   }
 
   .kicker-badge {
