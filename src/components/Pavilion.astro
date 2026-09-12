@@ -5,6 +5,7 @@ import { BookOpen, Award, Compass, Radio, Mic, Flame } from 'lucide-astro';
 import photoMic from '../assets/photos/abhishek-podcast-mic.jpg';
 import photoStands from '../assets/photos/abhishek-india-stands.jpg';
 import photoRail from '../assets/photos/abhishek-stadium-gt.jpg';
+import photoDesk from '../assets/photos/abhishek-broadcast-desk.jpg';
 
 const inningsTimeline = [
   { dates: 'March – May 2025', title: 'IPL 2025', accredited: false, desc: 'Content creation & audience engagement.' },
@@ -86,40 +87,58 @@ const inningsTimeline = [
         </figcaption>
       </figure>
 
+      <!-- Feature 2: Broadcast Desk Landscape Photo -->
+      <figure class="editorial-photo-card landscape-photo tilt-card" data-cursor-text="BROADCAST">
+        <div class="photo-inner">
+          <Image
+            src={photoDesk}
+            alt="Abhishek Pandey at the broadcast desk overlooking a packed stadium"
+            class="photo-img"
+            widths={[500, 900]}
+            sizes="(min-width: 64rem) 420px, 90vw"
+          />
+          <div class="photo-badge-chip neon">ON AIR</div>
+        </div>
+        <figcaption class="photo-caption">
+          <span class="caption-num">FIG 02</span>
+          <span class="caption-text">Pitchside broadcast desk on matchday.</span>
+        </figcaption>
+      </figure>
+
       <!-- Dual Sub-Photo Row -->
       <div class="photo-subgrid">
-        <!-- Feature 2: Indian Jersey Stands Photo -->
+        <!-- Feature 3: Indian Jersey Stands Photo -->
         <figure class="editorial-photo-card sub-photo tilt-card" data-cursor-text="STANDS">
           <div class="photo-inner">
-            <Image 
-              src={photoStands} 
-              alt="Abhishek Pandey smiling in Indian team jersey in stadium stands" 
-              class="photo-img" 
-              widths={[400, 700]} 
-              sizes="(min-width: 64rem) 220px, 45vw" 
+            <Image
+              src={photoStands}
+              alt="Abhishek Pandey smiling in Indian team jersey in stadium stands"
+              class="photo-img"
+              widths={[400, 700]}
+              sizes="(min-width: 64rem) 220px, 45vw"
             />
             <div class="photo-badge-chip neon">STANDS TO STAGE</div>
           </div>
           <figcaption class="photo-caption">
-            <span class="caption-num">FIG 02</span>
+            <span class="caption-num">FIG 03</span>
             <span class="caption-text">With the fans in the national stands.</span>
           </figcaption>
         </figure>
 
-        <!-- Feature 3: Stadium Railing Gujarat Titans Photo -->
+        <!-- Feature 4: Stadium Railing Gujarat Titans Photo -->
         <figure class="editorial-photo-card sub-photo tilt-card" data-cursor-text="TACTICS">
           <div class="photo-inner">
-            <Image 
-              src={photoRail} 
-              alt="Abhishek Pandey leaning on pitchside railing overlooking match" 
-              class="photo-img" 
-              widths={[400, 700]} 
-              sizes="(min-width: 64rem) 220px, 45vw" 
+            <Image
+              src={photoRail}
+              alt="Abhishek Pandey leaning on pitchside railing overlooking match"
+              class="photo-img"
+              widths={[400, 700]}
+              sizes="(min-width: 64rem) 220px, 45vw"
             />
             <div class="photo-badge-chip cyan">FIELD OF PLAY</div>
           </div>
           <figcaption class="photo-caption">
-            <span class="caption-num">FIG 03</span>
+            <span class="caption-num">FIG 04</span>
             <span class="caption-text">Pitchside tactical surveillance.</span>
           </figcaption>
         </figure>
@@ -331,6 +350,10 @@ const inningsTimeline = [
 
   .primary-photo .photo-inner {
     aspect-ratio: 3 / 4;
+  }
+
+  .landscape-photo .photo-inner {
+    aspect-ratio: 16 / 9;
   }
 
   .photo-subgrid {
