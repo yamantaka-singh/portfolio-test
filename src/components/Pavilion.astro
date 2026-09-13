@@ -1,31 +1,31 @@
 ---
 import { Image } from 'astro:assets';
 import { Content as Story } from '../data/story.md';
-import { BookOpen, Award, Compass, Radio, Mic, Flame } from 'lucide-astro';
+import { Mic } from 'lucide-astro';
 import photoMic from '../assets/photos/abhishek-podcast-mic.jpg';
 import photoStands from '../assets/photos/abhishek-india-stands.jpg';
 import photoRail from '../assets/photos/abhishek-stadium-gt.jpg';
 import photoDesk from '../assets/photos/abhishek-broadcast-desk.jpg';
 
 const inningsTimeline = [
-  { dates: 'March – May 2025', title: 'IPL 2025', accredited: false, desc: 'Content creation & audience engagement.' },
+  { dates: 'March – May 2025', title: 'IPL 2025', accredited: false, desc: 'Match reactions and stadium vlogs.' },
   { dates: 'January – February 2026', title: 'WPL 2026', accredited: false, desc: "Women's Premier League coverage." },
-  { dates: 'February – May 2026', title: 'Content Creator | My11Circle', accredited: false, desc: 'Produced engaging short-form reels directly for the My11Circle app feed, creating dynamic cricket content to boost user interaction.' },
-  { dates: 'February – March 2026', title: "ICC Men's T20 World Cup 2026", accredited: false, desc: 'Global tournament reaction & match content.' },
-  { dates: 'March – May 2026', title: 'IPL 2026', accredited: false, desc: 'Extensive match-by-match digital content.' },
-  { dates: 'August – September 2026', title: 'DPL 2026', accredited: true, desc: 'Ground/field access, exclusive reporting, and professional media coverage.' },
+  { dates: 'February – May 2026', title: 'Content Creator | My11Circle', accredited: false, desc: 'Made short-form cricket reels for the My11Circle app feed.' },
+  { dates: 'February – March 2026', title: "ICC Men's T20 World Cup 2026", accredited: false, desc: 'Match reactions through the tournament.' },
+  { dates: 'March – May 2026', title: 'IPL 2026', accredited: false, desc: 'Match-by-match reaction videos.' },
+  { dates: 'August – September 2026', title: 'DPL 2026', accredited: true, desc: 'Accredited field access and player interviews.' },
 ];
 ---
 <div class="pavilion-container">
   <header class="pavilion-header">
     <div class="header-left">
       <p class="kicker reveal-text">
-        <span class="hud-pill neon"><Mic class="icon-tiny" /> THE DOSSIER</span>
+        <span class="hud-pill neon"><Mic class="icon-tiny" /> THE STORY</span>
         PAVILION // THE STORY &amp; INNINGS
       </p>
       <h2 class="pavilion-title reveal-text">CRICKET WITH SOUL.</h2>
       <p class="pavilion-subtitle reveal-text">
-        From recording technical videos in a small room to pitchside field access with international stars.
+        From recording videos in my room to accredited field access at DPL 2026.
       </p>
     </div>
   </header>
@@ -77,13 +77,13 @@ const inningsTimeline = [
           />
           <div class="photo-tape top-right"></div>
           <div class="photo-hud-stamp">
-            <span class="stamp-id">EPISODES // STUDIO</span>
-            <span class="stamp-lbl">BROADCASTER PASS</span>
+            <span class="stamp-id">SPIN &amp; SWING</span>
+            <span class="stamp-lbl">STUDIO</span>
           </div>
         </div>
         <figcaption class="photo-caption">
           <span class="caption-num">FIG 01</span>
-          <span class="caption-text">Behind the microphone for Spin &amp; Swing technical breakdowns.</span>
+          <span class="caption-text">Behind the mic for Spin &amp; Swing.</span>
         </figcaption>
       </figure>
 
@@ -97,11 +97,11 @@ const inningsTimeline = [
             widths={[500, 900]}
             sizes="(min-width: 64rem) 420px, 90vw"
           />
-          <div class="photo-badge-chip neon">ON AIR</div>
+          <div class="photo-badge-chip neon">T20 WORLD CUP</div>
         </div>
         <figcaption class="photo-caption">
           <span class="caption-num">FIG 02</span>
-          <span class="caption-text">Pitchside broadcast desk on matchday.</span>
+          <span class="caption-text">At the ICC Men's T20 World Cup 2026.</span>
         </figcaption>
       </figure>
 
@@ -117,16 +117,16 @@ const inningsTimeline = [
               widths={[400, 700]}
               sizes="(min-width: 64rem) 220px, 45vw"
             />
-            <div class="photo-badge-chip neon">STANDS TO STAGE</div>
+            <div class="photo-badge-chip neon">IN THE STANDS</div>
           </div>
           <figcaption class="photo-caption">
             <span class="caption-num">FIG 03</span>
-            <span class="caption-text">With the fans in the national stands.</span>
+            <span class="caption-text">With India fans in the stands.</span>
           </figcaption>
         </figure>
 
         <!-- Feature 4: Stadium Railing Gujarat Titans Photo -->
-        <figure class="editorial-photo-card sub-photo tilt-card" data-cursor-text="TACTICS">
+        <figure class="editorial-photo-card sub-photo tilt-card" data-cursor-text="PITCHSIDE">
           <div class="photo-inner">
             <Image
               src={photoRail}
@@ -139,7 +139,7 @@ const inningsTimeline = [
           </div>
           <figcaption class="photo-caption">
             <span class="caption-num">FIG 04</span>
-            <span class="caption-text">Pitchside tactical surveillance.</span>
+            <span class="caption-text">Pitchside in Gujarat Titans colours.</span>
           </figcaption>
         </figure>
       </div>

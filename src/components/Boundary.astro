@@ -1,6 +1,6 @@
 ---
 import { site } from '../data/site.js';
-import { Mail, ExternalLink, Sparkles, Clock, CheckCircle, ArrowUpRight, Instagram, Youtube, Linkedin } from 'lucide-astro';
+import { Mail, ExternalLink, Sparkles, CheckCircle, ArrowUpRight, Instagram, Youtube, Linkedin } from 'lucide-astro';
 
 const handle = (url: string) => url.split('/').filter(Boolean).pop()?.replace('@', '') || '';
 const socials = [
@@ -11,55 +11,46 @@ const socials = [
 
 ---
 <div class="boundary-container">
-  <!-- Top Marquee Banner -->
   <div class="marquee-ribbon" aria-hidden="true">
     <div class="marquee-track">
       <div class="marquee-content">
-        <span>NOW BOOKING 2026 COMMERCIAL PARTNERSHIPS</span>
+        <span>BRAND SPONSORSHIPS</span>
         <span class="sep">///</span>
-        <span class="highlight">DIRECT EMAIL LINE OPEN</span>
+        <span class="highlight">LIVE EVENT COVERAGE</span>
         <span class="sep">///</span>
-        <span>BRAND COLLABORATIONS WELCOME</span>
+        <span>MEDIA APPEARANCES</span>
         <span class="sep">///</span>
-        <span class="highlight">TACTICAL CRICKET INTEL</span>
-        <span class="sep">///</span>
-        <span>KEYNOTE &amp; LIVE PANELS</span>
+        <span class="highlight">CRICKET ACADEMY COLLABORATIONS</span>
         <span class="sep">///</span>
       </div>
       <div class="marquee-content">
-        <span>NOW BOOKING 2026 COMMERCIAL PARTNERSHIPS</span>
+        <span>BRAND SPONSORSHIPS</span>
         <span class="sep">///</span>
-        <span class="highlight">DIRECT EMAIL LINE OPEN</span>
+        <span class="highlight">LIVE EVENT COVERAGE</span>
         <span class="sep">///</span>
-        <span>BRAND COLLABORATIONS WELCOME</span>
+        <span>MEDIA APPEARANCES</span>
         <span class="sep">///</span>
-        <span class="highlight">TACTICAL CRICKET INTEL</span>
-        <span class="sep">///</span>
-        <span>KEYNOTE &amp; LIVE PANELS</span>
+        <span class="highlight">CRICKET ACADEMY COLLABORATIONS</span>
         <span class="sep">///</span>
       </div>
       <div class="marquee-content">
-        <span>NOW BOOKING 2026 COMMERCIAL PARTNERSHIPS</span>
+        <span>BRAND SPONSORSHIPS</span>
         <span class="sep">///</span>
-        <span class="highlight">DIRECT EMAIL LINE OPEN</span>
+        <span class="highlight">LIVE EVENT COVERAGE</span>
         <span class="sep">///</span>
-        <span>BRAND COLLABORATIONS WELCOME</span>
+        <span>MEDIA APPEARANCES</span>
         <span class="sep">///</span>
-        <span class="highlight">TACTICAL CRICKET INTEL</span>
-        <span class="sep">///</span>
-        <span>KEYNOTE &amp; LIVE PANELS</span>
+        <span class="highlight">CRICKET ACADEMY COLLABORATIONS</span>
         <span class="sep">///</span>
       </div>
       <div class="marquee-content">
-        <span>NOW BOOKING 2026 COMMERCIAL PARTNERSHIPS</span>
+        <span>BRAND SPONSORSHIPS</span>
         <span class="sep">///</span>
-        <span class="highlight">DIRECT EMAIL LINE OPEN</span>
+        <span class="highlight">LIVE EVENT COVERAGE</span>
         <span class="sep">///</span>
-        <span>BRAND COLLABORATIONS WELCOME</span>
+        <span>MEDIA APPEARANCES</span>
         <span class="sep">///</span>
-        <span class="highlight">TACTICAL CRICKET INTEL</span>
-        <span class="sep">///</span>
-        <span>KEYNOTE &amp; LIVE PANELS</span>
+        <span class="highlight">CRICKET ACADEMY COLLABORATIONS</span>
         <span class="sep">///</span>
       </div>
     </div>
@@ -68,49 +59,39 @@ const socials = [
   <div class="boundary-main">
     <header class="boundary-header">
       <p class="kicker reveal-text">
-        <span class="hud-pill neon"><Sparkles class="icon-tiny" /> COLLABORATION TERMINAL</span>
+        <span class="hud-pill neon"><Sparkles class="icon-tiny" /> COLLABORATIONS</span>
         THE BOUNDARY // PARTNERSHIPS &amp; ENQUIRIES
       </p>
       <h2 class="massive-headline reveal-text">LET'S BUILD SOMETHING ICONIC.</h2>
-      <blockquote class="boundary-quote reveal-text">
-        "Cricket content works when it feels real. Get that right, and the brand partnership takes care of itself."
-      </blockquote>
+      <figure class="boundary-quote">
+        <blockquote class="reveal-text">My approach is simple: keep things authentic, respect the audience’s time, and make videos that are both enjoyable and easy to connect with.</blockquote>
+        <figcaption>Abhishek Pandey</figcaption>
+      </figure>
     </header>
 
-    <!-- Action Center & Social Ledger -->
     <div class="action-grid">
-      <!-- Direct Contact Action -->
       <div class="action-card primary-action">
-        <div class="action-header">
-          <span class="hud-pill live">
-            <span class="live-rec-dot"></span>
-            PRIORITY CHANNEL
-          </span>
-          <span class="resp-time"><Clock class="icon-tiny" /> Avg. response: &lt; 2h</span>
-        </div>
-
         <h3 class="action-title">Start a Conversation</h3>
         <p class="action-desc">
-          Drop a brief with your matchday vision or campaign scope. We reply swiftly.
+          Email a short brief with what you want to promote and when.
         </p>
 
         <div class="cta-stack">
           <a class="contact-cta cta-email magnetic" href="/go/email" data-cursor-text="EMAIL">
             <Mail class="cta-icon" />
-            <span>Send Email Brief</span>
+            <span>Email Abhishek</span>
             <ArrowUpRight class="icon-small" />
           </a>
         </div>
 
         <div class="direct-email-row">
-          <span class="lbl">DIRECT ADDRESS:</span>
+          <span class="lbl">EMAIL:</span>
           <span class="email-val">{site.email}</span>
         </div>
       </div>
 
-      <!-- Social Channels Registry -->
       <div class="action-card registry-card">
-        <h3 class="registry-title">Official Channels Registry</h3>
+        <h3 class="registry-title">Channels</h3>
         <ul class="socials-list" role="list">
           {socials.map((s) => (
             <li>
@@ -129,14 +110,10 @@ const socials = [
       </div>
     </div>
 
-    <!-- Colophon Footer -->
     <footer class="colophon-bar">
       <div class="colophon-left">
         <span class="brand-wordmark">{site.name}</span>
         <span class="copyright-text">© {new Date().getFullYear()} · All rights reserved</span>
-      </div>
-      <div class="colophon-right">
-        <span class="sign-off">DESIGNED FOR UNCOMPROMISED IMPACT</span>
       </div>
     </footer>
   </div>
@@ -180,11 +157,24 @@ const socials = [
     margin: 0;
     padding-left: var(--space-m);
     border-left: 3px solid var(--color-neon);
+  }
+
+  .boundary-quote blockquote {
+    margin: 0;
     font-family: var(--font-body);
     font-size: var(--step-1);
     font-style: italic;
     color: var(--color-text);
     line-height: 1.5;
+  }
+
+  .boundary-quote figcaption {
+    margin-top: var(--space-xs);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-muted);
   }
 
   /* Action Grid */
@@ -216,23 +206,6 @@ const socials = [
   .primary-action {
     border-color: rgba(231, 111, 81, 0.3);
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-  }
-
-  .action-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--space-xs);
-  }
-
-  .resp-time {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-3xs);
-    font-family: var(--font-mono);
-    font-size: var(--step--2);
-    color: var(--color-muted);
   }
 
   .action-title {

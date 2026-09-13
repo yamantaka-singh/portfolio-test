@@ -1,5 +1,5 @@
 ---
-import { Radio, Volume2, ArrowUp, Send, Flame } from 'lucide-astro';
+import { ArrowUp, Flame } from 'lucide-astro';
 ---
 <aside class="broadcast-dock" aria-label="Broadcast Navigation Dock">
   <div class="dock-inner">
@@ -33,15 +33,7 @@ import { Radio, Volume2, ArrowUp, Send, Flame } from 'lucide-astro';
       </a>
     </nav>
 
-    <!-- Right: Audio Atmosphere & Direct Collab CTA -->
     <div class="dock-right">
-      <div class="sound-wave" aria-hidden="true" title="Stadium Atmosphere Active">
-        <span class="bar bar-1"></span>
-        <span class="bar bar-2"></span>
-        <span class="bar bar-3"></span>
-        <span class="bar bar-4"></span>
-      </div>
-
       <a href="#boundary" class="dock-cta magnetic" data-cursor-text="BOOK">
         <Flame class="icon-tiny" />
         <span>COLLABORATE</span>
@@ -221,37 +213,6 @@ import { Radio, Volume2, ArrowUp, Send, Flame } from 'lucide-astro';
     align-items: center;
     gap: var(--space-2xs);
     flex-shrink: 0;
-  }
-
-  .sound-wave {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    height: 14px;
-    padding: 0 4px;
-  }
-
-  @media (max-width: 42rem) {
-    .sound-wave {
-      display: none;
-    }
-  }
-
-  .sound-wave .bar {
-    width: 2px;
-    border-radius: 1px;
-    background: var(--color-neon);
-    animation: wave-bounce 1.2s ease-in-out infinite alternate;
-  }
-
-  .bar-1 { height: 6px; animation-delay: 0.1s; }
-  .bar-2 { height: 12px; animation-delay: 0.3s; }
-  .bar-3 { height: 8px; animation-delay: 0.2s; }
-  .bar-4 { height: 14px; animation-delay: 0.4s; }
-
-  @keyframes wave-bounce {
-    0% { height: 3px; }
-    100% { height: 14px; }
   }
 
   .dock-cta {

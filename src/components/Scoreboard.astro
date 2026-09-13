@@ -2,7 +2,7 @@
 import { social } from '../lib/social.js';
 import { scoreboardStats } from '../lib/stats.js';
 import { compactCount, longDate } from '../lib/format.js';
-import { Users, Eye, TrendingUp, ExternalLink, Activity, Award, Radio } from 'lucide-astro';
+import { Users, Eye, TrendingUp, ExternalLink, Activity, Award } from 'lucide-astro';
 
 const s = scoreboardStats(social);
 ---
@@ -10,74 +10,43 @@ const s = scoreboardStats(social);
   <header class="board-header">
     <div class="header-left">
       <p class="kicker reveal-text">
-        <span class="hud-pill cyan"><Activity class="icon-tiny" /> TELEMETRY CORE</span>
-        SCOREBOARD // LIVE AUDIENCE &amp; REACH
+        <span class="hud-pill cyan"><Activity class="icon-tiny" /> STATS</span>
+        SCOREBOARD // AUDIENCE &amp; REACH
       </p>
       <h2 class="board-title reveal-text">THE NUMBERS.</h2>
       <p class="board-subtitle reveal-text">
-        Real public metrics and verified engagement across the Spin &amp; Swing ecosystem.
+        Follower and view counts from public YouTube and Instagram pages, refreshed daily.
       </p>
     </div>
     <div class="header-right">
-      <span class="hud-pill live">
-        <span class="live-rec-dot"></span>
-        UPDATED {longDate(s.asOf).toUpperCase()}
-      </span>
+      <span class="hud-pill">UPDATED {longDate(s.asOf).toUpperCase()}</span>
     </div>
   </header>
 
-  <!-- Stadium LED Scoreboard Grid -->
   <div class="jumbotron-matrix">
-    <!-- Big Highlight 1: Total Reach -->
     <div class="led-card primary tilt-card" data-cursor-text="REACH">
-      <div class="card-top">
-        <span class="metric-label"><Users class="card-icon" /> TOTAL PURIST NETWORK</span>
-        <span class="status-pip neon">VERIFIED</span>
-      </div>
+      <span class="metric-label"><Users class="card-icon" /> TOTAL FOLLOWERS</span>
       <div class="metric-value-wrap">
         <span class="led-number" data-count={s.totalReach}>{compactCount(s.totalReach)}</span>
-        <span class="metric-sub">Across YouTube &amp; Instagram channels</span>
-      </div>
-      <div class="led-bar">
-        <div class="led-fill neon-fill" style="width: 85%;"></div>
+        <span class="metric-sub">Across YouTube &amp; Instagram</span>
       </div>
     </div>
 
-    <!-- Big Highlight 2: Total Views -->
     <div class="led-card primary tilt-card" data-cursor-text="VIEWS">
-      <div class="card-top">
-        <span class="metric-label"><Eye class="card-icon" /> RECENT CONTENT IMPRESSIONS</span>
-        <span class="status-pip cyan">VIRAL</span>
-      </div>
+      <span class="metric-label"><Eye class="card-icon" /> VIEWS ON TOP VIDEOS</span>
       <div class="metric-value-wrap">
         <span class="led-number" data-count={s.totalViews}>{compactCount(s.totalViews)}</span>
-        <span class="metric-sub">Views recorded on featured breakdowns</span>
-      </div>
-      <div class="led-bar">
-        <div class="led-fill cyan-fill" style="width: 92%;"></div>
+        <span class="metric-sub">Across the {social.videos.length} most-viewed YouTube videos</span>
       </div>
     </div>
 
-    <!-- Telemetry Cards -->
-    <div class="led-card telemetry-hawk tilt-card" data-cursor-text="RADAR">
-      <div class="card-top">
-        <span class="metric-label"><Award class="card-icon" /> LIFETIME IMPRESSIONS</span>
-        <span class="status-pip gold">GLOBAL</span>
-      </div>
+    <div class="led-card telemetry-hawk tilt-card" data-cursor-text="LIFETIME">
+      <span class="metric-label"><Award class="card-icon" /> LIFETIME IMPRESSIONS</span>
       <div class="metric-value-wrap">
         <span class="led-number" data-count="50000000">50M+</span>
-        <span class="metric-sub">Total watch-time impressions generated</span>
-      </div>
-      <div class="hawk-eye-sim" aria-hidden="true">
-        <svg viewBox="0 0 200 40" class="pitch-trajectory">
-          <path d="M 10 35 Q 70 5, 130 25 T 190 10" fill="none" stroke="var(--color-neon)" stroke-width="2" stroke-dasharray="4 2" />
-          <circle cx="130" cy="25" r="4" fill="var(--color-crimson)" />
-          <circle cx="190" cy="10" r="3" fill="var(--color-neon)" />
-        </svg>
       </div>
     </div>
 
-    <!-- Account Breakdown Tiles -->
     {s.accounts.map((a) => (
       <div class="led-card tilt-card" data-cursor-text="FOLLOW">
         <div class="card-top">
@@ -88,10 +57,7 @@ const s = scoreboardStats(social);
         </div>
         <div class="metric-value-wrap">
           <span class="led-number small-led" data-count={a.value}>{compactCount(a.value)}</span>
-          <span class="metric-sub">Dedicated followers</span>
-        </div>
-        <div class="led-bar">
-          <div class="led-fill" style="width: 70%;"></div>
+          <span class="metric-sub">Followers</span>
         </div>
       </div>
     ))}
@@ -235,34 +201,6 @@ const s = scoreboardStats(social);
     color: var(--color-neon);
   }
 
-  .status-pip {
-    font-family: var(--font-mono);
-    font-size: var(--step--2);
-    font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 9999px;
-    border: 1px solid;
-    letter-spacing: 0.08em;
-  }
-
-  .status-pip.neon {
-    color: var(--color-neon);
-    border-color: rgba(231, 111, 81, 0.4);
-    background: rgba(231, 111, 81, 0.08);
-  }
-
-  .status-pip.cyan {
-    color: var(--color-cyan);
-    border-color: rgba(42, 157, 143, 0.4);
-    background: rgba(42, 157, 143, 0.08);
-  }
-
-  .status-pip.gold {
-    color: var(--color-gold);
-    border-color: rgba(233, 196, 106, 0.4);
-    background: rgba(233, 196, 106, 0.08);
-  }
-
   .metric-value-wrap {
     display: flex;
     flex-direction: column;
@@ -294,29 +232,6 @@ const s = scoreboardStats(social);
     color: var(--color-muted);
   }
 
-  .led-bar {
-    width: 100%;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-
-  .led-fill {
-    height: 100%;
-    background: var(--color-line-bright);
-  }
-
-  .neon-fill {
-    background: var(--color-neon);
-    box-shadow: 0 0 10px var(--color-neon);
-  }
-
-  .cyan-fill {
-    background: var(--color-cyan);
-    box-shadow: 0 0 10px var(--color-cyan);
-  }
-
   .external-trigger {
     color: var(--color-muted);
     transition: color 0.2s ease, transform 0.2s ease;
@@ -325,18 +240,6 @@ const s = scoreboardStats(social);
   .external-trigger:hover {
     color: var(--color-neon);
     transform: translate(2px, -2px);
-  }
-
-  .hawk-eye-sim {
-    width: 100%;
-    height: 40px;
-    display: flex;
-    align-items: center;
-  }
-
-  .pitch-trajectory {
-    width: 100%;
-    height: 100%;
   }
 
   .icon-tiny {

@@ -3,9 +3,8 @@ import { Image } from 'astro:assets';
 import { social, thumb } from '../lib/social.js';
 import { compactCount, longDate } from '../lib/format.js';
 import { videoTag } from '../lib/video-tags.js';
-import { Play, Eye, Sparkles, Flame, Trophy, ExternalLink, X } from 'lucide-astro';
+import { Play, Eye, Flame, ExternalLink, X } from 'lucide-astro';
 
-// Sort videos strictly by views descending to surface the most viral hits first
 const topVideos = [...social.videos]
   .sort((a, b) => b.views - a.views)
   .slice(0, 6);
@@ -14,17 +13,17 @@ const topVideos = [...social.videos]
   <header class="pitch-header">
     <div class="header-left">
       <p class="kicker reveal-text">
-        <span class="hud-pill neon"><Flame class="icon-tiny" /> VIRAL ARCHIVE</span>
-        THE PITCH // MATCHDAY HIGHLIGHTS
+        <span class="hud-pill neon"><Flame class="icon-tiny" /> YOUTUBE</span>
+        THE PITCH // MOST-VIEWED VIDEOS
       </p>
       <h2 class="pitch-title reveal-text">UNFILTERED INTEL.</h2>
       <p class="pitch-subtitle reveal-text">
-        The most viewed cricket breakdowns, player feature stories, and matchday tactical analyses.
+        The most-watched Spin &amp; Swing videos on YouTube, ranked by views.
       </p>
     </div>
     <div class="header-right">
       <a class="channel-btn magnetic" href="https://www.youtube.com/@spinandswing26" target="_blank" rel="noopener" data-cursor-text="YOUTUBE">
-        <span>Channel Archive</span>
+        <span>Open channel</span>
         <ExternalLink class="icon-tiny" />
       </a>
     </div>

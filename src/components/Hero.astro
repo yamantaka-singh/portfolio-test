@@ -1,12 +1,17 @@
 ---
 import { Image } from 'astro:assets';
 import { site } from '../data/site.js';
-import { Play, Radio, ArrowUpRight, Flame, ShieldCheck } from 'lucide-astro';
+import { social } from '../lib/social.js';
+import { scoreboardStats } from '../lib/stats.js';
+import { compactCount } from '../lib/format.js';
+import { Play, ArrowUpRight } from 'lucide-astro';
 import heroPortrait from '../assets/photos/abhishek-tata-ipl.jpg';
 import lordsHero from '../assets/photos/lords-stadium-sunny.jpg';
+
+const { totalReach } = scoreboardStats(social);
+const topViews = Math.max(0, ...social.videos.map((v) => v.views ?? 0));
 ---
 <div class="hero-wrapper">
-  <!-- Lord's Cricket Ground Stadium Background -->
   <div class="video-bg" aria-hidden="true">
     <Image
       src={lordsHero}
@@ -22,69 +27,51 @@ import lordsHero from '../assets/photos/lords-stadium-sunny.jpg';
   </div>
 
   <div class="hero-container">
-    <!-- Top Telemetry & Broadcast Bar -->
-    <div class="telemetry-bar">
-      <div class="telemetry-right">
-        <span class="hud-pill neon">
-          <Flame class="icon-tiny" /> 180K+ CRICKET PURISTS
-        </span>
-      </div>
-    </div>
-
-    <!-- Main Maximalist Grid -->
     <div class="hero-grid">
-      <!-- Left Content Column -->
       <div class="hero-content">
         <p class="kicker hero-kicker reveal-text">
           <span class="kicker-badge">HOST // SPIN &amp; SWING</span>
           <span>CRICKET CREATOR &amp; TACTICAL ANALYST</span>
         </p>
-        
+
         <h1 class="hero-title reveal-text">
           <span class="first-name">ABHISHEK</span>
           <span class="last-name">PANDEY</span>
         </h1>
 
-        <p class="hero-lede reveal-text">
-          {site.tagline} Deconstructing every seam movement, spin trajectory, and high-pressure tactical shift across international cricket.
-        </p>
+        <p class="hero-lede reveal-text">{site.tagline}</p>
 
         <div class="cta-cluster">
           <a class="cta-primary magnetic" href="#pitch" data-cursor-text="WATCH">
-            <span>Watch Top Intel</span>
+            <span>Watch top videos</span>
             <span class="icon-bubble"><Play class="icon-small" /></span>
           </a>
           <a class="cta-secondary magnetic" href="#pavilion" data-cursor-text="STORY">
-            <span>The Dossier</span>
+            <span>His story</span>
             <ArrowUpRight class="icon-small" />
           </a>
         </div>
 
-        <!-- Metric Mini Grid -->
         <div class="metric-ribbon">
           <div class="metric-cell">
-            <span class="metric-num">180K+</span>
-            <span class="metric-lbl">Audience Reach</span>
+            <span class="metric-num">{compactCount(totalReach)}</span>
+            <span class="metric-lbl">Followers</span>
           </div>
           <div class="metric-cell">
             <span class="metric-num">50M+</span>
             <span class="metric-lbl">Total Impressions</span>
           </div>
           <div class="metric-cell">
-            <span class="metric-num">CRICKET</span>
-            <span class="metric-lbl">Deep-Dive Specialty</span>
+            <span class="metric-num">{compactCount(topViews)}</span>
+            <span class="metric-lbl">Views on top video</span>
           </div>
         </div>
       </div>
 
-      <!-- Right Column: Pitchside Accreditation Dossier Card -->
       <div class="hero-card-col">
         <div class="accreditation-card tilt-card" data-cursor-text="ABHISHEK">
           <div class="card-header">
-            <div class="card-chip">
-              <ShieldCheck class="icon-tiny" />
-            </div>
-            <span class="card-loc">PITCHSIDE ACCESS</span>
+            <span class="card-loc">ON LOCATION</span>
           </div>
 
           <div class="card-image-wrap">
@@ -103,11 +90,8 @@ import lordsHero from '../assets/photos/lords-stadium-sunny.jpg';
 
           <div class="card-footer">
             <div class="telemetry-readout">
-              <span class="lbl">CONDITION</span>
-              <span class="val">HARD TURF · DRY SEAM</span>
-            </div>
-            <div class="barcode" aria-hidden="true">
-              <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+              <span class="lbl">ACCREDITED</span>
+              <span class="val">DPL 2026 MEDIA</span>
             </div>
           </div>
         </div>
@@ -125,21 +109,9 @@ import lordsHero from '../assets/photos/lords-stadium-sunny.jpg';
         <span class="sep">///</span>
         <span class="highlight">50,000,000+ IMPRESSIONS</span>
         <span class="sep">///</span>
-        <span>IPL TACTICAL DRILLS</span>
+        <span>POST-MATCH REACTIONS</span>
         <span class="sep">///</span>
-        <span class="highlight">UNFILTERED CRICKET INTEL</span>
-        <span class="sep">///</span>
-      </div>
-      <div class="marquee-content">
-        <span>SPIN &amp; SWING</span>
-        <span class="sep">///</span>
-        <span class="highlight">44.2K SUBSCRIBERS</span>
-        <span class="sep">///</span>
-        <span class="highlight">50,000,000+ IMPRESSIONS</span>
-        <span class="sep">///</span>
-        <span>IPL TACTICAL DRILLS</span>
-        <span class="sep">///</span>
-        <span class="highlight">UNFILTERED CRICKET INTEL</span>
+        <span class="highlight">STADIUM VLOGS</span>
         <span class="sep">///</span>
       </div>
       <div class="marquee-content">
@@ -149,9 +121,9 @@ import lordsHero from '../assets/photos/lords-stadium-sunny.jpg';
         <span class="sep">///</span>
         <span class="highlight">50,000,000+ IMPRESSIONS</span>
         <span class="sep">///</span>
-        <span>IPL TACTICAL DRILLS</span>
+        <span>POST-MATCH REACTIONS</span>
         <span class="sep">///</span>
-        <span class="highlight">UNFILTERED CRICKET INTEL</span>
+        <span class="highlight">STADIUM VLOGS</span>
         <span class="sep">///</span>
       </div>
       <div class="marquee-content">
@@ -161,9 +133,21 @@ import lordsHero from '../assets/photos/lords-stadium-sunny.jpg';
         <span class="sep">///</span>
         <span class="highlight">50,000,000+ IMPRESSIONS</span>
         <span class="sep">///</span>
-        <span>IPL TACTICAL DRILLS</span>
+        <span>POST-MATCH REACTIONS</span>
         <span class="sep">///</span>
-        <span class="highlight">UNFILTERED CRICKET INTEL</span>
+        <span class="highlight">STADIUM VLOGS</span>
+        <span class="sep">///</span>
+      </div>
+      <div class="marquee-content">
+        <span>SPIN &amp; SWING</span>
+        <span class="sep">///</span>
+        <span class="highlight">44.2K SUBSCRIBERS</span>
+        <span class="sep">///</span>
+        <span class="highlight">50,000,000+ IMPRESSIONS</span>
+        <span class="sep">///</span>
+        <span>POST-MATCH REACTIONS</span>
+        <span class="sep">///</span>
+        <span class="highlight">STADIUM VLOGS</span>
         <span class="sep">///</span>
       </div>
     </div>
@@ -264,36 +248,6 @@ import lordsHero from '../assets/photos/lords-stadium-sunny.jpg';
       padding-bottom: var(--space-2xs);
       gap: var(--space-xs);
     }
-  }
-
-  .telemetry-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: var(--space-xs);
-    width: 100%;
-  }
-
-  @media (max-width: 40rem) {
-    .telemetry-bar {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: var(--space-2xs);
-    }
-  }
-
-  .telemetry-left,
-  .telemetry-right {
-    display: flex;
-    align-items: center;
-    gap: var(--space-xs);
-    flex-wrap: wrap;
-  }
-
-  .icon-tiny {
-    width: 0.85rem;
-    height: 0.85rem;
   }
 
   .hero-grid {
@@ -517,14 +471,6 @@ import lordsHero from '../assets/photos/lords-stadium-sunny.jpg';
     border-bottom: 1px solid var(--color-line);
   }
 
-  .card-chip {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2xs);
-    color: var(--color-cyan);
-    font-weight: 700;
-  }
-
   .card-loc {
     color: var(--color-muted);
   }
@@ -568,11 +514,6 @@ import lordsHero from '../assets/photos/lords-stadium-sunny.jpg';
     font-size: var(--step--2);
   }
 
-  .badge-role {
-    color: var(--color-neon);
-    font-weight: 700;
-  }
-
   .badge-match {
     color: var(--color-text);
   }
@@ -599,29 +540,5 @@ import lordsHero from '../assets/photos/lords-stadium-sunny.jpg';
   .telemetry-readout .val {
     color: var(--color-text);
     font-weight: 600;
-  }
-
-  .barcode {
-    display: flex;
-    gap: 3px;
-    height: 24px;
-    align-items: center;
-  }
-
-  .barcode span {
-    display: block;
-    height: 100%;
-    background-color: var(--color-line-bright);
-    width: 2px;
-  }
-
-  .barcode span:nth-child(even) {
-    width: 3px;
-    background-color: var(--color-muted);
-  }
-
-  .barcode span:nth-child(3),
-  .barcode span:nth-child(7) {
-    width: 1px;
   }
 </style>
