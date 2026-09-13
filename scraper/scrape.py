@@ -4,12 +4,12 @@ Run from the repo root:  scraper/.venv/bin/python scraper/scrape.py
 Public pages only, logged out, no credentials. Re-running keeps `featured` flags.
 """
 import json
-import sys
+import os
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from scrapling.fetchers import Fetcher
+from scrapling.fetchers import Fetcher, StealthyFetcher
 
 import parse
 
@@ -17,18 +17,37 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT_JSON = ROOT / "src/data/social.json"
 THUMBS = ROOT / "src/assets/social"
 OVERRIDE = ROOT / "scraper/instagram_posts.txt"
+INNINGS = ROOT / "src/data/innings.json"  # hand-curated; this script only reads it
 IG_ACCOUNTS = ["abhishekpandey_26", "spinandswing26"]
 IG_REELS_ACCOUNTS = ["abhishekpandey_26"]  # Pulse of the Crowd: reels from this account only
 YT_CHANNELS = ["spinandswing26", "abhishekunseen26"]
 LINKEDIN = "abhishek-pandey-26sep03"
+YT_API_KEY = os.environ.get("YT_API_KEY")  # optional: without it, watch pages are scraped (bot-checked on GitHub runners)
 
 
 def get(url, **kw):
     time.sleep(2)  # ponytail: fixed politeness delay; ~50 requests total, no need for a rate limiter
     page = Fetcher.get(url, impersonate="chrome", stealthy_headers=True, timeout=30, **kw)
-    if page.status != 200:
-        raise RuntimeError(f"HTTP {page.status} for {url}")
-    return page
+    # 429 is a real rate-limit signal (seen live: shared GitHub runner IP ranges get
+    # rate-limited, not blocked outright) -- worth a few backed-off retries, honoring
+    # Retry-After when Instagram sends one. A login-wall or network-level block won't
+    # clear by retrying the same IP, so this loop is 429-only.
+    attempt = 0
+    while page.status == 429 and attempt < 3:
+        delay = int(page.headers.get("Retry-After", 5 * 2**attempt))
+        time.sleep(delay)
+        page = Fetcher.get(url, impersonate="chrome", stealthy_headers=True, timeout=30, **kw)
+        attempt += 1
+    if page.status == 200:
+        return page
+    # ADR-0003's own named next step: a real headless browser, still logged out, no
+    # credentials. Instagram-only -- it's the one blocking plain requests on some IPs
+    # (login-wall or 429); YouTube already has its own API fallback (youtube_api_details).
+    if "instagram.com" in url:
+        page = StealthyFetcher.fetch(url, headless=True, network_idle=True)
+        if page.status == 200:
+            return page
+    raise RuntimeError(f"HTTP {page.status} for {url}")
 
 
 def post_json(url, body, **kw):
@@ -88,7 +107,7 @@ def scrape_instagram(featured, pool_size=6):
             print("WARN IG profile", err)
         profiles.append(row)
 
-    posts = []
+    posts, pool = [], []
     if OVERRIDE.exists():
         urls = [line.strip() for line in OVERRIDE.read_text().splitlines() if line.strip()]
         for c in filter(None, map(parse.parse_instagram_post_url, urls)):
@@ -96,9 +115,9 @@ def scrape_instagram(featured, pool_size=6):
                 posts.append(fetch_override_post(c))
             except Exception as err:
                 print("WARN IG post", err)
-        return profiles, posts
+        return profiles, posts, pool
 
-    for handle in IG_REELS_ACCOUNTS:
+    for handle in IG_ACCOUNTS:
         try:
             reels_page = get(f"https://www.instagram.com/{handle}/reels/")
             candidates = parse.parse_instagram_reels_tab(reels_page.body.decode("utf-8", "ignore"))
@@ -106,6 +125,9 @@ def scrape_instagram(featured, pool_size=6):
             print("WARN IG reels tab", err)
             candidates = []
         candidates.sort(key=lambda c: c["views"], reverse=True)
+        pool += candidates  # every account's tab feeds curated counts
+        if handle not in IG_REELS_ACCOUNTS:
+            continue
         for c in candidates[:pool_size]:
             url = f"https://www.instagram.com/reel/{c['id']}/"
             try:
@@ -121,7 +143,21 @@ def scrape_instagram(featured, pool_size=6):
     # A reel cross-posted to both accounts shows up in both accounts' own /reels/ tab --
     # keep it once rather than showing the same card twice.
     posts = list({p["shortcode"]: p for p in posts}.values())
-    return profiles, posts
+    return profiles, posts, pool
+
+
+def youtube_api_details(ids):
+    """Exact title/views/date for up to 50 videos in one YouTube Data API call (1 quota unit).
+
+    The key travels in a header, never the URL, so it can't leak into a logged error.
+    """
+    try:
+        page = get("https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=" + ",".join(ids),
+                   headers={"X-Goog-Api-Key": YT_API_KEY})
+        return parse.parse_youtube_api_videos(page.body.decode("utf-8", "ignore"))
+    except Exception as err:
+        print("WARN YT API, falling back to watch pages:", err)
+        return {}
 
 
 def youtube_thumb(video_id):
@@ -180,11 +216,12 @@ def scrape_youtube(featured, pool_size=8):
             candidates = {v["id"]: v for v in (
                 parse.parse_youtube_videos_page(listing.body.decode("utf-8", "ignore")) + shorts_candidates
             )}.values()
-            candidates = sorted(candidates, key=lambda v: v["views"] or 0, reverse=True)
-            for c in candidates[:pool_size]:
+            candidates = sorted(candidates, key=lambda v: v["views"] or 0, reverse=True)[:pool_size]
+            api = youtube_api_details([c["id"] for c in candidates]) if YT_API_KEY and candidates else {}
+            for c in candidates:
                 try:
-                    watch = get(f"https://www.youtube.com/watch?v={c['id']}")
-                    detail = parse.parse_youtube_watch_page(watch.body.decode("utf-8", "ignore"))
+                    detail = api.get(c["id"]) or parse.parse_youtube_watch_page(
+                        get(f"https://www.youtube.com/watch?v={c['id']}").body.decode("utf-8", "ignore"))
                     thumb = youtube_thumb(c["id"])
                     if not thumb or detail["views"] is None:
                         raise RuntimeError(f"incomplete detail for {c['id']}: {detail}, thumb={thumb}")
@@ -210,16 +247,69 @@ def scrape_linkedin():
     return row
 
 
-def check_not_wiped(previous, videos, posts):
-    """A scrape can come back empty without raising -- e.g. every watch-page fetch
-    silently returns a bot-check/consent page instead of real content (seen live
-    from a GitHub Actions runner IP, not reproducible from a normal machine).
-    Refuse to overwrite real data with nothing rather than wiping it.
+def carry_over(previous, videos, posts):
+    """A scrape can come back empty without raising: bot-check or login-wall pages instead
+    of content (seen live on GitHub runners). A blocked platform keeps its last good data
+    so the other one can still refresh. If both come back empty, nothing refreshed, so
+    refuse outright rather than commit a new timestamp over stale data.
     """
+    if not videos and not posts and (previous.get("videos") or previous.get("posts")):
+        raise RuntimeError("both YouTube and Instagram returned nothing -- refusing to overwrite")
     if not videos and previous.get("videos"):
-        raise RuntimeError(f"scrape_youtube returned 0 videos but {len(previous['videos'])} existed before -- refusing to overwrite")
+        print(f"WARN YouTube returned 0 videos, keeping the previous {len(previous['videos'])}")
+        videos = previous["videos"]
     if not posts and previous.get("posts"):
-        raise RuntimeError(f"scrape_instagram returned 0 posts but {len(previous['posts'])} existed before -- refusing to overwrite")
+        print(f"WARN Instagram returned 0 posts, keeping the previous {len(previous['posts'])}")
+        posts = previous["posts"]
+    return videos, posts
+
+
+def merge_profiles(previous, fresh):
+    """Profile rows with any None field (a login wall parses to None) filled from the previous run."""
+    old = {(p["platform"], p["handle"]): p for p in previous}
+    return [{k: v if v is not None else old.get((p["platform"], p["handle"]), {}).get(k) for k, v in p.items()}
+            for p in fresh]
+
+
+def keep_featured(previous, fresh, key):
+    """A human-featured item survives dropping out of the top-views pool -- the scraper
+    never un-picks what a person picked (ADR-0003). Its counts stay at their last values.
+    """
+    have = {x[key] for x in fresh}
+    return fresh + [x for x in previous if x.get("featured") and x[key] not in have]
+
+
+def merge_curated(ids, previous, fresh):
+    """Counts for every curated reel id. A missing or zero fresh count keeps the previous
+    one -- a bot-check page parses to None/0 and must never overwrite a real number.
+    """
+    return {i: {k: fresh.get(i, {}).get(k) or previous.get(i, {}).get(k) for k in ("views", "likes")}
+            for i in ids}
+
+
+def refresh_curated(ids, pool):
+    """Fresh counts for curated reels: exact views from the /reels/ pool already fetched,
+    else the reel's own page (likes only, views aren't public there). Also saves a
+    thumbnail for any curated reel that doesn't have one yet.
+    """
+    by_id = {c["id"]: c for c in pool}
+    fresh = {}
+    for i in ids:
+        try:
+            if i in by_id:
+                fresh[i] = {"views": by_id[i]["views"], "likes": by_id[i]["likes"]}
+                image = by_id[i]["thumbUrl"]
+            else:
+                page = get(f"https://www.instagram.com/reel/{i}/")
+                rounded = parse.parse_instagram_post(meta(page, "og:description"))["likes"]
+                fresh[i] = {"views": None,
+                            "likes": parse.parse_instagram_like_count(page.body.decode("utf-8", "ignore"), rounded)}
+                image = meta(page, "og:image")
+            if image and not (THUMBS / f"ig-{i}.jpg").exists():
+                save_image(image, f"ig-{i}.jpg")
+        except Exception as err:
+            print("WARN IG curated reel", i, err)
+    return fresh
 
 
 def main():
@@ -227,20 +317,35 @@ def main():
     previous = json.loads(OUT_JSON.read_text()) if OUT_JSON.exists() else {}
     featured = {r["id"] for r in previous.get("videos", []) if r.get("featured")} | \
                {r["shortcode"] for r in previous.get("posts", []) if r.get("featured")}
+    curated_ids = [r["id"] for i in json.loads(INNINGS.read_text()) for r in i.get("reels", [])]
 
-    ig_profiles, posts = scrape_instagram(featured)
+    ig_profiles, posts, pool = scrape_instagram(featured)
     yt_profiles, videos = scrape_youtube(featured)
-    check_not_wiped(previous, videos, posts)
+    videos, posts = carry_over(previous, videos, posts)
+    posts = keep_featured(previous.get("posts", []), posts, "shortcode")
+    videos = keep_featured(previous.get("videos", []), videos, "id")
 
     data = {
         "scrapedAt": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "profiles": ig_profiles + yt_profiles + [scrape_linkedin()],
+        "profiles": merge_profiles(previous.get("profiles", []), ig_profiles + yt_profiles + [scrape_linkedin()]),
         "videos": videos,
         "posts": posts,
     }
+    fresh = refresh_curated(curated_ids, pool)
+    data["curated"] = merge_curated(curated_ids, previous.get("curated", {}), fresh)
     OUT_JSON.parent.mkdir(parents=True, exist_ok=True)
     OUT_JSON.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
-    print(f"profiles={len(data['profiles'])} videos={len(videos)} posts={len(posts)} -> {OUT_JSON.relative_to(ROOT)}")
+    print(f"profiles={len(data['profiles'])} videos={len(videos)} posts={len(posts)} "
+          f"curated_fresh={len(fresh)}/{len(curated_ids)} -> {OUT_JSON.relative_to(ROOT)}")
+
+    # Curation gate (ADR-0009): list top reels nobody has filed yet, never publish them.
+    unfiled = [p["url"] for p in posts if p["shortcode"] not in curated_ids]
+    if unfiled:
+        note = "Reels not yet filed in src/data/innings.json:\n" + "".join(f"- {u}\n" for u in unfiled)
+        print(note)
+        if os.environ.get("GITHUB_STEP_SUMMARY"):
+            with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as f:
+                f.write(note)
 
 
 if __name__ == "__main__":

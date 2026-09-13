@@ -1,7 +1,7 @@
 # ADR-0003: Scrapling seed (public data), self-hosted thumbnails, GitHub Actions refresh later
 
 ## Status
-Accepted — 2026-09-12
+Accepted — 2026-09-12. The "Later (deferred phase)" bullet is superseded by ADR-0009 (2026-09-13).
 
 ## Context
 The Pitch, Scoreboard and Stands sections need real content and numbers from:

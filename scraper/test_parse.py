@@ -1,4 +1,5 @@
 import unittest
+from unittest import mock
 
 import parse
 import scrape
@@ -197,21 +198,157 @@ class LinkedIn(unittest.TestCase):
         self.assertEqual(parse.parse_linkedin(None), {"name": None, "headline": None})
 
 
-class CheckNotWiped(unittest.TestCase):
-    def test_raises_when_videos_wiped(self):
+class CarryOver(unittest.TestCase):
+    def test_raises_when_both_platforms_come_back_empty(self):
         with self.assertRaises(RuntimeError):
-            scrape.check_not_wiped({"videos": [{"id": "a"}]}, videos=[], posts=[])
+            scrape.carry_over({"videos": [{"id": "a"}], "posts": [{"shortcode": "a"}]}, videos=[], posts=[])
 
-    def test_raises_when_posts_wiped(self):
-        with self.assertRaises(RuntimeError):
-            scrape.check_not_wiped({"posts": [{"shortcode": "a"}]}, videos=[{"id": "a"}], posts=[])
+    def test_blocked_platform_keeps_previous_data(self):
+        # Seen live on a GitHub runner: Instagram login-walls while YouTube still works.
+        prev = {"videos": [{"id": "a"}], "posts": [{"shortcode": "p"}]}
+        self.assertEqual(scrape.carry_over(prev, videos=[{"id": "b"}], posts=[]), ([{"id": "b"}], [{"shortcode": "p"}]))
+        self.assertEqual(scrape.carry_over(prev, videos=[], posts=[{"shortcode": "q"}]), ([{"id": "a"}], [{"shortcode": "q"}]))
 
     def test_allows_empty_when_previous_was_also_empty(self):
-        scrape.check_not_wiped({}, videos=[], posts=[])
+        self.assertEqual(scrape.carry_over({}, videos=[], posts=[]), ([], []))
 
-    def test_allows_a_real_scrape_through(self):
-        scrape.check_not_wiped({"videos": [{"id": "a"}], "posts": [{"shortcode": "a"}]},
-                                videos=[{"id": "b"}], posts=[{"shortcode": "b"}])
+
+class MergeProfiles(unittest.TestCase):
+    def test_null_counts_keep_previous_values(self):
+        prev = [{"platform": "instagram", "handle": "x", "followers": 10, "postCount": 5}]
+        fresh = [{"platform": "instagram", "handle": "x", "followers": None, "postCount": 6}]
+        self.assertEqual(scrape.merge_profiles(prev, fresh),
+                         [{"platform": "instagram", "handle": "x", "followers": 10, "postCount": 6}])
+
+
+class RetryOn429(unittest.TestCase):
+    """A 429 is a real rate-limit signal, worth retrying -- unlike a login-wall or a
+    hard network-level block, which retrying the same IP can never fix.
+    """
+
+    @mock.patch("scrape.time.sleep")
+    @mock.patch("scrape.Fetcher")
+    def test_retries_on_429_then_succeeds(self, fetcher, sleep):
+        fetcher.get.side_effect = [mock.Mock(status=429, headers={}), mock.Mock(status=200, body=b"ok")]
+        page = scrape.get("https://www.instagram.com/x/")
+        self.assertEqual(page.body, b"ok")
+        self.assertEqual(fetcher.get.call_count, 2)
+
+    @mock.patch("scrape.time.sleep")
+    @mock.patch("scrape.Fetcher")
+    def test_honors_retry_after_header(self, fetcher, sleep):
+        fetcher.get.side_effect = [mock.Mock(status=429, headers={"Retry-After": "7"}), mock.Mock(status=200, body=b"ok")]
+        scrape.get("https://www.instagram.com/x/")
+        self.assertIn(7, [c.args[0] for c in sleep.call_args_list])
+
+    @mock.patch("scrape.time.sleep")
+    @mock.patch("scrape.Fetcher")
+    def test_exhausts_retries_then_falls_through(self, fetcher, sleep):
+        fetcher.get.return_value = mock.Mock(status=429, headers={})
+        with mock.patch("scrape.StealthyFetcher") as stealth:
+            stealth.fetch.return_value = mock.Mock(status=429, body=b"still blocked")
+            with self.assertRaises(RuntimeError):
+                scrape.get("https://www.instagram.com/x/")
+
+
+class InstagramStealthFallback(unittest.TestCase):
+    """Instagram, logged out, blocks plain Fetcher requests on some IPs (login-wall or
+    429). Retrying only those with a real headless browser (still no credentials) is
+    ADR-0003's own named next step -- these requests never see it if the plain fetch works.
+    """
+
+    @mock.patch("scrape.Fetcher")
+    def test_plain_200_never_touches_stealth(self, fetcher):
+        fetcher.get.return_value = mock.Mock(status=200, body=b"ok")
+        with mock.patch("scrape.StealthyFetcher") as stealth:
+            page = scrape.get("https://www.instagram.com/x/")
+            stealth.fetch.assert_not_called()
+        self.assertEqual(page.body, b"ok")
+
+    @mock.patch("scrape.Fetcher")
+    def test_instagram_blocked_retries_with_stealth(self, fetcher):
+        fetcher.get.return_value = mock.Mock(status=403, body=b"blocked")
+        with mock.patch("scrape.StealthyFetcher") as stealth:
+            stealth.fetch.return_value = mock.Mock(status=200, body=b"real page")
+            page = scrape.get("https://www.instagram.com/x/")
+            stealth.fetch.assert_called_once()
+        self.assertEqual(page.body, b"real page")
+
+    @mock.patch("scrape.Fetcher")
+    def test_non_instagram_blocked_does_not_retry_with_stealth(self, fetcher):
+        fetcher.get.return_value = mock.Mock(status=403, body=b"blocked")
+        with mock.patch("scrape.StealthyFetcher") as stealth:
+            with self.assertRaises(RuntimeError):
+                scrape.get("https://www.youtube.com/x/")
+            stealth.fetch.assert_not_called()
+
+    @mock.patch("scrape.Fetcher")
+    def test_stealth_also_failing_raises(self, fetcher):
+        fetcher.get.return_value = mock.Mock(status=403, body=b"blocked")
+        with mock.patch("scrape.StealthyFetcher") as stealth:
+            stealth.fetch.return_value = mock.Mock(status=403, body=b"still blocked")
+            with self.assertRaises(RuntimeError):
+                scrape.get("https://www.instagram.com/x/")
+
+
+class YouTubeApi(unittest.TestCase):
+    def test_videos_list_response(self):
+        body = ('{"items":[{"id":"DxgBGpUzZ08","snippet":{"publishedAt":"2026-05-31T14:30:40Z","title":"Gt fan vs Mi fan"},'
+                '"statistics":{"viewCount":"18674473"}},{"id":"YPeQi6-h30M","snippet":{"publishedAt":"2026-01-18T11:30:27Z",'
+                '"title":"Guess"},"statistics":{}}]}')
+        self.assertEqual(parse.parse_youtube_api_videos(body), {
+            "DxgBGpUzZ08": {"title": "Gt fan vs Mi fan", "views": 18_674_473, "publishedAt": "2026-05-31T14:30:40Z"},
+            "YPeQi6-h30M": {"title": "Guess", "views": None, "publishedAt": "2026-01-18T11:30:27Z"},
+        })
+
+    def test_error_or_garbage_is_empty(self):
+        self.assertEqual(parse.parse_youtube_api_videos('{"error":{"code":403}}'), {})
+        self.assertEqual(parse.parse_youtube_api_videos("<html>"), {})
+
+
+class MergeCurated(unittest.TestCase):
+    def test_fresh_counts_win(self):
+        got = scrape.merge_curated(["a"], {"a": {"views": 1, "likes": 1}}, {"a": {"views": 5, "likes": 2}})
+        self.assertEqual(got, {"a": {"views": 5, "likes": 2}})
+
+    def test_missing_or_zero_fresh_keeps_previous(self):
+        # A bot-check page parses to None/0 -- it must never overwrite a real count.
+        got = scrape.merge_curated(["a"], {"a": {"views": 9, "likes": 3}}, {"a": {"views": 0, "likes": None}})
+        self.assertEqual(got, {"a": {"views": 9, "likes": 3}})
+
+    def test_new_id_is_nulls_and_uncurated_ids_drop(self):
+        got = scrape.merge_curated(["b"], {"a": {"views": 9, "likes": 3}}, {})
+        self.assertEqual(got, {"b": {"views": None, "likes": None}})
+
+
+class KeepFeatured(unittest.TestCase):
+    def test_featured_item_outside_new_pool_survives(self):
+        prev = [{"shortcode": "a", "featured": True}, {"shortcode": "b", "featured": False}]
+        got = scrape.keep_featured(prev, [{"shortcode": "c", "featured": False}], "shortcode")
+        self.assertEqual([x["shortcode"] for x in got], ["c", "a"])
+
+    def test_no_duplicate_when_featured_item_is_still_in_pool(self):
+        got = scrape.keep_featured([{"id": "a", "featured": True}], [{"id": "a", "featured": True}], "id")
+        self.assertEqual(len(got), 1)
+
+
+class ReelLikeCount(unittest.TestCase):
+    def test_exact_like_count_from_embedded_json(self):
+        self.assertEqual(parse.parse_instagram_like_count('"pk":"1","like_count":63947,"comment_count":210', 64000), 63947)
+
+    def test_missing_is_none(self):
+        self.assertIsNone(parse.parse_instagram_like_count("<html></html>"))
+
+    def test_unconfirmed_exact_count_is_none(self):
+        # Seen live: og:description had no likes and the page's first embedded
+        # like_count (3) belonged to other media -- never trust it unconfirmed.
+        self.assertIsNone(parse.parse_instagram_like_count('"like_count":3'))
+
+    def test_count_that_disagrees_with_rounded_og_likes_is_ignored(self):
+        # The page embeds related media too: 999 can't be this reel's "64K likes".
+        self.assertEqual(parse.parse_instagram_like_count('"like_count":999', 64000), 64000)
+        self.assertEqual(parse.parse_instagram_like_count('"like_count":63947', 64000), 63947)
+        self.assertEqual(parse.parse_instagram_like_count("<html></html>", 44000), 44000)
 
 
 if __name__ == "__main__":

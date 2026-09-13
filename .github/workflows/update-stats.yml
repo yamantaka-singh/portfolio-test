@@ -2,27 +2,44 @@ name: Update social stats
 
 on:
   schedule:
-    - cron: '0 3 * * *' # daily at 03:00 UTC -- change the cron expression to adjust frequency
+    - cron: '30 16 * * *' # daily at 16:30 UTC = 22:00 IST, when the runner Mac is normally awake
   workflow_dispatch:
 
 permissions:
   contents: write
 
+# One refresh at a time: a manual dispatch and the cron must not race on social.json.
+concurrency:
+  group: social-sync
+  cancel-in-progress: false
+
 jobs:
   scrape:
-    runs-on: ubuntu-latest
+    # Self-hosted: Instagram blocks GitHub's datacenter IP ranges outright (login-wall
+    # + 429 even on /accounts/login/, verified across three runs). A home IP serves the
+    # same pages fine, so the runner lives on the owner's Mac (ADR-0009).
+    runs-on: self-hosted
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: pip install -r scraper/requirements.txt
-      - run: python scraper/scrape.py
+      # No setup-python/setup-node: those provision toolchains for throwaway hosted
+      # runners and fail on a real Mac trying to write to /Users/runner. This runner
+      # already has Python and Node on PATH.
+      # The venv lives outside the workspace because checkout wipes untracked files
+      # every run, which would otherwise rebuild it daily for nothing.
+      - run: |
+          python3 -m venv "$HOME/.venvs/portfolio-scraper"
+          "$HOME/.venvs/portfolio-scraper/bin/pip" install -q -r scraper/requirements.txt
+      # Headless Chromium for StealthyFetcher, used only as an Instagram fallback
+      # when the plain fetcher is blocked (still logged out -- ADR-0003).
+      - run: |
+          "$HOME/.venvs/portfolio-scraper/bin/scrapling" install
+      - run: |
+          "$HOME/.venvs/portfolio-scraper/bin/python" scraper/scrape.py
+        env:
+          YT_API_KEY: ${{ secrets.YT_API_KEY }}  # YouTube Data API; Instagram has no hands-off route yet (ADR-0009)
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
       - run: npm ci
       # Reuses the existing schema validation (astro build fails on malformed
       # social.json) as a safety gate before anything gets pushed to prod.

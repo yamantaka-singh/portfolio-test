@@ -77,6 +77,22 @@ def parse_instagram_post(og_description):
     return {"account": m.group(2), "likes": parse_count(m.group(1)), "caption": (m.group(3) or "").strip()}
 
 
+def parse_instagram_like_count(html, rounded=None):
+    """Exact like count from a reel page's embedded JSON, when the page carries one.
+
+    The page embeds related media too, so an exact count more than 10% off the
+    og:description's rounded one ("64K likes") belongs to something else -- the
+    rounded count is returned instead. With no rounded count there is nothing to
+    confirm against (seen live: the first embedded count was another item's 3), so
+    None is returned and the caller keeps the last known value.
+    """
+    if rounded is None:
+        return None
+    m = re.search(r'"like_count":(\d+)', html or "")
+    exact = int(m.group(1)) if m else None
+    return exact if exact is not None and abs(exact - rounded) <= rounded * 0.1 else rounded
+
+
 def parse_youtube_channel(html, handle):
     cid = re.search(r'<link rel="canonical" href="https://www\.youtube\.com/channel/(UC[\w-]{22})"', html)
     subs = re.search(rf"@{re.escape(handle)}\W{{0,6}}•\W{{0,6}}({_NUM}) subscribers", html, re.I)
@@ -156,6 +172,24 @@ def parse_youtube_watch_page(html):
         "views": int(views_m.group(1)) if views_m else None,
         "publishedAt": date_m.group(1) if date_m else None,
     }
+
+
+def parse_youtube_api_videos(body):
+    """{id: {title, views, publishedAt}} from a YouTube Data API videos.list response.
+
+    An error response or a non-JSON body gives {}, so the caller falls back to watch pages.
+    """
+    try:
+        items = json.loads(body).get("items", [])
+    except (ValueError, AttributeError):
+        return {}
+    out = {}
+    for it in items:
+        views = it.get("statistics", {}).get("viewCount")
+        out[it["id"]] = {"title": it["snippet"]["title"],
+                         "views": int(views) if views is not None else None,
+                         "publishedAt": it["snippet"]["publishedAt"]}
+    return out
 
 
 def parse_linkedin(og_title):
