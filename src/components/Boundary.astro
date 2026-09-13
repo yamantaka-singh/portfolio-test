@@ -3,6 +3,7 @@ import { site } from '../data/site.js';
 import { Mail, ExternalLink, Sparkles, CheckCircle, ArrowUpRight, Instagram, Youtube, Linkedin } from 'lucide-astro';
 import { Image } from 'astro:assets';
 import pandaMail from '../assets/photos/panda-mail.webp';
+import Signature from './Signature.astro';
 
 const handle = (url: string) => url.split('/').filter(Boolean).pop()?.replace('@', '') || '';
 const socials = [
@@ -91,43 +92,7 @@ const socials = [
         </div>
 
         <div class="signature-wrap" aria-hidden="true">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 360 128"
-            class="signature-svg"
-            aria-hidden="true"
-          >
-            <defs>
-              <filter id="sig-glow" x="-20%" y="-20%" width="140%" height="140%">
-                <feDropShadow dx="0" dy="0" stdDeviation="2.2" flood-color="#E76F51" flood-opacity="0.9" />
-                <feDropShadow dx="0" dy="2" stdDeviation="4.5" flood-color="#FFB703" flood-opacity="0.45" />
-              </filter>
-            </defs>
-            <g
-              stroke="#E76F51"
-              fill="none"
-              stroke-width="2.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              filter="url(#sig-glow)"
-            >
-              <path
-                class="sig-name"
-                d="M 22 75 C 28 35 42 16 54 18 C 66 20 58 55 46 88 C 38 108 28 98 34 76 C 42 46 64 54 82 58 C 92 60 100 40 104 25 C 108 14 112 16 110 32 C 106 58 98 84 108 82 C 116 80 122 68 126 62 C 132 58 136 38 138 24 C 140 15 144 18 142 34 C 138 58 134 82 134 82 C 134 82 142 56 150 56 C 158 56 156 74 158 82 C 162 76 168 62 170 60 C 172 64 170 76 174 82 C 178 78 184 62 186 58 C 188 54 184 72 188 80 C 190 82 194 72 196 52 C 198 28 202 20 204 26 C 204 36 198 62 198 82 C 198 82 204 56 212 56 C 220 56 218 74 222 82 C 226 78 234 60 236 60 C 238 60 232 72 230 76 C 232 80 238 82 244 80 C 250 76 254 36 256 22 C 258 14 262 18 260 34 C 256 60 252 82 252 82 C 252 82 260 62 266 64 C 270 66 264 74 274 82"
-              />
-              <path
-                class="sig-dot"
-                d="M 171 44 C 172 43 174 44 173 46 C 172 47 170 46 171 44 Z"
-                stroke-width="3.6"
-                fill="#E76F51"
-              />
-              <path
-                class="sig-flourish"
-                d="M 274 82 C 290 84 318 80 326 74 C 332 68 316 84 278 94 C 210 112 110 114 42 104 C 30 102 38 98 64 97 C 120 95 200 94 286 91"
-                stroke-width="2.4"
-              />
-            </g>
-          </svg>
+          <Signature class="signature-svg" />
         </div>
 
         <div class="panda-mascot-wrap" aria-hidden="true">
@@ -275,15 +240,14 @@ const socials = [
 
   .signature-wrap {
     position: absolute;
-    bottom: clamp(14px, 2.2vw, 28px);
-    right: calc(clamp(110px, 22vw, 155px) + clamp(8px, 1.8vw, 22px));
-    width: clamp(125px, 20vw, 185px);
+    bottom: clamp(12px, 2vw, 24px);
+    right: calc(clamp(110px, 22vw, 155px) + clamp(8px, 1.6vw, 20px));
+    width: clamp(140px, 22vw, 220px);
     pointer-events: none;
     z-index: 2;
     transform-origin: center right;
-    transform: rotate(-9deg);
+    transform: rotate(-7deg);
     line-height: 0;
-    opacity: 0.96;
     transition: opacity 0.3s var(--ease-out);
   }
 
@@ -291,70 +255,36 @@ const socials = [
     width: 100%;
     height: auto;
     overflow: visible;
+    display: block;
+    clip-path: inset(0 100% 0 0);
+    filter: drop-shadow(0 0 12px rgba(231, 111, 81, 0.45));
+    transition: clip-path 1.55s cubic-bezier(0.38, 0, 0.22, 1), filter 0.4s ease;
   }
 
-  .sig-name {
-    stroke-dasharray: 1080;
-    stroke-dashoffset: 1080;
-    transition: stroke-dashoffset 0.95s cubic-bezier(0.45, 0, 0.2, 1);
+  /* When actively writing: clip-path sweeps from left to right like pen writing */
+  .primary-action.is-signing .signature-svg,
+  .primary-action.has-drawn .signature-svg {
+    clip-path: inset(0 0% 0 0);
   }
 
-  .sig-dot {
-    opacity: 0;
-    transform-origin: 172px 45px;
-    transform: scale(0);
-    transition: opacity 0.15s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  .primary-action:not(.is-signing):not(.has-drawn) .signature-svg {
+    clip-path: inset(0 100% 0 0);
+    transition: none;
   }
 
-  .sig-flourish {
-    stroke-dasharray: 610;
-    stroke-dashoffset: 610;
-    transition: stroke-dashoffset 0.55s cubic-bezier(0.2, 0.8, 0.25, 1);
-  }
-
-  /* When actively writing: tactile paper micro-shiver */
+  /* Tactile paper micro-shiver while writing */
   .primary-action.is-signing {
     animation: paper-scrawl-shiver 0.08s infinite ease-in-out;
     will-change: transform;
   }
 
-  .primary-action.is-signing .sig-name,
-  .primary-action.has-drawn .sig-name {
-    stroke-dashoffset: 0;
-  }
-
-  .primary-action.is-signing .sig-dot,
-  .primary-action.has-drawn .sig-dot {
-    opacity: 1;
-    transform: scale(1);
-    transition-delay: 0.92s;
-  }
-
-  .primary-action.is-signing .sig-flourish,
-  .primary-action.has-drawn .sig-flourish {
-    stroke-dashoffset: 0;
-    transition-delay: 1.05s;
-  }
-
-  .primary-action:not(.is-signing):not(.has-drawn) .sig-name {
-    stroke-dashoffset: 1080;
-    transition: none;
-  }
-
-  .primary-action:not(.is-signing):not(.has-drawn) .sig-dot {
-    opacity: 0;
-    transform: scale(0);
-    transition: none;
-  }
-
-  .primary-action:not(.is-signing):not(.has-drawn) .sig-flourish {
-    stroke-dashoffset: 610;
-    transition: none;
-  }
-
-  /* Ambient floating breathe once drawn and not actively signing */
+  /* Ambient glowing floating breathe once drawn and settled */
   .primary-action.has-drawn:not(.is-signing) .signature-wrap {
-    animation: signature-float 3.6s ease-in-out infinite alternate;
+    animation: signature-float 3.8s ease-in-out infinite alternate;
+  }
+
+  .primary-action.has-drawn:not(.is-signing) .signature-svg {
+    animation: signature-glow-pulse 3.8s ease-in-out infinite alternate;
   }
 
   .panda-mascot-wrap {
@@ -594,13 +524,24 @@ const socials = [
 
   @keyframes signature-float {
     0% {
-      transform: rotate(-9deg) translate3d(0, 0, 0) scale(1);
+      transform: rotate(-7deg) translate3d(0, 0, 0) scale(1);
     }
     50% {
-      transform: rotate(-7.5deg) translate3d(0, -4px, 0) scale(1.02);
+      transform: rotate(-5.5deg) translate3d(0, -4px, 0) scale(1.02);
     }
     100% {
-      transform: rotate(-10deg) translate3d(0, 2px, 0) scale(0.99);
+      transform: rotate(-8deg) translate3d(0, 2px, 0) scale(0.99);
+    }
+  }
+
+  @keyframes signature-glow-pulse {
+    0% {
+      filter: drop-shadow(0 0 10px rgba(231, 111, 81, 0.4)) drop-shadow(0 2px 14px rgba(255, 183, 3, 0.25));
+      opacity: 0.94;
+    }
+    100% {
+      filter: drop-shadow(0 0 20px rgba(231, 111, 81, 0.85)) drop-shadow(0 4px 30px rgba(255, 183, 3, 0.55));
+      opacity: 1;
     }
   }
 
@@ -610,17 +551,12 @@ const socials = [
     }
     .signature-wrap {
       animation: none !important;
-      transform: rotate(-9deg) !important;
+      transform: rotate(-7deg) !important;
     }
-    .sig-name,
-    .sig-flourish {
-      stroke-dashoffset: 0 !important;
+    .signature-svg {
+      clip-path: inset(0 0% 0 0) !important;
       transition: none !important;
-    }
-    .sig-dot {
-      opacity: 1 !important;
-      transform: scale(1) !important;
-      transition: none !important;
+      animation: none !important;
     }
   }
 </style>
