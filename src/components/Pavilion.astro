@@ -1,7 +1,9 @@
 ---
 import { Image } from 'astro:assets';
 import { Content as Story } from '../data/story.md';
-import { Mic, MapPin, Sparkles } from 'lucide-astro';
+import { Mic, MapPin, Sparkles, Instagram, Play, Eye, Heart, Lock, Pin, X } from 'lucide-astro';
+import { thumb } from '../lib/social.js';
+import { compactCount } from '../lib/format.js';
 import photoMic from '../assets/photos/abhishek-podcast-mic.jpg';
 import photoTrophy from '../assets/photos/abhishek-trophy-parul.jpg';
 import photoStands from '../assets/photos/abhishek-india-stands.jpg';
@@ -9,7 +11,54 @@ import photoRail from '../assets/photos/abhishek-stadium-gt.jpg';
 import photoDesk from '../assets/photos/abhishek-broadcast-desk.jpg';
 
 const inningsTimeline = [
-  { dates: 'March – May 2025', title: 'IPL 2025', accredited: false, desc: 'Match reactions and stadium vlogs.' },
+  {
+    dates: 'March – May 2025',
+    title: 'IPL 2025',
+    accredited: false,
+    desc: 'Match reactions and stadium vlogs.',
+    reels: [
+      {
+        id: 'DJUtWygz-T2',
+        url: 'https://www.instagram.com/reel/DJUtWygz-T2/?stkn=MW81a2R1bHo0Z3E4Yw==',
+        thumb: 'ig-DJUtWygz-T2.jpg',
+        views: 540000,
+        likes: 44000,
+        caption: 'We did it @gujarat_titans 🥹 (GT vs MI)'
+      },
+      {
+        id: 'DJTjMYSSL4B',
+        url: 'https://www.instagram.com/reel/DJTjMYSSL4B/?stkn=anN4cTZwZjl2cWNz',
+        thumb: 'ig-DJTjMYSSL4B.jpg',
+        views: 165000,
+        likes: 13000,
+        caption: 'Guess the Player !! | Spin & Swing (RCB)'
+      },
+      {
+        id: 'DJmHLxRSeFU',
+        url: 'https://www.instagram.com/reel/DJmHLxRSeFU/?stkn=NXRydmZnczhyb2Y2',
+        thumb: 'ig-DJmHLxRSeFU.jpg',
+        views: 8200,
+        likes: 367,
+        caption: 'Guess the Player | Spin & Swing (SRH)'
+      },
+      {
+        id: 'DKMMtRnIzAE',
+        url: 'https://www.instagram.com/reel/DKMMtRnIzAE/?stkn=MTR5MTNueXV1a3Q1YQ==',
+        thumb: 'ig-DKMMtRnIzAE.jpg',
+        views: 210000,
+        likes: 17000,
+        caption: 'Guess the Player !! | Spin & Swing (RCB)'
+      },
+      {
+        id: 'DKOxcw4y6LX',
+        url: 'https://www.instagram.com/reel/DKOxcw4y6LX/?stkn=ejE4bWJmbHMxZ3Y2',
+        thumb: 'ig-DKOxcw4y6LX.jpg',
+        views: 7400,
+        likes: 335,
+        caption: 'Guess the Player | Spin & Swing (MI vs GT)'
+      }
+    ]
+  },
   { dates: 'January – February 2026', title: 'WPL 2026', accredited: false, desc: "Women's Premier League coverage." },
   { dates: 'February – May 2026', title: 'Content Creator | My11Circle', accredited: false, desc: 'Made short-form cricket reels for the My11Circle app feed.' },
   { dates: 'February – March 2026', title: "ICC Men's T20 World Cup 2026", accredited: false, desc: 'Match reactions through the tournament.' },
@@ -45,7 +94,14 @@ const inningsTimeline = [
         <h3 class="card-heading">Career Innings</h3>
         <div class="timeline">
           {inningsTimeline.map((item, idx) => (
-            <div class="timeline-step">
+            <div
+              class={`timeline-step ${item.reels ? 'has-reels' : ''}`}
+              data-has-reels={item.reels ? 'true' : undefined}
+              tabindex={item.reels ? '0' : undefined}
+              role={item.reels ? 'button' : undefined}
+              aria-expanded={item.reels ? 'false' : undefined}
+              aria-label={item.reels ? `${item.title}: Hover to preview reels, click to lock/unlock window.` : undefined}
+            >
               <span class="step-num">0{idx + 1}</span>
               <div class="step-content">
                 <div class="step-meta">
@@ -53,10 +109,84 @@ const inningsTimeline = [
                   <span class={`step-status ${item.accredited ? 'accredited' : 'independent'}`}>
                     {item.accredited ? 'Accredited' : 'Independent Coverage'}
                   </span>
+                  {item.reels && (
+                    <span class="innings-peek-badge">
+                      <Play class="icon-micro" />
+                      <span>{item.reels.length} REELS</span>
+                      <span class="pin-hint-tag">HOVER // CLICK TO LOCK</span>
+                    </span>
+                  )}
                 </div>
                 <h4 class="step-title">{item.title}</h4>
                 <p class="step-desc">{item.desc}</p>
               </div>
+
+              {item.reels && (
+                <div class="innings-popout-window" role="dialog" aria-label={`${item.title} reels window`}>
+                  <div class="popout-header">
+                    <div class="popout-header-left">
+                      <span class="hud-pill neon"><Instagram class="icon-tiny" /> {item.title} REELS</span>
+                      <span class="popout-subtitle">{item.reels.length} Highlights &bull; Horizontal Scroll</span>
+                    </div>
+                    <div class="popout-header-right">
+                      <button class="lock-toggle-pill" type="button" aria-label="Toggle lock">
+                        <span class="lock-state-tag unpinned"><Pin class="icon-micro" /> PIN OPEN</span>
+                        <span class="lock-state-tag pinned"><Lock class="icon-micro" /> LOCKED</span>
+                      </button>
+                      <button class="popout-close-btn" type="button" aria-label="Close reels window">
+                        <X class="icon-tiny" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="popout-carousel-wrapper">
+                    <div class="popout-reels-track" role="list">
+                      {item.reels.map((r) => (
+                        <div class="popout-reel-card tilt-card" role="listitem">
+                          <a
+                            class="popout-reel-anchor"
+                            href={r.url}
+                            target="_blank"
+                            rel="noopener"
+                            aria-label={r.caption || `${item.title} reel`}
+                          >
+                            <div class="thumb-frame">
+                              <Image
+                                class="reel-thumb"
+                                src={thumb(r.thumb)}
+                                alt=""
+                                widths={[320, 500]}
+                                sizes="(min-width: 64rem) 200px, 50vw"
+                              />
+                              <div class="frame-vignette"></div>
+                              <div class="reel-top-badges">
+                                <span class="type-pill reel-pill"><Play class="icon-micro" /> REEL</span>
+                              </div>
+                              <div class="reel-bottom-info">
+                                <div class="metric-chips">
+                                  {r.views != null && (
+                                    <div class="views-chip">
+                                      <Eye class="icon-eye" />
+                                      <span>{compactCount(r.views)}</span>
+                                    </div>
+                                  )}
+                                  {r.likes != null && (
+                                    <div class="likes-chip">
+                                      <Heart class="icon-heart" />
+                                      <span>{compactCount(r.likes)}</span>
+                                    </div>
+                                  )}
+                                </div>
+                                {r.caption && <p class="caption-text">{r.caption}</p>}
+                              </div>
+                            </div>
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -378,6 +508,345 @@ const inningsTimeline = [
     font-size: var(--step--1);
     color: var(--color-muted);
     line-height: 1.4;
+  }
+
+  /* Has Reels Interactive Step */
+  .timeline-step.has-reels {
+    cursor: pointer;
+    border-radius: var(--glass-radius);
+    padding: var(--space-2xs) var(--space-xs);
+    margin-left: calc(-1 * var(--space-xs));
+    transition: background 0.25s var(--ease-out), border-color 0.25s var(--ease-out);
+  }
+
+  .timeline-step.has-reels:hover,
+  .timeline-step.has-reels.is-open {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .timeline-step.has-reels.is-locked {
+    background: rgba(231, 111, 81, 0.07);
+    border: 1px solid rgba(231, 111, 81, 0.35);
+  }
+
+  .innings-peek-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    background: rgba(231, 111, 81, 0.15);
+    border: 1px solid rgba(231, 111, 81, 0.45);
+    color: var(--color-neon);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    transition: all 0.25s var(--ease-out);
+  }
+
+  .timeline-step.has-reels:hover .innings-peek-badge,
+  .timeline-step.has-reels.is-open .innings-peek-badge {
+    background: var(--gradient-neon);
+    color: var(--color-bg);
+    box-shadow: 0 0 16px rgba(231, 111, 81, 0.4);
+  }
+
+  .pin-hint-tag {
+    font-size: 0.65rem;
+    opacity: 0.85;
+    padding-left: 4px;
+    border-left: 1px solid currentColor;
+  }
+
+  /* Popout Window */
+  .innings-popout-window {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: min(92vw, 560px);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(231, 111, 81, 0.08) 28%, rgba(10, 15, 24, 0.92) 100%), rgba(10, 15, 24, 0.95);
+    border: var(--glass-border);
+    border-top-color: var(--glass-border-top);
+    border-left-color: var(--glass-border-left);
+    border-bottom-color: var(--glass-border-bottom);
+    border-radius: var(--glass-radius);
+    padding: var(--space-s);
+    backdrop-filter: blur(32px) saturate(200%) contrast(102%);
+    -webkit-backdrop-filter: blur(32px) saturate(200%) contrast(102%);
+    box-shadow: var(--glass-highlight-hover), 0 24px 60px -10px rgba(0, 0, 0, 0.95);
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(8px) scale(0.97);
+    transition: opacity 0.25s var(--ease-out), transform 0.25s var(--ease-out), visibility 0.25s;
+  }
+
+  .timeline-step.has-reels.is-open .innings-popout-window {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+  }
+
+  .timeline-step.has-reels.is-locked .innings-popout-window {
+    border-color: rgba(231, 111, 81, 0.5);
+    box-shadow: var(--glass-highlight-hover), 0 24px 60px -10px rgba(0, 0, 0, 0.9), 0 0 30px rgba(231, 111, 81, 0.2);
+  }
+
+  /* Popout Header */
+  .popout-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-xs);
+    padding-bottom: var(--space-xs);
+    margin-bottom: var(--space-xs);
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .popout-header-left {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .popout-subtitle {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    color: var(--color-muted);
+  }
+
+  .popout-header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+  }
+
+  .lock-toggle-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 9999px;
+    border: 1px solid var(--color-line-bright);
+    background: rgba(255, 255, 255, 0.08);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    font-weight: 700;
+    color: var(--color-text);
+    cursor: pointer;
+    transition: all 0.2s var(--ease-out);
+  }
+
+  .lock-toggle-pill:hover {
+    background: rgba(231, 111, 81, 0.2);
+    border-color: var(--color-neon);
+    color: var(--color-neon);
+  }
+
+  .lock-state-tag.pinned {
+    display: none;
+    color: var(--color-neon);
+  }
+
+  .timeline-step.is-locked .lock-state-tag.unpinned {
+    display: none;
+  }
+
+  .timeline-step.is-locked .lock-state-tag.pinned {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .timeline-step.is-locked .lock-toggle-pill {
+    border-color: var(--color-neon);
+    background: rgba(231, 111, 81, 0.25);
+    box-shadow: 0 0 12px rgba(231, 111, 81, 0.35);
+  }
+
+  .popout-close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--color-line);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--color-muted);
+    cursor: pointer;
+    transition: all 0.2s var(--ease-out);
+  }
+
+  .popout-close-btn:hover {
+    background: rgba(255, 51, 68, 0.2);
+    border-color: var(--color-crimson);
+    color: #FFF;
+    transform: scale(1.1);
+  }
+
+  /* Popout Carousel Track */
+  .popout-carousel-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 2px;
+  }
+
+  .popout-carousel-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+  .popout-reels-track {
+    display: flex;
+    gap: var(--space-xs);
+    width: max-content;
+  }
+
+  .popout-reel-card {
+    position: relative;
+    width: clamp(150px, 34vw, 185px);
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    background: var(--glass-bg);
+    border: var(--glass-border);
+    border-top-color: var(--glass-border-top);
+    border-left-color: var(--glass-border-left);
+    border-bottom-color: var(--glass-border-bottom);
+    border-radius: 14px;
+    padding: 5px;
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-highlight), 0 8px 24px rgba(0, 0, 0, 0.4);
+    transition: transform 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), border-color 0.25s var(--ease-out);
+  }
+
+  .popout-reel-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--color-neon);
+    border-top-color: rgba(255, 140, 120, 0.7);
+    box-shadow: var(--glass-highlight-hover), 0 14px 32px rgba(0, 0, 0, 0.7), 0 0 20px rgba(231, 111, 81, 0.35);
+  }
+
+  .popout-reel-anchor {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .popout-reel-card .thumb-frame {
+    position: relative;
+    aspect-ratio: 9/16;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #000;
+  }
+
+  .popout-reel-card .reel-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  .popout-reel-card:hover .reel-thumb {
+    transform: scale(1.05);
+  }
+
+  .popout-reel-card .frame-vignette {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.2) 0%,
+      transparent 35%,
+      rgba(0, 0, 0, 0.6) 70%,
+      rgba(0, 0, 0, 0.95) 100%
+    );
+    pointer-events: none;
+  }
+
+  .popout-reel-card .reel-top-badges {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    z-index: 2;
+  }
+
+  .popout-reel-card .type-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 6px;
+    border-radius: 9999px;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    color: #FFF;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .popout-reel-card .reel-bottom-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 8px;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .popout-reel-card .metric-chips {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .popout-reel-card .views-chip,
+  .popout-reel-card .likes-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #FFF;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  }
+
+  .popout-reel-card .icon-eye {
+    width: 0.72rem;
+    height: 0.72rem;
+    color: var(--color-cyan);
+  }
+
+  .popout-reel-card .icon-heart {
+    width: 0.72rem;
+    height: 0.72rem;
+    color: var(--color-crimson);
+  }
+
+  .popout-reel-card .caption-text {
+    margin: 0;
+    font-size: 0.7rem;
+    line-height: 1.25;
+    color: #E2E8F0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   /* Gallery Column */
@@ -736,6 +1205,101 @@ const inningsTimeline = [
       if ((e as KeyboardEvent).key === 'Enter' || (e as KeyboardEvent).key === ' ') {
         e.preventDefault();
         card.classList.toggle('is-flipped');
+      }
+    });
+  });
+
+  // Timeline step reels popout: hover preview + click lock/unlock
+  const timelineSteps = document.querySelectorAll('.timeline-step.has-reels');
+  timelineSteps.forEach((step) => {
+    const popout = step.querySelector('.innings-popout-window');
+    const closeBtn = step.querySelector('.popout-close-btn');
+    const lockBtn = step.querySelector('.lock-toggle-pill');
+    let isLocked = false;
+    let isDismissed = false;
+    let closeTimer: ReturnType<typeof setTimeout> | null = null;
+
+    function open(locked = false) {
+      if (closeTimer) clearTimeout(closeTimer);
+      isDismissed = false;
+      step.classList.add('is-open');
+      if (locked) {
+        isLocked = true;
+        step.classList.add('is-locked');
+        step.setAttribute('aria-expanded', 'true');
+      }
+    }
+
+    function close(force = false) {
+      if (isLocked && !force) return;
+      isLocked = false;
+      if (force) isDismissed = true;
+      step.classList.remove('is-open', 'is-locked');
+      step.setAttribute('aria-expanded', 'false');
+    }
+
+    step.addEventListener('mouseenter', () => {
+      if (!isDismissed) {
+        open(isLocked);
+      }
+    });
+
+    step.addEventListener('mouseleave', () => {
+      isDismissed = false;
+      if (!isLocked) {
+        closeTimer = setTimeout(() => close(false), 220);
+      }
+    });
+
+    step.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      // Don't toggle lock if clicking an actual reel link or close button
+      if (target.closest('.popout-reel-anchor') || target.closest('.popout-close-btn')) {
+        return;
+      }
+      if (target.closest('.lock-toggle-pill')) {
+        e.stopPropagation();
+        if (isLocked) {
+          close(true);
+        } else {
+          open(true);
+        }
+        return;
+      }
+      // If clicking inside carousel track, don't lock/unlock
+      if (target.closest('.popout-carousel-wrapper')) {
+        return;
+      }
+
+      // Clicking anywhere else on the timeline step toggles lock!
+      if (isLocked) {
+        close(true);
+      } else {
+        open(true);
+      }
+    });
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        close(true);
+      });
+    }
+
+    step.addEventListener('keydown', (e) => {
+      const evt = e as KeyboardEvent;
+      if (evt.key === 'Escape' && isLocked) {
+        close(true);
+      } else if ((evt.key === 'Enter' || evt.key === ' ') && evt.target === step) {
+        evt.preventDefault();
+        if (isLocked) close(true);
+        else open(true);
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (isLocked && !step.contains(e.target as Node)) {
+        close(true);
       }
     });
   });

@@ -32,5 +32,9 @@
 2026-09-13 checkpoint: transformed all UI cards, panels, badges, and floating broadcast dock into Apple-style glossy translucent frosted glass with specular top reflection and saturate boost
 2026-09-13 checkpoint: engineered iPhone-style chromatic gradient glassmorphism with dual-chroma stadium twilight refraction, directional specular lighting, chamfered bevels, and iOS 18 squircle radii
 2026-09-13 checkpoint: pushed 857d8db to origin main and deployed live to production on Vercel
+2026-09-13 session-start scan: files=3 parsed=3
 2026-09-13 checkpoint: removed UPDATED timestamp pill from Scoreboard header and pruned unused longDate import
+2026-09-13 session-start scan: files=3 parsed=3
 2026-09-13 checkpoint: integrated transparent 3D glowing mail panda mascot in bottom right corner of primary-action email box with warm drop shadows and hover tilt
+2026-09-13 session-start scan: files=3 parsed=3
+2026-09-13 checkpoint: added career innings interactive popout window for IPL 2025 with hover preview, click lock/unlock, and horizontal glassmorphic reels carousel
