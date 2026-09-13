@@ -3,7 +3,6 @@ import { site } from '../data/site.js';
 import { Mail, ExternalLink, Sparkles, CheckCircle, ArrowUpRight, Instagram, Youtube, Linkedin } from 'lucide-astro';
 import { Image } from 'astro:assets';
 import pandaMail from '../assets/photos/panda-mail.webp';
-import Signature from './Signature.astro';
 
 const handle = (url: string) => url.split('/').filter(Boolean).pop()?.replace('@', '') || '';
 const socials = [
@@ -89,10 +88,6 @@ const socials = [
         <div class="direct-email-row">
           <span class="lbl">EMAIL:</span>
           <span class="email-val">{site.email}</span>
-        </div>
-
-        <div class="signature-wrap" aria-hidden="true">
-          <Signature class="signature-svg" />
         </div>
 
         <div class="panda-mascot-wrap" aria-hidden="true">
@@ -233,58 +228,9 @@ const socials = [
     box-shadow: var(--glass-highlight-hover), 0 20px 50px rgba(0, 0, 0, 0.75);
   }
 
-  .primary-action > *:not(.panda-mascot-wrap):not(.signature-wrap) {
+  .primary-action > *:not(.panda-mascot-wrap) {
     position: relative;
     z-index: 2;
-  }
-
-  .signature-wrap {
-    position: absolute;
-    bottom: clamp(12px, 2vw, 24px);
-    right: calc(clamp(110px, 22vw, 155px) + clamp(8px, 1.6vw, 20px));
-    width: clamp(140px, 22vw, 220px);
-    pointer-events: none;
-    z-index: 2;
-    transform-origin: center right;
-    transform: rotate(-7deg);
-    line-height: 0;
-    transition: opacity 0.3s var(--ease-out);
-  }
-
-  .signature-svg {
-    width: 100%;
-    height: auto;
-    overflow: visible;
-    display: block;
-    clip-path: inset(0 100% 0 0);
-    filter: drop-shadow(0 0 12px rgba(231, 111, 81, 0.45));
-    transition: clip-path 1.55s cubic-bezier(0.38, 0, 0.22, 1), filter 0.4s ease;
-  }
-
-  /* When actively writing: clip-path sweeps from left to right like pen writing */
-  .primary-action.is-signing .signature-svg,
-  .primary-action.has-drawn .signature-svg {
-    clip-path: inset(0 0% 0 0);
-  }
-
-  .primary-action:not(.is-signing):not(.has-drawn) .signature-svg {
-    clip-path: inset(0 100% 0 0);
-    transition: none;
-  }
-
-  /* Tactile paper micro-shiver while writing */
-  .primary-action.is-signing {
-    animation: paper-scrawl-shiver 0.08s infinite ease-in-out;
-    will-change: transform;
-  }
-
-  /* Ambient glowing floating breathe once drawn and settled */
-  .primary-action.has-drawn:not(.is-signing) .signature-wrap {
-    animation: signature-float 3.8s ease-in-out infinite alternate;
-  }
-
-  .primary-action.has-drawn:not(.is-signing) .signature-svg {
-    animation: signature-glow-pulse 3.8s ease-in-out infinite alternate;
   }
 
   .panda-mascot-wrap {
@@ -385,25 +331,15 @@ const socials = [
   }
 
   @media (max-width: 480px) {
-    .primary-action {
-      padding-bottom: 5.25rem;
-    }
-
     .direct-email-row {
       font-size: 0.72rem;
-      padding-right: 0;
+      padding-right: 80px;
     }
 
     .panda-mascot-wrap {
-      width: 76px;
-      right: 10px;
-      bottom: 6px;
-    }
-
-    .signature-wrap {
-      width: 86px;
-      right: 86px;
-      bottom: 12px;
+      width: 85px;
+      right: 6px;
+      bottom: 2px;
     }
   }
 
@@ -510,102 +446,4 @@ const socials = [
     width: 1.1rem;
     height: 1.1rem;
   }
-
-  @keyframes paper-scrawl-shiver {
-    0% { transform: translate3d(0, 0, 0) rotate(0deg); }
-    15% { transform: translate3d(-0.7px, 0.5px, 0) rotate(-0.09deg); }
-    30% { transform: translate3d(0.9px, -0.6px, 0) rotate(0.12deg); }
-    45% { transform: translate3d(-0.6px, -0.4px, 0) rotate(-0.07deg); }
-    60% { transform: translate3d(0.8px, 0.7px, 0) rotate(0.1deg); }
-    75% { transform: translate3d(-0.9px, 0.3px, 0) rotate(-0.11deg); }
-    90% { transform: translate3d(0.6px, -0.8px, 0) rotate(0.08deg); }
-    100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-  }
-
-  @keyframes signature-float {
-    0% {
-      transform: rotate(-7deg) translate3d(0, 0, 0) scale(1);
-    }
-    50% {
-      transform: rotate(-5.5deg) translate3d(0, -4px, 0) scale(1.02);
-    }
-    100% {
-      transform: rotate(-8deg) translate3d(0, 2px, 0) scale(0.99);
-    }
-  }
-
-  @keyframes signature-glow-pulse {
-    0% {
-      filter: drop-shadow(0 0 10px rgba(231, 111, 81, 0.4)) drop-shadow(0 2px 14px rgba(255, 183, 3, 0.25));
-      opacity: 0.94;
-    }
-    100% {
-      filter: drop-shadow(0 0 20px rgba(231, 111, 81, 0.85)) drop-shadow(0 4px 30px rgba(255, 183, 3, 0.55));
-      opacity: 1;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .primary-action.is-signing {
-      animation: none !important;
-    }
-    .signature-wrap {
-      animation: none !important;
-      transform: rotate(-7deg) !important;
-    }
-    .signature-svg {
-      clip-path: inset(0 0% 0 0) !important;
-      transition: none !important;
-      animation: none !important;
-    }
-  }
 </style>
-
-<script>
-  const primaryAction = document.querySelector('.primary-action');
-  if (primaryAction) {
-    let hasPlayed = false;
-    let signingTimer: ReturnType<typeof setTimeout> | null = null;
-
-    function playSigning() {
-      if (signingTimer) clearTimeout(signingTimer);
-      primaryAction?.classList.remove('is-signing', 'has-drawn');
-      // Trigger DOM reflow to restart CSS stroke transitions cleanly
-      void primaryAction?.offsetWidth;
-      primaryAction?.classList.add('is-signing');
-
-      signingTimer = setTimeout(() => {
-        primaryAction?.classList.remove('is-signing');
-        primaryAction?.classList.add('has-drawn');
-      }, 1600);
-    }
-
-    // Trigger on viewport intersection
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting && !hasPlayed) {
-              hasPlayed = true;
-              playSigning();
-            }
-          });
-        },
-        { threshold: 0.25 }
-      );
-      observer.observe(primaryAction);
-    } else {
-      playSigning();
-    }
-
-    // Re-flourish on card hover (with debounce)
-    let hoverDebounce: ReturnType<typeof setTimeout> | null = null;
-    primaryAction.addEventListener('mouseenter', () => {
-      if (primaryAction.classList.contains('is-signing')) return;
-      if (hoverDebounce) clearTimeout(hoverDebounce);
-      hoverDebounce = setTimeout(() => {
-        playSigning();
-      }, 200);
-    });
-  }
-</script>
