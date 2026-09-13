@@ -1,8 +1,9 @@
 ---
 import { Image } from 'astro:assets';
 import { Content as Story } from '../data/story.md';
-import { Mic } from 'lucide-astro';
+import { Mic, MapPin, Sparkles } from 'lucide-astro';
 import photoMic from '../assets/photos/abhishek-podcast-mic.jpg';
+import photoTrophy from '../assets/photos/abhishek-trophy-parul.jpg';
 import photoStands from '../assets/photos/abhishek-india-stands.jpg';
 import photoRail from '../assets/photos/abhishek-stadium-gt.jpg';
 import photoDesk from '../assets/photos/abhishek-broadcast-desk.jpg';
@@ -62,85 +63,146 @@ const inningsTimeline = [
       </div>
     </div>
 
-    <!-- Right Column: Editorial Photo Magazine Spread -->
+    <!-- Right Column: Editorial Photo Magazine Spread with 3D Flip Origin Cards -->
     <div class="gallery-column">
-      <!-- Feature 1: Broadcast Mic Photo -->
-      <figure class="editorial-photo-card primary-photo tilt-card" data-cursor-text="STUDIO">
-        <div class="photo-inner">
-          <Image 
-            src={photoMic} 
-            alt="Abhishek Pandey hosting Spin & Swing podcast on microphone" 
-            class="photo-img" 
-            widths={[500, 900]} 
-            sizes="(min-width: 64rem) 420px, 90vw" 
-          />
-          <div class="photo-tape top-right"></div>
-          <div class="photo-hud-stamp">
-            <span class="stamp-id">SPIN &amp; SWING</span>
-            <span class="stamp-lbl">STUDIO</span>
+      <!-- Feature 1: Live Reporting Mic Photo (Flip reveals Parul University Runner Up Trophy) -->
+      <div class="flip-card primary-photo" tabindex="0" role="button" aria-label="Parul University live reporting event. Click or hover to flip for trophy and origin details.">
+        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <Image 
+              src={photoMic} 
+              alt="Abhishek Pandey at Parul University PU Wants To Know event" 
+              class="photo-img" 
+              widths={[500, 900]} 
+              sizes="(min-width: 64rem) 420px, 90vw" 
+            />
+            <div class="photo-badge-chip gold">LIVE REPORTING</div>
+          </div>
+          <div class="flip-face flip-back polaroid-trophy-back">
+            <div class="trophy-image-box">
+              <Image
+                src={photoTrophy}
+                alt="Parul University PU Wants To Know Runner Up Trophy"
+                class="trophy-photo"
+                widths={[400, 700]}
+                sizes="(min-width: 64rem) 420px, 90vw"
+              />
+              <span class="trophy-plaque-tag">RUNNER UP</span>
+            </div>
+            <div class="trophy-meta-strip">
+              <div class="polaroid-field">
+                <span class="polaroid-label"><MapPin class="icon-micro" /> WHERE</span>
+                <p class="polaroid-val venue">Parul University, Vadodara</p>
+              </div>
+              <div class="polaroid-field">
+                <span class="polaroid-label"><Sparkles class="icon-micro" /> WHAT</span>
+                <p class="polaroid-val what">PU Wants To Know (Live Reporting Competition)</p>
+              </div>
+            </div>
           </div>
         </div>
-        <figcaption class="photo-caption">
-          <span class="caption-num">FIG 01</span>
-          <span class="caption-text">Behind the mic for Spin &amp; Swing.</span>
-        </figcaption>
-      </figure>
+      </div>
 
-      <!-- Feature 2: Broadcast Desk Landscape Photo -->
-      <figure class="editorial-photo-card landscape-photo tilt-card" data-cursor-text="BROADCAST">
-        <div class="photo-inner">
-          <Image
-            src={photoDesk}
-            alt="Abhishek Pandey at the broadcast desk overlooking a packed stadium"
-            class="photo-img"
-            widths={[500, 900]}
-            sizes="(min-width: 64rem) 420px, 90vw"
-          />
-          <div class="photo-badge-chip neon">T20 WORLD CUP</div>
+      <!-- Feature 2: T20 World Cup Final Desk Landscape Photo -->
+      <div class="flip-card landscape-photo" tabindex="0" role="button" aria-label="ICC Men's T20 World Cup Final 2026. Click or hover to flip for origin details.">
+        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <Image
+              src={photoDesk}
+              alt="Abhishek Pandey at Narendra Modi Stadium for T20 World Cup Final 2026"
+              class="photo-img"
+              widths={[500, 900]}
+              sizes="(min-width: 64rem) 420px, 90vw"
+            />
+            <div class="photo-badge-chip gold">T20 WC FINAL 2026</div>
+          </div>
+          <div class="flip-face flip-back polaroid-back">
+            <div class="polaroid-top-row">
+              <span class="polaroid-tag gold">WORLD CHAMPIONS</span>
+              <span class="polaroid-stamp">FINAL // 2026</span>
+            </div>
+            <div class="polaroid-fields">
+              <div class="polaroid-field">
+                <span class="polaroid-label"><MapPin class="icon-micro" /> WHERE</span>
+                <p class="polaroid-val venue">Narendra Modi Stadium, Ahmedabad</p>
+              </div>
+              <div class="polaroid-field-divider"></div>
+              <div class="polaroid-field">
+                <span class="polaroid-label"><Sparkles class="icon-micro" /> WHAT</span>
+                <p class="polaroid-val what">ICC Men's T20 World Cup Final 2026 — India Won the Final</p>
+              </div>
+            </div>
+          </div>
         </div>
-        <figcaption class="photo-caption">
-          <span class="caption-num">FIG 02</span>
-          <span class="caption-text">At the ICC Men's T20 World Cup 2026.</span>
-        </figcaption>
-      </figure>
+      </div>
 
       <!-- Dual Sub-Photo Row -->
       <div class="photo-subgrid">
-        <!-- Feature 3: Indian Jersey Stands Photo -->
-        <figure class="editorial-photo-card sub-photo tilt-card" data-cursor-text="STANDS">
-          <div class="photo-inner">
-            <Image
-              src={photoStands}
-              alt="Abhishek Pandey smiling in Indian team jersey in stadium stands"
-              class="photo-img"
-              widths={[400, 700]}
-              sizes="(min-width: 64rem) 220px, 45vw"
-            />
-            <div class="photo-badge-chip neon">IN THE STANDS</div>
+        <!-- Feature 3: Test Match IND vs WI Photo -->
+        <div class="flip-card sub-photo" tabindex="0" role="button" aria-label="India vs West Indies Test match 2025. Click or hover to flip for origin details.">
+          <div class="flip-inner">
+            <div class="flip-face flip-front">
+              <Image
+                src={photoStands}
+                alt="Abhishek Pandey in the stands at Narendra Modi Stadium for India vs West Indies Test match 2025"
+                class="photo-img"
+                widths={[400, 700]}
+                sizes="(min-width: 64rem) 220px, 45vw"
+              />
+              <div class="photo-badge-chip neon">TEST MATCH</div>
+            </div>
+            <div class="flip-face flip-back polaroid-back compact">
+              <div class="polaroid-top-row">
+                <span class="polaroid-tag neon">TEST CRICKET</span>
+                <span class="polaroid-stamp">2025</span>
+              </div>
+              <div class="polaroid-fields">
+                <div class="polaroid-field">
+                  <span class="polaroid-label"><MapPin class="icon-micro" /> WHERE</span>
+                  <p class="polaroid-val venue">Narendra Modi Stadium, Ahmedabad</p>
+                </div>
+                <div class="polaroid-field-divider"></div>
+                <div class="polaroid-field">
+                  <span class="polaroid-label"><Sparkles class="icon-micro" /> WHAT</span>
+                  <p class="polaroid-val what">India vs West Indies Test Match (2025)</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <figcaption class="photo-caption">
-            <span class="caption-num">FIG 03</span>
-            <span class="caption-text">With India fans in the stands.</span>
-          </figcaption>
-        </figure>
+        </div>
 
-        <!-- Feature 4: Stadium Railing Gujarat Titans Photo -->
-        <figure class="editorial-photo-card sub-photo tilt-card" data-cursor-text="PITCHSIDE">
-          <div class="photo-inner">
-            <Image
-              src={photoRail}
-              alt="Abhishek Pandey leaning on pitchside railing overlooking match"
-              class="photo-img"
-              widths={[400, 700]}
-              sizes="(min-width: 64rem) 220px, 45vw"
-            />
-            <div class="photo-badge-chip cyan">FIELD OF PLAY</div>
+        <!-- Feature 4: Arun Jaitley Stadium IPL 2026 GT vs DC Photo -->
+        <div class="flip-card sub-photo" tabindex="0" role="button" aria-label="Arun Jaitley Stadium IPL 2026 Gujarat Titans vs DC. Click or hover to flip for origin details.">
+          <div class="flip-inner">
+            <div class="flip-face flip-front">
+              <Image
+                src={photoRail}
+                alt="Abhishek Pandey at Arun Jaitley Stadium during IPL 2026 GT vs DC fixture"
+                class="photo-img"
+                widths={[400, 700]}
+                sizes="(min-width: 64rem) 220px, 45vw"
+              />
+              <div class="photo-badge-chip cyan">IPL 2026</div>
+            </div>
+            <div class="flip-face flip-back polaroid-back compact">
+              <div class="polaroid-top-row">
+                <span class="polaroid-tag cyan">IPL MATCHDAY</span>
+                <span class="polaroid-stamp">2026</span>
+              </div>
+              <div class="polaroid-fields">
+                <div class="polaroid-field">
+                  <span class="polaroid-label"><MapPin class="icon-micro" /> WHERE</span>
+                  <p class="polaroid-val venue">Arun Jaitley Stadium, New Delhi</p>
+                </div>
+                <div class="polaroid-field-divider"></div>
+                <div class="polaroid-field">
+                  <span class="polaroid-label"><Sparkles class="icon-micro" /> WHAT</span>
+                  <p class="polaroid-val what">IPL 2026: Gujarat Titans vs DC (GT won by 1 run)</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <figcaption class="photo-caption">
-            <span class="caption-num">FIG 04</span>
-            <span class="caption-text">Pitchside in Gujarat Titans colours.</span>
-          </figcaption>
-        </figure>
+        </div>
       </div>
     </div>
   </div>
@@ -323,36 +385,31 @@ const inningsTimeline = [
     justify-content: center;
   }
 
-  .editorial-photo-card {
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2xs);
-    background: var(--color-card);
-    border: 1px solid var(--color-line);
-    border-radius: 12px;
-    padding: var(--space-xs);
-    backdrop-filter: blur(12px);
-    transition: transform 0.3s var(--ease-out), border-color 0.3s var(--ease-out);
-  }
-
-  .editorial-photo-card:hover {
-    border-color: var(--color-neon);
-  }
-
-  .photo-inner {
+  /* 3D Flip Card System */
+  .flip-card {
     position: relative;
-    border-radius: 8px;
-    overflow: hidden;
-    background: var(--color-surface);
+    perspective: 1200px;
+    -webkit-perspective: 1200px;
+    cursor: pointer;
+    border-radius: 12px;
+    user-select: none;
+    outline: none;
+    margin: 0;
   }
 
-  .primary-photo .photo-inner {
+  .primary-photo {
     aspect-ratio: 3 / 4;
+    width: 100%;
   }
 
-  .landscape-photo .photo-inner {
+  .landscape-photo {
     aspect-ratio: 16 / 9;
+    width: 100%;
+  }
+
+  .sub-photo {
+    aspect-ratio: 3 / 4;
+    width: 100%;
   }
 
   .photo-subgrid {
@@ -367,8 +424,63 @@ const inningsTimeline = [
     }
   }
 
-  .sub-photo .photo-inner {
-    aspect-ratio: 3 / 4;
+  .flip-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 12px;
+  }
+
+  .flip-card:hover .flip-inner,
+  .flip-card:focus-visible .flip-inner,
+  .flip-card.is-flipped .flip-inner {
+    transform: rotateY(180deg);
+  }
+
+  .flip-face {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    transition: border-color 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
+  }
+
+  .flip-front {
+    background: var(--color-surface);
+    transform: rotateY(0deg);
+    -webkit-transform: rotateY(0deg);
+    z-index: 2;
+  }
+
+  .flip-back {
+    background: linear-gradient(145deg, rgba(20, 24, 34, 0.96), rgba(11, 14, 20, 0.98));
+    border-color: var(--color-line-bright);
+    transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    padding: clamp(var(--space-xs), 3vw, var(--space-m));
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8), 0 0 30px rgba(231, 111, 81, 0.15);
+  }
+
+  .flip-card:hover .flip-back,
+  .flip-card.is-flipped .flip-back {
+    z-index: 3;
+    border-color: var(--color-neon);
+    box-shadow: 0 24px 50px rgba(0, 0, 0, 0.85), 0 0 35px rgba(231, 111, 81, 0.3);
+  }
+
+  .flip-card:hover .flip-front {
+    border-color: var(--color-neon);
   }
 
   .photo-img {
@@ -380,49 +492,8 @@ const inningsTimeline = [
     transition: transform 0.5s var(--ease-out);
   }
 
-  .editorial-photo-card:hover .photo-img {
-    transform: scale(1.04);
-  }
-
-  .photo-tape {
-    position: absolute;
-    width: 60px;
-    height: 20px;
-    background: rgba(233, 196, 106, 0.4);
-    backdrop-filter: blur(4px);
-    border: 1px dashed rgba(233, 196, 106, 0.6);
-    pointer-events: none;
-  }
-
-  .photo-tape.top-right {
-    top: -5px;
-    right: 15px;
-    transform: rotate(12deg);
-  }
-
-  .photo-hud-stamp {
-    position: absolute;
-    bottom: var(--space-xs);
-    left: var(--space-xs);
-    display: flex;
-    flex-direction: column;
-    padding: var(--space-3xs) var(--space-xs);
-    background: rgba(7, 9, 14, 0.85);
-    border: 1px solid var(--color-line-bright);
-    border-radius: 4px;
-    font-family: var(--font-mono);
-  }
-
-  .stamp-id {
-    font-size: var(--step--2);
-    font-weight: 700;
-    color: var(--color-neon);
-  }
-
-  .stamp-lbl {
-    font-size: 0.65rem;
-    color: var(--color-muted);
-    letter-spacing: 0.06em;
+  .flip-card:hover .photo-img {
+    transform: scale(1.03);
   }
 
   .photo-badge-chip {
@@ -437,6 +508,8 @@ const inningsTimeline = [
     letter-spacing: 0.08em;
     background: rgba(7, 9, 14, 0.85);
     border: 1px solid;
+    backdrop-filter: blur(8px);
+    z-index: 2;
   }
 
   .photo-badge-chip.neon {
@@ -449,29 +522,205 @@ const inningsTimeline = [
     border-color: rgba(42, 157, 143, 0.5);
   }
 
-  .photo-caption {
+  .photo-badge-chip.gold {
+    color: var(--color-gold);
+    border-color: rgba(233, 196, 106, 0.5);
+  }
+
+  /* Polaroid Back Face System */
+  .polaroid-trophy-back {
+    padding: var(--space-2xs);
     display: flex;
-    align-items: center;
-    gap: var(--space-xs);
-    font-family: var(--font-mono);
-    font-size: var(--step--2);
-    color: var(--color-muted);
-    padding: 0 var(--space-2xs);
+    flex-direction: column;
+    gap: var(--space-2xs);
+    height: 100%;
   }
 
-  .caption-num {
-    color: var(--color-neon);
-    font-weight: 700;
-  }
-
-  .caption-text {
-    white-space: nowrap;
+  .trophy-image-box {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    border-radius: 8px;
     overflow: hidden;
-    text-overflow: ellipsis;
+    background: #07090e;
+    border: 1px solid var(--color-line);
+  }
+
+  .trophy-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+    display: block;
+  }
+
+  .trophy-plaque-tag {
+    position: absolute;
+    top: var(--space-3xs);
+    right: var(--space-3xs);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 2px var(--space-2xs);
+    border-radius: 4px;
+    background: rgba(7, 9, 14, 0.9);
+    border: 1px solid var(--color-gold);
+    color: var(--color-gold);
+    backdrop-filter: blur(6px);
+  }
+
+  .trophy-meta-strip {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--space-2xs) var(--space-xs);
+    background: rgba(14, 18, 26, 0.95);
+    border-radius: 6px;
+    border: 1px solid var(--color-line);
+  }
+
+  /* Standard Polaroid Content (Cards 2, 3, 4) */
+  .polaroid-back {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    gap: var(--space-xs);
+  }
+
+  .polaroid-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px dashed var(--color-line);
+    padding-bottom: var(--space-3xs);
+  }
+
+  .polaroid-tag {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 2px var(--space-xs);
+    border-radius: 4px;
+    border: 1px solid;
+    text-transform: uppercase;
+  }
+
+  .polaroid-tag.neon {
+    color: var(--color-neon);
+    border-color: rgba(231, 111, 81, 0.4);
+    background: rgba(231, 111, 81, 0.1);
+  }
+
+  .polaroid-tag.gold {
+    color: var(--color-gold);
+    border-color: rgba(233, 196, 106, 0.4);
+    background: rgba(233, 196, 106, 0.1);
+  }
+
+  .polaroid-tag.cyan {
+    color: var(--color-cyan);
+    border-color: rgba(42, 157, 143, 0.4);
+    background: rgba(42, 157, 143, 0.1);
+  }
+
+  .polaroid-stamp {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--color-muted);
+    letter-spacing: 0.05em;
+  }
+
+  .polaroid-fields {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-s);
+    margin: auto 0;
+  }
+
+  .polaroid-back.compact .polaroid-fields {
+    gap: var(--space-xs);
+  }
+
+  .polaroid-field {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .polaroid-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--color-neon);
+    letter-spacing: 0.1em;
+  }
+
+  .polaroid-field:nth-child(n+2) .polaroid-label {
+    color: var(--color-gold);
+  }
+
+  .polaroid-val.venue {
+    font-family: var(--font-display);
+    font-size: clamp(1rem, 2vw, 1.35rem);
+    font-weight: 800;
+    color: var(--color-text);
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  .polaroid-back.compact .polaroid-val.venue {
+    font-size: clamp(0.95rem, 1.8vw, 1.15rem);
+  }
+
+  .polaroid-val.what {
+    font-family: var(--font-body);
+    font-size: clamp(0.85rem, 1.4vw, 0.95rem);
+    font-weight: 600;
+    color: #e0e4ec;
+    line-height: 1.35;
+    margin: 0;
+  }
+
+  .polaroid-back.compact .polaroid-val.what {
+    font-size: 0.8rem;
+  }
+
+  .polaroid-field-divider {
+    width: 100%;
+    height: 1px;
+    background: var(--color-line);
+    opacity: 0.7;
   }
 
   .icon-tiny {
     width: 0.85rem;
     height: 0.85rem;
   }
+
+  .icon-micro {
+    width: 0.7rem;
+    height: 0.7rem;
+  }
 </style>
+
+<script>
+  // Mobile touch/click flip toggle for photo cards
+  document.querySelectorAll('.flip-card').forEach((card) => {
+    card.addEventListener('click', () => {
+      card.classList.toggle('is-flipped');
+    });
+    card.addEventListener('keydown', (e) => {
+      if ((e as KeyboardEvent).key === 'Enter' || (e as KeyboardEvent).key === ' ') {
+        e.preventDefault();
+        card.classList.toggle('is-flipped');
+      }
+    });
+  });
+</script>

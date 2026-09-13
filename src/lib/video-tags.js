@@ -3,12 +3,17 @@
  * into that slot -- e.g. a "Guess the Player" quiz short tagged DPL TIGER). Order matters:
  * first matching rule wins. */
 const RULES = [
-  [/\bdpl\b/i, { tag: 'DPL TIGER', badgeClass: 'gold' }],
-  [/\bipl\b/i, { tag: 'IPL SPOTLIGHT', badgeClass: 'neon' }],
-  [/interview/i, { tag: 'INTERVIEW', badgeClass: 'cyan' }],
+  [/jersey.*(pt|part)|(pt|part).*jersey/i, { tag: 'TRIVIA VAULT', badgeClass: 'cyan' }],
+  [/jersey/i, { tag: 'JERSEY INTEL', badgeClass: 'gold' }],
+  [/player/i, { tag: 'PLAYER QUIZ', badgeClass: 'neon' }],
+  [/world cup|t20/i, { tag: 'WORLD CUP SQUAD', badgeClass: 'gold' }],
   [/\bvs\b/i, { tag: 'FAN FACEOFF', badgeClass: 'cyan' }],
-  [/guess|squad|jersey|quiz/i, { tag: 'GUESS THE SQUAD', badgeClass: 'gold' }],
+  [/\b(gt|rcb|csk|mi|ipl|titans|superstarz)\b/i, { tag: 'IPL SPOTLIGHT', badgeClass: 'neon' }],
+  [/\bdpl\b/i, { tag: 'DPL TIGER', badgeClass: 'gold' }],
+  [/interview/i, { tag: 'INTERVIEW', badgeClass: 'cyan' }],
   [/vlog/i, { tag: 'VLOG', badgeClass: 'cyan' }],
+  [/squad/i, { tag: 'SQUAD INTEL', badgeClass: 'gold' }],
+  [/guess|quiz/i, { tag: 'CRICKET TRIVIA', badgeClass: 'gold' }],
   [/world cup|t20|\bmatch\b/i, { tag: 'MATCHDAY INTEL', badgeClass: 'gold' }],
 ];
 const FALLBACK = { tag: 'FEATURED', badgeClass: 'neon' };

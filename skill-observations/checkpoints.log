@@ -19,3 +19,8 @@
 2026-09-13 checkpoint: updated hero background to daytime sunny Lord's Cricket Ground with balanced overlay contrast
 2026-09-13 checkpoint: resolved localhost cache issue with unique sunny asset name, restarted dev server, and added missing 512K views to DcOV2DtBXIL reel
 2026-09-13 session-start scan: files=3 parsed=3
+2026-09-13 session-start scan: files=3 parsed=3
+2026-09-13 checkpoint: added 3D flip card image origins, removed card numbering & fig captions, diversified video tags, curated DPL reels
+2026-09-13 session-start scan: files=3 parsed=3
+2026-09-13 checkpoint: updated pavilion gallery cards with polaroid backfaces, runner-up trophy photo, and accurate venue/event metadata
+2026-09-13 session-start scan: files=3 parsed=3

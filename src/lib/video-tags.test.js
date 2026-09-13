@@ -7,7 +7,11 @@ test('rank 0 is always VIRAL HIT, regardless of title', () => {
 });
 
 test('matches content rules by title for lower ranks', () => {
-  assert.deepEqual(videoTag('Guess the Jersey number - Pt 10', 1), { tag: 'GUESS THE SQUAD', badgeClass: 'gold' });
+  assert.deepEqual(videoTag('Guess the Jersey number - Pt 10', 1), { tag: 'TRIVIA VAULT', badgeClass: 'cyan' });
+  assert.deepEqual(videoTag('Guess the Jersey number !', 1), { tag: 'JERSEY INTEL', badgeClass: 'gold' });
+  assert.deepEqual(videoTag('Guess the Player | Spin & Swing', 1), { tag: 'PLAYER QUIZ', badgeClass: 'neon' });
+  assert.deepEqual(videoTag('Guess the squad of T20 World Cup ?', 2), { tag: 'WORLD CUP SQUAD', badgeClass: 'gold' });
+  assert.deepEqual(videoTag('Guess the Squad of Gt !!', 2), { tag: 'IPL SPOTLIGHT', badgeClass: 'neon' });
   assert.deepEqual(videoTag('What does DPL mean to you ?', 2), { tag: 'DPL TIGER', badgeClass: 'gold' });
   assert.deepEqual(videoTag('Gt fan vs Mi fan', 3), { tag: 'FAN FACEOFF', badgeClass: 'cyan' });
   assert.deepEqual(videoTag('My Sister Got a New Scooty !! | VLOG 24', 4), { tag: 'VLOG', badgeClass: 'cyan' });
