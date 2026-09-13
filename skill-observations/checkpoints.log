@@ -40,3 +40,6 @@
 2026-09-13 checkpoint: added career innings interactive popout window for IPL 2025 with hover preview, click lock/unlock, and horizontal glassmorphic reels carousel
 2026-09-13 session-start scan: files=3 parsed=3
 2026-09-13 checkpoint: added career innings interactive popout windows for WPL 2026, ICC T20 World Cup 2026, and IPL 2026 with 15 curated reels, thumbnails, and coordinated single-active state management
+2026-09-13 session-start scan: files=3 parsed=3
+2026-09-13 session-start scan: files=3 parsed=3
+2026-09-13 checkpoint: converted career innings popouts to anchored flyouts with z-index elevation, added DPL 2026 reels, removed redundant lock/hint buttons

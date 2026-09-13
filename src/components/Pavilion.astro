@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import { Content as Story } from '../data/story.md';
-import { Mic, MapPin, Sparkles, Instagram, Play, Eye, Heart, Lock, Pin, X } from 'lucide-astro';
+import { Mic, MapPin, Sparkles, Instagram, Play, Eye, Heart, X } from 'lucide-astro';
 import { thumb } from '../lib/social.js';
 import { compactCount } from '../lib/format.js';
 import photoMic from '../assets/photos/abhishek-podcast-mic.jpg';
@@ -204,7 +204,54 @@ const inningsTimeline = [
       }
     ]
   },
-  { dates: 'August – September 2026', title: 'DPL 2026', accredited: true, desc: 'Accredited field access and player interviews.' },
+  {
+    dates: 'August – September 2026',
+    title: 'DPL 2026',
+    accredited: true,
+    desc: 'Accredited field access, boundary rope coverage, and player interviews.',
+    reels: [
+      {
+        id: 'DcRzXB-zlPg',
+        url: 'https://www.instagram.com/reel/DcRzXB-zlPg/?stkn=NWZqb2V6dGo1eDRk',
+        thumb: 'ig-DcRzXB-zlPg.jpg',
+        views: 800000,
+        likes: 64000,
+        caption: 'Story behind the 6-7 Celebration (DPL)'
+      },
+      {
+        id: 'DcOV2DtBXIL',
+        url: 'https://www.instagram.com/reel/DcOV2DtBXIL/?stkn=MXh5Mzc0dHk2ZWw0ZQ==',
+        thumb: 'ig-DcOV2DtBXIL.jpg',
+        views: 512500,
+        likes: 41000,
+        caption: 'Episode 2 : Story Behind the Post ft. Vansh Bedi'
+      },
+      {
+        id: 'DcdlCohB4qZ',
+        url: 'https://www.instagram.com/reel/DcdlCohB4qZ/?stkn=MXJzeDFnM3NwMm5nZQ==',
+        thumb: 'ig-DcdlCohB4qZ.jpg',
+        views: 237500,
+        likes: 19000,
+        caption: 'Episode 4 : Story Behind the Post ft. Himmat Singh'
+      },
+      {
+        id: 'DclYxOiBsuy',
+        url: 'https://www.instagram.com/reel/DclYxOiBsuy/?stkn=cWFtaHFoY2doMG15',
+        thumb: 'ig-DclYxOiBsuy.jpg',
+        views: 123500,
+        likes: 9900,
+        caption: 'Episode 6 : Story Behind the Post ft. Anuj Rawat'
+      },
+      {
+        id: 'Dc2Rv1shQzz',
+        url: 'https://www.instagram.com/reel/Dc2Rv1shQzz/?stkn=bndsamRiaDExcHpx',
+        thumb: 'ig-Dc2Rv1shQzz.jpg',
+        views: 20800,
+        likes: 1700,
+        caption: 'Episode 8 : Story Behind the Post ft. Priya Punia'
+      }
+    ]
+  },
 ];
 
 ---
@@ -242,7 +289,7 @@ const inningsTimeline = [
               tabindex={item.reels ? '0' : undefined}
               role={item.reels ? 'button' : undefined}
               aria-expanded={item.reels ? 'false' : undefined}
-              aria-label={item.reels ? `${item.title}: Hover to preview reels, click to lock/unlock window.` : undefined}
+              aria-label={item.reels ? `${item.title}: View reels highlights.` : undefined}
             >
               <span class="step-num">0{idx + 1}</span>
               <div class="step-content">
@@ -251,15 +298,11 @@ const inningsTimeline = [
                   <span class={`step-status ${item.accredited ? 'accredited' : 'independent'}`}>
                     {item.accredited ? 'Accredited' : 'Independent Coverage'}
                   </span>
-                  {item.reels && (
-                    <span class="innings-peek-badge">
-                      <Play class="icon-micro" />
-                      <span>{item.reels.length} REELS</span>
-                      <span class="pin-hint-tag">HOVER // CLICK TO LOCK</span>
-                    </span>
-                  )}
                 </div>
-                <h4 class="step-title">{item.title}</h4>
+                <h4 class="step-title">
+                  <span>{item.title}</span>
+                  {item.reels && <span class="step-has-reels-dot" title="Has reels highlights" aria-hidden="true"></span>}
+                </h4>
                 <p class="step-desc">{item.desc}</p>
               </div>
 
@@ -268,13 +311,8 @@ const inningsTimeline = [
                   <div class="popout-header">
                     <div class="popout-header-left">
                       <span class="hud-pill neon"><Instagram class="icon-tiny" /> {item.title} REELS</span>
-                      <span class="popout-subtitle">{item.reels.length} Highlights &bull; Horizontal Scroll</span>
                     </div>
                     <div class="popout-header-right">
-                      <button class="lock-toggle-pill" type="button" aria-label="Toggle lock">
-                        <span class="lock-state-tag unpinned"><Pin class="icon-micro" /> PIN OPEN</span>
-                        <span class="lock-state-tag pinned"><Lock class="icon-micro" /> LOCKED</span>
-                      </button>
                       <button class="popout-close-btn" type="button" aria-label="Close reels window">
                         <X class="icon-tiny" />
                       </button>
@@ -536,6 +574,19 @@ const inningsTimeline = [
     display: flex;
     flex-direction: column;
     gap: var(--space-m);
+    position: relative;
+    z-index: 10;
+  }
+
+  .story-column:has(.timeline-step.is-open),
+  .story-column.has-active-popout {
+    z-index: 200;
+  }
+
+  .editorial-card.innings-card:has(.timeline-step.is-open),
+  .editorial-card.innings-card.has-active-popout {
+    position: relative;
+    z-index: 200;
   }
 
   .editorial-card {
@@ -663,51 +714,48 @@ const inningsTimeline = [
 
   .timeline-step.has-reels:hover,
   .timeline-step.has-reels.is-open {
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.05);
   }
 
-  .timeline-step.has-reels.is-locked {
-    background: rgba(231, 111, 81, 0.07);
-    border: 1px solid rgba(231, 111, 81, 0.35);
-  }
-
-  .innings-peek-badge {
+  .timeline-step.has-reels .step-title {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    padding: 2px 8px;
-    border-radius: 9999px;
-    background: rgba(231, 111, 81, 0.15);
-    border: 1px solid rgba(231, 111, 81, 0.45);
+    gap: 8px;
+    transition: color 0.2s var(--ease-out);
+  }
+
+  .timeline-step.has-reels:hover .step-title,
+  .timeline-step.has-reels.is-open .step-title {
     color: var(--color-neon);
-    font-family: var(--font-mono);
-    font-size: var(--step--2);
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    transition: all 0.25s var(--ease-out);
   }
 
-  .timeline-step.has-reels:hover .innings-peek-badge,
-  .timeline-step.has-reels.is-open .innings-peek-badge {
-    background: var(--gradient-neon);
-    color: var(--color-bg);
-    box-shadow: 0 0 16px rgba(231, 111, 81, 0.4);
-  }
-
-  .pin-hint-tag {
-    font-size: 0.65rem;
+  .step-has-reels-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-neon);
+    box-shadow: 0 0 8px var(--color-neon);
+    vertical-align: middle;
     opacity: 0.85;
-    padding-left: 4px;
-    border-left: 1px solid currentColor;
+    transition: transform 0.2s var(--ease-out), opacity 0.2s var(--ease-out);
   }
 
-  /* Popout Window */
+  .timeline-step.has-reels:hover .step-has-reels-dot,
+  .timeline-step.has-reels.is-open .step-has-reels-dot {
+    transform: scale(1.4);
+    opacity: 1;
+    box-shadow: 0 0 12px var(--color-neon);
+  }
+
+  /* Popout Flyout Window */
   .innings-popout-window {
     position: absolute;
     top: calc(100% + 8px);
     left: 0;
-    width: min(92vw, 560px);
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(231, 111, 81, 0.08) 28%, rgba(10, 15, 24, 0.92) 100%), rgba(10, 15, 24, 0.95);
+    width: 100%;
+    max-width: min(92vw, 560px);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(231, 111, 81, 0.08) 28%, rgba(10, 15, 24, 0.94) 100%), rgba(10, 15, 24, 0.96);
     border: var(--glass-border);
     border-top-color: var(--glass-border-top);
     border-left-color: var(--glass-border-left);
@@ -717,7 +765,7 @@ const inningsTimeline = [
     backdrop-filter: blur(32px) saturate(200%) contrast(102%);
     -webkit-backdrop-filter: blur(32px) saturate(200%) contrast(102%);
     box-shadow: var(--glass-highlight-hover), 0 24px 60px -10px rgba(0, 0, 0, 0.95);
-    z-index: 100;
+    z-index: 1000;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -732,9 +780,51 @@ const inningsTimeline = [
     transform: translateY(0) scale(1);
   }
 
-  .timeline-step.has-reels.is-locked .innings-popout-window {
-    border-color: rgba(231, 111, 81, 0.5);
-    box-shadow: var(--glass-highlight-hover), 0 24px 60px -10px rgba(0, 0, 0, 0.9), 0 0 30px rgba(231, 111, 81, 0.2);
+  /* Desktop Anchored Flyout: expands outward into the space to the right */
+  @media (min-width: 62rem) {
+    .innings-popout-window {
+      top: 50%;
+      left: calc(100% + 20px);
+      width: clamp(520px, 46vw, 680px);
+      max-width: 680px;
+      transform: translateY(-50%) translateX(12px) scale(0.97);
+    }
+
+    .timeline-step.has-reels.is-open .innings-popout-window {
+      transform: translateY(-50%) translateX(0) scale(1);
+    }
+
+    /* Invisible hover bridge between milestone row and flyout window */
+    .innings-popout-window::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -28px;
+      width: 32px;
+      pointer-events: auto;
+    }
+
+    /* Alignment for first milestone (top of card) */
+    .timeline-step:first-child .innings-popout-window {
+      top: -12px;
+      transform: translateY(0) translateX(12px) scale(0.97);
+    }
+    .timeline-step:first-child.is-open .innings-popout-window {
+      transform: translateY(0) translateX(0) scale(1);
+    }
+
+    /* Alignment for bottom milestones (bottom of card) */
+    .timeline-step:last-child .innings-popout-window,
+    .timeline-step:nth-last-child(2) .innings-popout-window {
+      top: auto;
+      bottom: -12px;
+      transform: translateY(0) translateX(12px) scale(0.97);
+    }
+    .timeline-step:last-child.is-open .innings-popout-window,
+    .timeline-step:nth-last-child(2).is-open .innings-popout-window {
+      transform: translateY(0) translateX(0) scale(1);
+    }
   }
 
   /* Popout Header */
@@ -751,63 +841,12 @@ const inningsTimeline = [
   .popout-header-left {
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
     gap: var(--space-xs);
-  }
-
-  .popout-subtitle {
-    font-family: var(--font-mono);
-    font-size: var(--step--2);
-    color: var(--color-muted);
   }
 
   .popout-header-right {
     display: flex;
     align-items: center;
-    gap: var(--space-2xs);
-  }
-
-  .lock-toggle-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 8px;
-    border-radius: 9999px;
-    border: 1px solid var(--color-line-bright);
-    background: rgba(255, 255, 255, 0.08);
-    font-family: var(--font-mono);
-    font-size: var(--step--2);
-    font-weight: 700;
-    color: var(--color-text);
-    cursor: pointer;
-    transition: all 0.2s var(--ease-out);
-  }
-
-  .lock-toggle-pill:hover {
-    background: rgba(231, 111, 81, 0.2);
-    border-color: var(--color-neon);
-    color: var(--color-neon);
-  }
-
-  .lock-state-tag.pinned {
-    display: none;
-    color: var(--color-neon);
-  }
-
-  .timeline-step.is-locked .lock-state-tag.unpinned {
-    display: none;
-  }
-
-  .timeline-step.is-locked .lock-state-tag.pinned {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .timeline-step.is-locked .lock-toggle-pill {
-    border-color: var(--color-neon);
-    background: rgba(231, 111, 81, 0.25);
-    box-shadow: 0 0 12px rgba(231, 111, 81, 0.35);
   }
 
   .popout-close-btn {
@@ -997,6 +1036,8 @@ const inningsTimeline = [
     flex-direction: column;
     gap: var(--space-m);
     justify-content: center;
+    position: relative;
+    z-index: 5;
   }
 
   /* 3D Flip Card System */
@@ -1351,90 +1392,85 @@ const inningsTimeline = [
     });
   });
 
-  // Timeline step reels popout: hover preview + click lock/unlock
+  // Timeline step reels flyout popout: hover preview + click toggle
   const timelineSteps = Array.from(document.querySelectorAll('.timeline-step.has-reels'));
   const controllers: Array<{
     step: Element;
     close: (force?: boolean) => void;
-    open: (locked?: boolean) => void;
-    isLocked: () => boolean;
+    open: (pinned?: boolean) => void;
+    isOpen: () => boolean;
   }> = [];
 
   timelineSteps.forEach((step) => {
     const popout = step.querySelector('.innings-popout-window');
     const closeBtn = step.querySelector('.popout-close-btn');
-    const lockBtn = step.querySelector('.lock-toggle-pill');
-    let isLocked = false;
+    let isPinned = false;
     let isDismissed = false;
     let closeTimer: ReturnType<typeof setTimeout> | null = null;
 
-    function open(locked = false) {
+    function open(pinned = false) {
       if (closeTimer) clearTimeout(closeTimer);
       isDismissed = false;
 
-      // Close all other open popouts so only one is active at any time
+      // Close all other open popouts
       controllers.forEach((c) => {
         if (c.step !== step) c.close(true);
       });
 
       step.classList.add('is-open');
-      if (locked) {
-        isLocked = true;
-        step.classList.add('is-locked');
-        step.setAttribute('aria-expanded', 'true');
-      }
+      step.closest('.innings-card')?.classList.add('has-active-popout');
+      step.closest('.story-column')?.classList.add('has-active-popout');
+      step.setAttribute('aria-expanded', 'true');
+      if (pinned) isPinned = true;
     }
 
     function close(force = false) {
-      if (isLocked && !force) return;
-      isLocked = false;
+      if (isPinned && !force) return;
+      isPinned = false;
       if (force) isDismissed = true;
-      step.classList.remove('is-open', 'is-locked');
+      step.classList.remove('is-open');
       step.setAttribute('aria-expanded', 'false');
+
+      const anyOpen = controllers.some((c) => c.step !== step && c.isOpen());
+      if (!anyOpen) {
+        step.closest('.innings-card')?.classList.remove('has-active-popout');
+        step.closest('.story-column')?.classList.remove('has-active-popout');
+      }
     }
 
     controllers.push({
       step,
       open,
       close,
-      isLocked: () => isLocked
+      isOpen: () => step.classList.contains('is-open')
     });
 
     step.addEventListener('mouseenter', () => {
       if (!isDismissed) {
-        open(isLocked);
+        open(isPinned);
       }
     });
 
     step.addEventListener('mouseleave', () => {
       isDismissed = false;
-      if (!isLocked) {
-        closeTimer = setTimeout(() => close(false), 220);
+      if (!isPinned) {
+        closeTimer = setTimeout(() => close(false), 260);
       }
     });
 
     step.addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
-      // Don't toggle lock if clicking an actual reel link or close button
+      // Don't toggle if clicking an actual reel link or close button
       if (target.closest('.popout-reel-anchor') || target.closest('.popout-close-btn')) {
         return;
       }
-      if (target.closest('.lock-toggle-pill')) {
-        e.stopPropagation();
-        if (isLocked) {
-          close(true);
-        } else {
-          open(true);
-        }
-        return;
-      }
-      // If clicking inside carousel track, don't lock/unlock
+      // If clicking inside carousel track while open, keep open
       if (target.closest('.popout-carousel-wrapper')) {
         return;
       }
 
-      // Clicking anywhere else on the timeline step toggles lock!
-      if (isLocked) {
+      // Clicking the step or title toggles open/pinned state
+      if (step.classList.contains('is-open')) {
         close(true);
       } else {
         open(true);
@@ -1450,21 +1486,21 @@ const inningsTimeline = [
 
     step.addEventListener('keydown', (e) => {
       const evt = e as KeyboardEvent;
-      if (evt.key === 'Escape' && isLocked) {
+      if (evt.key === 'Escape') {
         close(true);
       } else if ((evt.key === 'Enter' || evt.key === ' ') && evt.target === step) {
         evt.preventDefault();
-        if (isLocked) close(true);
+        if (step.classList.contains('is-open')) close(true);
         else open(true);
       }
     });
   });
 
-  // Global click outside listener to close any locked popout
+  // Global click outside listener to close any open flyouts
   document.addEventListener('click', (e) => {
     const target = e.target as Node;
     controllers.forEach((c) => {
-      if (c.isLocked() && !c.step.contains(target)) {
+      if (c.isOpen() && !c.step.contains(target)) {
         c.close(true);
       }
     });
