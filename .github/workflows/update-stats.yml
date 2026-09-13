@@ -24,6 +24,9 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -r scraper/requirements.txt
+      # Headless Chromium for StealthyFetcher, used only as an Instagram fallback
+      # when the plain fetcher is blocked (still logged out -- ADR-0003).
+      - run: scrapling install --force
       - run: python scraper/scrape.py
         env:
           YT_API_KEY: ${{ secrets.YT_API_KEY }}  # YouTube Data API; Instagram has no hands-off route yet (ADR-0009)

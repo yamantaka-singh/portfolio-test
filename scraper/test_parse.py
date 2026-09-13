@@ -1,4 +1,5 @@
 import unittest
+from unittest import mock
 
 import parse
 import scrape
@@ -218,6 +219,46 @@ class MergeProfiles(unittest.TestCase):
         fresh = [{"platform": "instagram", "handle": "x", "followers": None, "postCount": 6}]
         self.assertEqual(scrape.merge_profiles(prev, fresh),
                          [{"platform": "instagram", "handle": "x", "followers": 10, "postCount": 6}])
+
+
+class InstagramStealthFallback(unittest.TestCase):
+    """Instagram, logged out, blocks plain Fetcher requests on some IPs (login-wall or
+    429). Retrying only those with a real headless browser (still no credentials) is
+    ADR-0003's own named next step -- these requests never see it if the plain fetch works.
+    """
+
+    @mock.patch("scrape.Fetcher")
+    def test_plain_200_never_touches_stealth(self, fetcher):
+        fetcher.get.return_value = mock.Mock(status=200, body=b"ok")
+        with mock.patch("scrape.StealthyFetcher") as stealth:
+            page = scrape.get("https://www.instagram.com/x/")
+            stealth.fetch.assert_not_called()
+        self.assertEqual(page.body, b"ok")
+
+    @mock.patch("scrape.Fetcher")
+    def test_instagram_blocked_retries_with_stealth(self, fetcher):
+        fetcher.get.return_value = mock.Mock(status=429, body=b"blocked")
+        with mock.patch("scrape.StealthyFetcher") as stealth:
+            stealth.fetch.return_value = mock.Mock(status=200, body=b"real page")
+            page = scrape.get("https://www.instagram.com/x/")
+            stealth.fetch.assert_called_once()
+        self.assertEqual(page.body, b"real page")
+
+    @mock.patch("scrape.Fetcher")
+    def test_non_instagram_blocked_does_not_retry_with_stealth(self, fetcher):
+        fetcher.get.return_value = mock.Mock(status=429, body=b"blocked")
+        with mock.patch("scrape.StealthyFetcher") as stealth:
+            with self.assertRaises(RuntimeError):
+                scrape.get("https://www.youtube.com/x/")
+            stealth.fetch.assert_not_called()
+
+    @mock.patch("scrape.Fetcher")
+    def test_stealth_also_failing_raises(self, fetcher):
+        fetcher.get.return_value = mock.Mock(status=429, body=b"blocked")
+        with mock.patch("scrape.StealthyFetcher") as stealth:
+            stealth.fetch.return_value = mock.Mock(status=429, body=b"still blocked")
+            with self.assertRaises(RuntimeError):
+                scrape.get("https://www.instagram.com/x/")
 
 
 class YouTubeApi(unittest.TestCase):

@@ -9,7 +9,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from scrapling.fetchers import Fetcher
+from scrapling.fetchers import Fetcher, StealthyFetcher
 
 import parse
 
@@ -28,9 +28,16 @@ YT_API_KEY = os.environ.get("YT_API_KEY")  # optional: without it, watch pages a
 def get(url, **kw):
     time.sleep(2)  # ponytail: fixed politeness delay; ~50 requests total, no need for a rate limiter
     page = Fetcher.get(url, impersonate="chrome", stealthy_headers=True, timeout=30, **kw)
-    if page.status != 200:
-        raise RuntimeError(f"HTTP {page.status} for {url}")
-    return page
+    if page.status == 200:
+        return page
+    # ADR-0003's own named next step: a real headless browser, still logged out, no
+    # credentials. Instagram-only -- it's the one blocking plain requests on some IPs
+    # (login-wall or 429); YouTube already has its own API fallback (youtube_api_details).
+    if "instagram.com" in url:
+        page = StealthyFetcher.fetch(url, headless=True, network_idle=True)
+        if page.status == 200:
+            return page
+    raise RuntimeError(f"HTTP {page.status} for {url}")
 
 
 def post_json(url, body, **kw):
