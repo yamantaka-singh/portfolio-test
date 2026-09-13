@@ -2,7 +2,7 @@ name: Update social stats
 
 on:
   schedule:
-    - cron: '0 3 * * *' # daily at 03:00 UTC -- change the cron expression to adjust frequency
+    - cron: '30 16 * * *' # daily at 16:30 UTC = 22:00 IST, when the runner Mac is normally awake
   workflow_dispatch:
 
 permissions:
@@ -15,7 +15,10 @@ concurrency:
 
 jobs:
   scrape:
-    runs-on: ubuntu-latest
+    # Self-hosted: Instagram blocks GitHub's datacenter IP ranges outright (login-wall
+    # + 429 even on /accounts/login/, verified across three runs). A home IP serves the
+    # same pages fine, so the runner lives on the owner's Mac (ADR-0009).
+    runs-on: self-hosted
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -26,7 +29,7 @@ jobs:
       - run: pip install -r scraper/requirements.txt
       # Headless Chromium for StealthyFetcher, used only as an Instagram fallback
       # when the plain fetcher is blocked (still logged out -- ADR-0003).
-      - run: scrapling install --force
+      - run: scrapling install
       - run: python scraper/scrape.py
         env:
           YT_API_KEY: ${{ secrets.YT_API_KEY }}  # YouTube Data API; Instagram has no hands-off route yet (ADR-0009)
