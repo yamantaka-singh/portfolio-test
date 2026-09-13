@@ -23,20 +23,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: pip install -r scraper/requirements.txt
+      # No setup-python/setup-node: those provision toolchains for throwaway hosted
+      # runners and fail on a real Mac trying to write to /Users/runner. This runner
+      # already has Python and Node on PATH.
+      # The venv lives outside the workspace because checkout wipes untracked files
+      # every run, which would otherwise rebuild it daily for nothing.
+      - run: |
+          python3 -m venv "$HOME/.venvs/portfolio-scraper"
+          "$HOME/.venvs/portfolio-scraper/bin/pip" install -q -r scraper/requirements.txt
       # Headless Chromium for StealthyFetcher, used only as an Instagram fallback
       # when the plain fetcher is blocked (still logged out -- ADR-0003).
-      - run: scrapling install
-      - run: python scraper/scrape.py
+      - run: |
+          "$HOME/.venvs/portfolio-scraper/bin/scrapling" install
+      - run: |
+          "$HOME/.venvs/portfolio-scraper/bin/python" scraper/scrape.py
         env:
           YT_API_KEY: ${{ secrets.YT_API_KEY }}  # YouTube Data API; Instagram has no hands-off route yet (ADR-0009)
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
       - run: npm ci
       # Reuses the existing schema validation (astro build fails on malformed
       # social.json) as a safety gate before anything gets pushed to prod.
