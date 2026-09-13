@@ -13,16 +13,15 @@ const topViews = Math.max(0, ...social.videos.map((v) => v.views ?? 0));
 ---
 <div class="hero-wrapper">
   <div class="video-bg" aria-hidden="true">
-    <Image
-      src={lordsHero}
-      alt="Lord's Cricket Ground under midday sun with pitch, wickets, Victorian Pavilion, and Media Centre"
-      class="video-element hero-bg-img"
-      widths={[640, 1024, 1600, 2048]}
-      sizes="100vw"
-      quality={60}
-      priority
-      loading="eager"
-    />
+    <video
+      class="video-element"
+      src="/hero-section.mp4"
+      autoplay
+      muted
+      loop
+      playsinline
+      poster={lordsHero.src}
+    ></video>
     <div class="video-overlay"></div>
   </div>
 
@@ -181,20 +180,7 @@ const topViews = Math.max(0, ...social.videos.map((v) => v.views ?? 0));
     transform-origin: center center;
   }
 
-  @media (prefers-reduced-motion: no-preference) {
-    .hero-bg-img {
-      animation: heroBreathe 30s ease-in-out infinite alternate;
-    }
-  }
 
-  @keyframes heroBreathe {
-    0% {
-      transform: scale(1);
-    }
-    100% {
-      transform: scale(1.05);
-    }
-  }
 
   .video-overlay {
     position: absolute;
