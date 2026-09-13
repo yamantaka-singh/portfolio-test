@@ -116,4 +116,8 @@ Chain: `scrape.py` (live, logged out) → value diff vs committed `social.json` 
 
 **Known ceiling (logged out):** exact views exist only for reels on the first page (12) of each account's `/reels/` tab. 3 of 25 curated reels are there today. The other 22 keep their last views, and likes refresh when the page's rounded count confirms them. Pagination has no reachable public query id, so going further means reverse-engineering Instagram's private API, which ADR-0003 rules out. The upgrade path is the Instagram Graph API with Abhishek's access.
 
-**Not yet tested:** the GitHub-runner run (IP blocking, `GITHUB_STEP_SUMMARY`). It needs a push and a `workflow_dispatch`.
+**GitHub-runner run — 2026-09-13, [run 34770335457](https://github.com/yamantaka-singh/portfolio-test/actions/runs/34770335457) (`workflow_dispatch` on `social-sync-v2`): FAILED, and the guard worked.**
+- Instagram: every profile and reels request was redirected to `instagram.com/accounts/…`, the login wall. No Instagram data came back.
+- YouTube: the channel, listing and Shorts-popular requests succeeded, but all 16 watch pages returned 200 without view counts (bot-check content). That made 0 videos.
+- `check_not_wiped` refused to overwrite ("0 videos but 16 existed before"). Node, test, build and commit steps were skipped, and the branch data is unchanged.
+- Conclusion: ADR-0009 Q1(a), "GitHub runner + guard", keeps data safe but never refreshes it. Q1 needs a new decision. `update-stats.yml` was disabled again right after the run.
