@@ -15,19 +15,19 @@ import { ArrowUp, Flame } from 'lucide-astro';
 
     <!-- Center: Stadium Zone Navigation -->
     <nav class="dock-nav" aria-label="Quick Jump">
-      <a href="#pitch" class="nav-chip magnetic" data-cursor-text="PITCH">
+      <a href="#pitch" class="nav-chip magnetic" data-section="pitch" data-cursor-text="PITCH">
         <span class="chip-idx">01</span>
         <span class="chip-name">PITCH</span>
       </a>
-      <a href="#scoreboard" class="nav-chip magnetic" data-cursor-text="STATS">
+      <a href="#scoreboard" class="nav-chip magnetic" data-section="scoreboard" data-cursor-text="STATS">
         <span class="chip-idx">02</span>
         <span class="chip-name">SCORE</span>
       </a>
-      <a href="#stands" class="nav-chip magnetic" data-cursor-text="STANDS">
+      <a href="#stands" class="nav-chip magnetic" data-section="stands" data-cursor-text="STANDS">
         <span class="chip-idx">03</span>
         <span class="chip-name">STANDS</span>
       </a>
-      <a href="#pavilion" class="nav-chip magnetic" data-cursor-text="STORY">
+      <a href="#pavilion" class="nav-chip magnetic" data-section="pavilion" data-cursor-text="STORY">
         <span class="chip-idx">04</span>
         <span class="chip-name">STORY</span>
       </a>
@@ -79,6 +79,30 @@ import { ArrowUp, Flame } from 'lucide-astro';
     } else {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  });
+  // Active section highlighting via IntersectionObserver
+  const chips = document.querySelectorAll<HTMLElement>('.nav-chip[data-section]');
+  const sections = ['pitch', 'scoreboard', 'stands', 'pavilion'];
+  let activeSection = '';
+
+  const obs = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          activeSection = entry.target.id;
+        }
+      }
+      chips.forEach((chip) => {
+        const match = chip.dataset.section === activeSection;
+        chip.classList.toggle('is-active', match);
+      });
+    },
+    { threshold: 0.3 }
+  );
+
+  sections.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) obs.observe(el);
   });
 </script>
 
@@ -182,7 +206,8 @@ import { ArrowUp, Flame } from 'lucide-astro';
     font-family: var(--font-mono);
     font-size: var(--step--2);
     color: var(--color-muted);
-    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    transition: color 0.3s ease, background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease;
   }
 
   .chip-idx {
@@ -196,6 +221,21 @@ import { ArrowUp, Flame } from 'lucide-astro';
   }
 
   .nav-chip:hover .chip-idx {
+    color: var(--color-neon);
+  }
+
+  .nav-chip.is-active {
+    color: var(--color-text);
+    background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(231,111,81,0.10) 60%, rgba(42,157,143,0.06) 100%);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-top-color: rgba(255,255,255,0.38);
+    border-bottom-color: rgba(255,255,255,0.06);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.35), 0 4px 16px rgba(0,0,0,0.35), 0 0 12px rgba(231,111,81,0.18);
+  }
+
+  .nav-chip.is-active .chip-idx {
     color: var(--color-neon);
   }
 
