@@ -70,10 +70,6 @@ const topViews = Math.max(0, ...social.videos.map((v) => v.views ?? 0));
 
       <div class="hero-card-col">
         <div class="accreditation-card tilt-card" data-cursor-text="ABHISHEK">
-          <div class="card-header">
-            <span class="card-loc">ON LOCATION</span>
-          </div>
-
           <div class="card-image-wrap">
             <Image
               src={heroPortrait}
@@ -85,13 +81,6 @@ const topViews = Math.max(0, ...social.videos.map((v) => v.views ?? 0));
             />
             <div class="card-overlay-badge">
               <span class="badge-match">TATA IPL EVENT</span>
-            </div>
-          </div>
-
-          <div class="card-footer">
-            <div class="telemetry-readout">
-              <span class="lbl">ACCREDITED</span>
-              <span class="val">DPL 2026 MEDIA</span>
             </div>
           </div>
         </div>
@@ -443,43 +432,18 @@ const topViews = Math.max(0, ...social.videos.map((v) => v.views ?? 0));
     position: relative;
     width: 100%;
     max-width: 380px;
-    background: linear-gradient(145deg, rgba(24, 28, 40, 0.85), rgba(13, 16, 24, 0.95));
-    border: 1px solid var(--color-line-bright);
-    border-radius: 12px;
-    padding: var(--space-s);
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(42, 157, 143, 0.12);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(231, 111, 81, 0.15);
     transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-xs);
   }
 
   .accreditation-card:hover {
-    box-shadow: 0 32px 70px rgba(0, 0, 0, 0.85), 0 0 45px rgba(231, 111, 81, 0.25);
-  }
-
-  .card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-family: var(--font-mono);
-    font-size: var(--step--2);
-    letter-spacing: 0.1em;
-    padding-bottom: var(--space-2xs);
-    border-bottom: 1px solid var(--color-line);
-  }
-
-  .card-loc {
-    color: var(--color-muted);
+    box-shadow: 0 32px 70px rgba(0, 0, 0, 0.85), 0 0 55px rgba(231, 111, 81, 0.3);
   }
 
   .card-image-wrap {
     position: relative;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid var(--color-line);
     aspect-ratio: 4 / 5;
     background: var(--color-surface);
   }
@@ -518,27 +482,4 @@ const topViews = Math.max(0, ...social.videos.map((v) => v.views ?? 0));
     color: var(--color-text);
   }
 
-  .card-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: var(--space-2xs);
-  }
-
-  .telemetry-readout {
-    display: flex;
-    flex-direction: column;
-    font-family: var(--font-mono);
-    font-size: var(--step--2);
-    line-height: 1.2;
-  }
-
-  .telemetry-readout .lbl {
-    color: var(--color-muted);
-  }
-
-  .telemetry-readout .val {
-    color: var(--color-text);
-    font-weight: 600;
-  }
 </style>
