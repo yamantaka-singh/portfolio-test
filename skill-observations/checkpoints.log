@@ -38,3 +38,5 @@
 2026-09-13 checkpoint: integrated transparent 3D glowing mail panda mascot in bottom right corner of primary-action email box with warm drop shadows and hover tilt
 2026-09-13 session-start scan: files=3 parsed=3
 2026-09-13 checkpoint: added career innings interactive popout window for IPL 2025 with hover preview, click lock/unlock, and horizontal glassmorphic reels carousel
+2026-09-13 session-start scan: files=3 parsed=3
+2026-09-13 checkpoint: added career innings interactive popout windows for WPL 2026, ICC T20 World Cup 2026, and IPL 2026 with 15 curated reels, thumbnails, and coordinated single-active state management
