@@ -1,6 +1,7 @@
 import unittest
 
 import parse
+import scrape
 
 YT_HTML = (
     '<link rel="canonical" href="https://www.youtube.com/channel/UCBR8-60-B28hp2BmDPdntcQ">'
@@ -194,6 +195,23 @@ class LinkedIn(unittest.TestCase):
     def test_authwall_title_is_nulls(self):
         self.assertEqual(parse.parse_linkedin("Sign Up | LinkedIn"), {"name": None, "headline": None})
         self.assertEqual(parse.parse_linkedin(None), {"name": None, "headline": None})
+
+
+class CheckNotWiped(unittest.TestCase):
+    def test_raises_when_videos_wiped(self):
+        with self.assertRaises(RuntimeError):
+            scrape.check_not_wiped({"videos": [{"id": "a"}]}, videos=[], posts=[])
+
+    def test_raises_when_posts_wiped(self):
+        with self.assertRaises(RuntimeError):
+            scrape.check_not_wiped({"posts": [{"shortcode": "a"}]}, videos=[{"id": "a"}], posts=[])
+
+    def test_allows_empty_when_previous_was_also_empty(self):
+        scrape.check_not_wiped({}, videos=[], posts=[])
+
+    def test_allows_a_real_scrape_through(self):
+        scrape.check_not_wiped({"videos": [{"id": "a"}], "posts": [{"shortcode": "a"}]},
+                                videos=[{"id": "b"}], posts=[{"shortcode": "b"}])
 
 
 if __name__ == "__main__":

@@ -210,6 +210,18 @@ def scrape_linkedin():
     return row
 
 
+def check_not_wiped(previous, videos, posts):
+    """A scrape can come back empty without raising -- e.g. every watch-page fetch
+    silently returns a bot-check/consent page instead of real content (seen live
+    from a GitHub Actions runner IP, not reproducible from a normal machine).
+    Refuse to overwrite real data with nothing rather than wiping it.
+    """
+    if not videos and previous.get("videos"):
+        raise RuntimeError(f"scrape_youtube returned 0 videos but {len(previous['videos'])} existed before -- refusing to overwrite")
+    if not posts and previous.get("posts"):
+        raise RuntimeError(f"scrape_instagram returned 0 posts but {len(previous['posts'])} existed before -- refusing to overwrite")
+
+
 def main():
     THUMBS.mkdir(parents=True, exist_ok=True)
     previous = json.loads(OUT_JSON.read_text()) if OUT_JSON.exists() else {}
@@ -218,6 +230,7 @@ def main():
 
     ig_profiles, posts = scrape_instagram(featured)
     yt_profiles, videos = scrape_youtube(featured)
+    check_not_wiped(previous, videos, posts)
 
     data = {
         "scrapedAt": datetime.now(timezone.utc).isoformat(timespec="seconds"),
