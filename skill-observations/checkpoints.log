@@ -49,3 +49,5 @@
 2026-09-13 checkpoint: pushed f07cdf0 to origin main and deployed live to production on Vercel
 2026-09-13 session-start scan: files=3 parsed=3
 2026-09-13 checkpoint: fixed career innings hover switching by isolating isDismissed to manual close triggers
+2026-09-13 session-start scan: files=3 parsed=3
+Checkpoint: dock active section feature - commit e03e484 - deploying
