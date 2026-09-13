@@ -221,6 +221,36 @@ class MergeProfiles(unittest.TestCase):
                          [{"platform": "instagram", "handle": "x", "followers": 10, "postCount": 6}])
 
 
+class RetryOn429(unittest.TestCase):
+    """A 429 is a real rate-limit signal, worth retrying -- unlike a login-wall or a
+    hard network-level block, which retrying the same IP can never fix.
+    """
+
+    @mock.patch("scrape.time.sleep")
+    @mock.patch("scrape.Fetcher")
+    def test_retries_on_429_then_succeeds(self, fetcher, sleep):
+        fetcher.get.side_effect = [mock.Mock(status=429, headers={}), mock.Mock(status=200, body=b"ok")]
+        page = scrape.get("https://www.instagram.com/x/")
+        self.assertEqual(page.body, b"ok")
+        self.assertEqual(fetcher.get.call_count, 2)
+
+    @mock.patch("scrape.time.sleep")
+    @mock.patch("scrape.Fetcher")
+    def test_honors_retry_after_header(self, fetcher, sleep):
+        fetcher.get.side_effect = [mock.Mock(status=429, headers={"Retry-After": "7"}), mock.Mock(status=200, body=b"ok")]
+        scrape.get("https://www.instagram.com/x/")
+        self.assertIn(7, [c.args[0] for c in sleep.call_args_list])
+
+    @mock.patch("scrape.time.sleep")
+    @mock.patch("scrape.Fetcher")
+    def test_exhausts_retries_then_falls_through(self, fetcher, sleep):
+        fetcher.get.return_value = mock.Mock(status=429, headers={})
+        with mock.patch("scrape.StealthyFetcher") as stealth:
+            stealth.fetch.return_value = mock.Mock(status=429, body=b"still blocked")
+            with self.assertRaises(RuntimeError):
+                scrape.get("https://www.instagram.com/x/")
+
+
 class InstagramStealthFallback(unittest.TestCase):
     """Instagram, logged out, blocks plain Fetcher requests on some IPs (login-wall or
     429). Retrying only those with a real headless browser (still no credentials) is
@@ -237,7 +267,7 @@ class InstagramStealthFallback(unittest.TestCase):
 
     @mock.patch("scrape.Fetcher")
     def test_instagram_blocked_retries_with_stealth(self, fetcher):
-        fetcher.get.return_value = mock.Mock(status=429, body=b"blocked")
+        fetcher.get.return_value = mock.Mock(status=403, body=b"blocked")
         with mock.patch("scrape.StealthyFetcher") as stealth:
             stealth.fetch.return_value = mock.Mock(status=200, body=b"real page")
             page = scrape.get("https://www.instagram.com/x/")
@@ -246,7 +276,7 @@ class InstagramStealthFallback(unittest.TestCase):
 
     @mock.patch("scrape.Fetcher")
     def test_non_instagram_blocked_does_not_retry_with_stealth(self, fetcher):
-        fetcher.get.return_value = mock.Mock(status=429, body=b"blocked")
+        fetcher.get.return_value = mock.Mock(status=403, body=b"blocked")
         with mock.patch("scrape.StealthyFetcher") as stealth:
             with self.assertRaises(RuntimeError):
                 scrape.get("https://www.youtube.com/x/")
@@ -254,9 +284,9 @@ class InstagramStealthFallback(unittest.TestCase):
 
     @mock.patch("scrape.Fetcher")
     def test_stealth_also_failing_raises(self, fetcher):
-        fetcher.get.return_value = mock.Mock(status=429, body=b"blocked")
+        fetcher.get.return_value = mock.Mock(status=403, body=b"blocked")
         with mock.patch("scrape.StealthyFetcher") as stealth:
-            stealth.fetch.return_value = mock.Mock(status=429, body=b"still blocked")
+            stealth.fetch.return_value = mock.Mock(status=403, body=b"still blocked")
             with self.assertRaises(RuntimeError):
                 scrape.get("https://www.instagram.com/x/")
 

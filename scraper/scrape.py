@@ -28,6 +28,16 @@ YT_API_KEY = os.environ.get("YT_API_KEY")  # optional: without it, watch pages a
 def get(url, **kw):
     time.sleep(2)  # ponytail: fixed politeness delay; ~50 requests total, no need for a rate limiter
     page = Fetcher.get(url, impersonate="chrome", stealthy_headers=True, timeout=30, **kw)
+    # 429 is a real rate-limit signal (seen live: shared GitHub runner IP ranges get
+    # rate-limited, not blocked outright) -- worth a few backed-off retries, honoring
+    # Retry-After when Instagram sends one. A login-wall or network-level block won't
+    # clear by retrying the same IP, so this loop is 429-only.
+    attempt = 0
+    while page.status == 429 and attempt < 3:
+        delay = int(page.headers.get("Retry-After", 5 * 2**attempt))
+        time.sleep(delay)
+        page = Fetcher.get(url, impersonate="chrome", stealthy_headers=True, timeout=30, **kw)
+        attempt += 1
     if page.status == 200:
         return page
     # ADR-0003's own named next step: a real headless browser, still logged out, no
