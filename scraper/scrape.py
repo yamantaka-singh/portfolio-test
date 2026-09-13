@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT_JSON = ROOT / "src/data/social.json"
 THUMBS = ROOT / "src/assets/social"
 OVERRIDE = ROOT / "scraper/instagram_posts.txt"
+INNINGS = ROOT / "src/data/innings.json"  # hand-curated; this script only reads it
 IG_ACCOUNTS = ["abhishekpandey_26", "spinandswing26"]
 IG_REELS_ACCOUNTS = ["abhishekpandey_26"]  # Pulse of the Crowd: reels from this account only
 YT_CHANNELS = ["spinandswing26", "abhishekunseen26"]
@@ -88,7 +89,7 @@ def scrape_instagram(featured, pool_size=6):
             print("WARN IG profile", err)
         profiles.append(row)
 
-    posts = []
+    posts, pool = [], []
     if OVERRIDE.exists():
         urls = [line.strip() for line in OVERRIDE.read_text().splitlines() if line.strip()]
         for c in filter(None, map(parse.parse_instagram_post_url, urls)):
@@ -96,7 +97,7 @@ def scrape_instagram(featured, pool_size=6):
                 posts.append(fetch_override_post(c))
             except Exception as err:
                 print("WARN IG post", err)
-        return profiles, posts
+        return profiles, posts, pool
 
     for handle in IG_REELS_ACCOUNTS:
         try:
@@ -106,6 +107,7 @@ def scrape_instagram(featured, pool_size=6):
             print("WARN IG reels tab", err)
             candidates = []
         candidates.sort(key=lambda c: c["views"], reverse=True)
+        pool += candidates
         for c in candidates[:pool_size]:
             url = f"https://www.instagram.com/reel/{c['id']}/"
             try:
@@ -121,7 +123,7 @@ def scrape_instagram(featured, pool_size=6):
     # A reel cross-posted to both accounts shows up in both accounts' own /reels/ tab --
     # keep it once rather than showing the same card twice.
     posts = list({p["shortcode"]: p for p in posts}.values())
-    return profiles, posts
+    return profiles, posts, pool
 
 
 def youtube_thumb(video_id):
@@ -222,13 +224,45 @@ def check_not_wiped(previous, videos, posts):
         raise RuntimeError(f"scrape_instagram returned 0 posts but {len(previous['posts'])} existed before -- refusing to overwrite")
 
 
+def merge_curated(ids, previous, fresh):
+    """Counts for every curated reel id. A missing or zero fresh count keeps the previous
+    one -- a bot-check page parses to None/0 and must never overwrite a real number.
+    """
+    return {i: {k: fresh.get(i, {}).get(k) or previous.get(i, {}).get(k) for k in ("views", "likes")}
+            for i in ids}
+
+
+def refresh_curated(ids, pool):
+    """Fresh counts for curated reels: exact views from the /reels/ pool already fetched,
+    else the reel's own page (likes only, views aren't public there). Also saves a
+    thumbnail for any curated reel that doesn't have one yet.
+    """
+    by_id = {c["id"]: c for c in pool}
+    fresh = {}
+    for i in ids:
+        try:
+            if i in by_id:
+                fresh[i] = {"views": by_id[i]["views"], "likes": by_id[i]["likes"]}
+                image = by_id[i]["thumbUrl"]
+            else:
+                page = get(f"https://www.instagram.com/reel/{i}/")
+                fresh[i] = {"views": None, "likes": parse.parse_instagram_post(meta(page, "og:description"))["likes"]}
+                image = meta(page, "og:image")
+            if image and not (THUMBS / f"ig-{i}.jpg").exists():
+                save_image(image, f"ig-{i}.jpg")
+        except Exception as err:
+            print("WARN IG curated reel", i, err)
+    return fresh
+
+
 def main():
     THUMBS.mkdir(parents=True, exist_ok=True)
     previous = json.loads(OUT_JSON.read_text()) if OUT_JSON.exists() else {}
     featured = {r["id"] for r in previous.get("videos", []) if r.get("featured")} | \
                {r["shortcode"] for r in previous.get("posts", []) if r.get("featured")}
+    curated_ids = [r["id"] for i in json.loads(INNINGS.read_text()) for r in i.get("reels", [])]
 
-    ig_profiles, posts = scrape_instagram(featured)
+    ig_profiles, posts, pool = scrape_instagram(featured)
     yt_profiles, videos = scrape_youtube(featured)
     check_not_wiped(previous, videos, posts)
 
@@ -237,6 +271,7 @@ def main():
         "profiles": ig_profiles + yt_profiles + [scrape_linkedin()],
         "videos": videos,
         "posts": posts,
+        "curated": merge_curated(curated_ids, previous.get("curated", {}), refresh_curated(curated_ids, pool)),
     }
     OUT_JSON.parent.mkdir(parents=True, exist_ok=True)
     OUT_JSON.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")

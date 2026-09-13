@@ -214,5 +214,20 @@ class CheckNotWiped(unittest.TestCase):
                                 videos=[{"id": "b"}], posts=[{"shortcode": "b"}])
 
 
+class MergeCurated(unittest.TestCase):
+    def test_fresh_counts_win(self):
+        got = scrape.merge_curated(["a"], {"a": {"views": 1, "likes": 1}}, {"a": {"views": 5, "likes": 2}})
+        self.assertEqual(got, {"a": {"views": 5, "likes": 2}})
+
+    def test_missing_or_zero_fresh_keeps_previous(self):
+        # A bot-check page parses to None/0 -- it must never overwrite a real count.
+        got = scrape.merge_curated(["a"], {"a": {"views": 9, "likes": 3}}, {"a": {"views": 0, "likes": None}})
+        self.assertEqual(got, {"a": {"views": 9, "likes": 3}})
+
+    def test_new_id_is_nulls_and_uncurated_ids_drop(self):
+        got = scrape.merge_curated(["b"], {"a": {"views": 9, "likes": 3}}, {})
+        self.assertEqual(got, {"b": {"views": None, "likes": None}})
+
+
 if __name__ == "__main__":
     unittest.main()

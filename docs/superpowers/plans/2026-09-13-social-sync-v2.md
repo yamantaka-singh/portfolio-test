@@ -1,6 +1,6 @@
 # Social Sync v2 — revised plan
 
-**Status:** Grill round 1 decided on 2026-09-13 (§4) and recorded in ADR-0009. Task 0 is done. Tasks 1–3 wait for the user's go. Task 4 is blocked on consent (Q6).
+**Status:** Grill round 1 decided on 2026-09-13 (§4) and recorded in ADR-0009. Tasks 0–3 are done on branch `social-sync-v2`. `update-stats.yml` was disabled on 2026-09-13. Task 4 is blocked on consent (Q6). Task 2's live local run is deferred to the same consent.
 **Replaces:** the pasted "Automated Multi-Account Content Pipeline (Scrapling + Hot/Cold CSVs + GitHub Actions)" draft.
 **Governing docs:** ADR-0003 (data pipeline), ADR-0005 (hosting), ADR-0007 (stack), ADR-0008 (task-observer), and the Global Constraints in `2026-09-12-abhishek-portfolio.md`.
 
