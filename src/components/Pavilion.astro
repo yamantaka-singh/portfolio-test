@@ -1427,7 +1427,7 @@ const inningsTimeline = [
     function close(force = false) {
       if (isPinned && !force) return;
       isPinned = false;
-      if (force) isDismissed = true;
+      if (closeTimer) clearTimeout(closeTimer);
       step.classList.remove('is-open');
       step.setAttribute('aria-expanded', 'false');
 
@@ -1447,7 +1447,7 @@ const inningsTimeline = [
 
     step.addEventListener('mouseenter', () => {
       if (!isDismissed) {
-        open(isPinned);
+        open(false);
       }
     });
 
@@ -1480,6 +1480,7 @@ const inningsTimeline = [
     if (closeBtn) {
       closeBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        isDismissed = true;
         close(true);
       });
     }
@@ -1487,6 +1488,7 @@ const inningsTimeline = [
     step.addEventListener('keydown', (e) => {
       const evt = e as KeyboardEvent;
       if (evt.key === 'Escape') {
+        isDismissed = true;
         close(true);
       } else if ((evt.key === 'Enter' || evt.key === ' ') && evt.target === step) {
         evt.preventDefault();
