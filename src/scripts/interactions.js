@@ -1,7 +1,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import SplitType from 'split-type';
-import { initLenis } from './lenis-scroll.js';
+import { initLenis, initAnchorScroll } from './lenis-scroll.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -69,6 +69,7 @@ export function initTiltCards() {
     card.addEventListener('mouseenter', () => {
       bounds = card.getBoundingClientRect();
       if (pop > 1) {
+        card.style.zIndex = '50';
         gsap.to(card, { y: y0, scale: pop, duration: 0.3, ease: 'power2.out', overwrite: 'auto' });
       }
     });
@@ -97,9 +98,14 @@ export function initTiltCards() {
         rotationX: 0,
         y: 0,
         scale: 1,
-        duration: 0.6,
+        duration: 0.5,
         ease: 'power3.out',
         overwrite: 'auto',
+        onComplete: () => {
+          if (pop > 1) {
+            card.style.zIndex = '';
+          }
+        },
       });
     });
   });
@@ -218,6 +224,7 @@ export function initTextReveals() {
 
 export function initAllInteractions() {
   initLenis();
+  initAnchorScroll();
   initCursor();
   initMagneticButtons();
   initTiltCards();

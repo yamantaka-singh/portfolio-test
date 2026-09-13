@@ -181,8 +181,12 @@ const topPosts = [...social.posts]
     gap: var(--space-xs);
     padding: var(--space-xs) var(--space-m);
     border-radius: 9999px;
-    border: 1px solid var(--color-line-bright);
-    background: rgba(17, 20, 29, 0.75);
+    border: var(--glass-border);
+    border-top-color: var(--glass-border-top);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-highlight), 0 8px 24px rgba(0, 0, 0, 0.35);
     font-family: var(--font-mono);
     font-size: var(--step--1);
     color: var(--color-text);
@@ -191,8 +195,10 @@ const topPosts = [...social.posts]
 
   .follow-pill:hover {
     border-color: var(--color-neon);
+    border-top-color: rgba(255, 140, 120, 0.6);
     color: var(--color-neon);
-    background: rgba(231, 111, 81, 0.1);
+    background: var(--glass-bg-hover);
+    box-shadow: var(--glass-highlight-hover), 0 0 24px rgba(231, 111, 81, 0.3);
   }
 
   .badge-count {
@@ -207,11 +213,12 @@ const topPosts = [...social.posts]
     width: 100%;
     overflow-x: auto;
     overscroll-behavior-x: contain;
-    padding-bottom: var(--space-m);
+    padding-block: var(--space-m);
+    margin-block: calc(-1 * var(--space-m));
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
     scroll-snap-type: x mandatory;
-    padding-inline: 4px;
+    padding-inline: var(--space-s);
   }
 
   .carousel-wrapper::-webkit-scrollbar {
@@ -222,26 +229,36 @@ const topPosts = [...social.posts]
     display: flex;
     gap: var(--space-m);
     width: max-content;
-    padding-right: var(--space-m);
+    padding-block: var(--space-xs);
+    padding-inline: var(--space-xs) var(--space-m);
   }
 
   .reel-card {
+    position: relative;
+    z-index: 1;
     width: clamp(190px, 48vw, 260px);
     flex: 0 0 auto;
     scroll-snap-align: start;
-    background: var(--color-card);
-    border: 1px solid var(--color-line);
-    border-radius: 12px;
+    background: var(--glass-bg);
+    border: var(--glass-border);
+    border-top-color: var(--glass-border-top);
+    border-left-color: var(--glass-border-left);
+    border-bottom-color: var(--glass-border-bottom);
+    border-radius: var(--glass-radius);
     padding: var(--space-2xs);
-    backdrop-filter: blur(12px);
-    transition: transform 0.3s var(--ease-out), border-color 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-highlight), 0 16px 40px -10px rgba(0, 0, 0, 0.65);
+    transition: transform 0.3s var(--ease-out), border-color 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out), background 0.3s var(--ease-out);
   }
 
   .reel-card:hover {
     position: relative;
-    z-index: 2;
-    border-color: var(--color-blood);
-    box-shadow: 0 24px 50px rgba(0, 0, 0, 0.75), 0 0 32px rgba(141, 8, 1, 0.5);
+    z-index: 50;
+    border-color: var(--color-neon);
+    border-top-color: rgba(255, 140, 120, 0.6);
+    background: var(--glass-bg-hover);
+    box-shadow: var(--glass-highlight-hover), 0 24px 50px rgba(0, 0, 0, 0.8), 0 0 36px rgba(231, 111, 81, 0.4);
     /* transform (the actual "pop out" scale) is driven by initTiltCards()'s
        GSAP tween on this .tilt-pop card, not CSS -- see interactions.js */
   }

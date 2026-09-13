@@ -31,6 +31,39 @@ export function initLenis() {
   gsap.ticker.lagSmoothing(500, 33);
 }
 
+export function initAnchorScroll() {
+  if (typeof document === 'undefined') return;
+
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a[href^="#"]');
+    if (!link) return;
+
+    const href = link.getAttribute('href');
+    if (!href || href === '#' || href.length <= 1) return;
+
+    const target = document.querySelector(href);
+    if (!target) return;
+
+    e.preventDefault();
+
+    const prefersReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (lenis && !prefersReduced) {
+      lenis.scrollTo(target, {
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      });
+    } else {
+      target.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth' });
+    }
+
+    if (history.pushState) {
+      history.pushState(null, '', href);
+    }
+  });
+}
+
 export function getLenis() {
   return lenis;
 }
+

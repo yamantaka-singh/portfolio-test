@@ -24,3 +24,10 @@
 2026-09-13 session-start scan: files=3 parsed=3
 2026-09-13 checkpoint: updated pavilion gallery cards with polaroid backfaces, runner-up trophy photo, and accurate venue/event metadata
 2026-09-13 session-start scan: files=3 parsed=3
+2026-09-13 session-start scan: files=3 parsed=3
+2026-09-13 session-start scan: files=3 parsed=3
+2026-09-13 checkpoint: smooth anchor scrolling, unclipped card pop-out on hover, and hero metric white color match verified
+2026-09-13 checkpoint: video grid minmax adjusted to 340px to enforce 2x3 layout at 100% desktop mac size without affecting other viewports
+2026-09-13 session-start scan: files=3 parsed=3
+2026-09-13 checkpoint: transformed all UI cards, panels, badges, and floating broadcast dock into Apple-style glossy translucent frosted glass with specular top reflection and saturate boost
+2026-09-13 checkpoint: engineered iPhone-style chromatic gradient glassmorphism with dual-chroma stadium twilight refraction, directional specular lighting, chamfered bevels, and iOS 18 squircle radii
