@@ -191,7 +191,7 @@ const topViews = Math.max(0, ...social.videos.map((v) => v.views ?? 0));
       /* The source photo is brightest at the top (sky) and darkest at the bottom
          (pitch/stands) -- the opposite of the video this replaced -- so the darkening
          has to be strongest at the top, where the kicker/title text sits. */
-      linear-gradient(to bottom, rgba(7, 9, 14, 0.78) 0%, rgba(7, 9, 14, 0.55) 35%, rgba(7, 9, 14, 0.38) 65%, var(--color-bg) 100%);
+      linear-gradient(to bottom, rgba(7, 9, 14, 0.38) 0%, rgba(7, 9, 14, 0.35) 35%, rgba(7, 9, 14, 0.38) 65%, var(--color-bg) 100%);
     z-index: 1;
     pointer-events: none;
   }
@@ -201,7 +201,7 @@ const topViews = Math.max(0, ...social.videos.map((v) => v.views ?? 0));
       background:
         radial-gradient(circle at 75% 45%, rgba(42, 157, 143, 0.08) 0%, transparent 60%),
         radial-gradient(circle at 25% 65%, rgba(231, 111, 81, 0.06) 0%, transparent 60%),
-        linear-gradient(to bottom, rgba(7, 9, 14, 0.85) 0%, rgba(7, 9, 14, 0.68) 35%, rgba(7, 9, 14, 0.5) 65%, var(--color-bg) 100%);
+        linear-gradient(to bottom, rgba(7, 9, 14, 0.45) 0%, rgba(7, 9, 14, 0.42) 35%, rgba(7, 9, 14, 0.5) 65%, var(--color-bg) 100%);
     }
   }
 
