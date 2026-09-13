@@ -10,7 +10,7 @@ const sample = {
 };
 
 const innings = [
-  { dates: 'August – September 2026', title: 'DPL 2026', accredited: true, desc: 'Field access.', reels: [{ id: 'DcRzXB-zlPg', caption: 'Story' }] },
+  { dates: 'August – September 2026', title: 'DPL 2026', accredited: true, desc: 'Field access.', reels: [{ id: 'DcRzXB-zlPg', caption: 'Story', account: 'abhishekpandey_26' }] },
   { dates: 'February – May 2026', title: 'Content Creator | My11Circle', accredited: false, desc: 'Reels.' },
 ];
 
@@ -55,5 +55,11 @@ test('rejects an innings entry without accredited', () => {
 test('rejects a malformed reel id', () => {
   const s = structuredClone(innings);
   s[0].reels[0].id = 'bad id!';
+  assert.throws(() => parseInnings(s));
+});
+
+test('rejects a reel with no account', () => {
+  const s = structuredClone(innings);
+  delete s[0].reels[0].account;
   assert.throws(() => parseInnings(s));
 });

@@ -24,9 +24,7 @@ export function rankReels({ posts, curated, excluded }) {
         views: r.views,
         likes: r.likes,
         isReel: true,
-        // Only ever read as an aria-label fallback, and curated reels always have a
-        // caption, so the label never falls back to it.
-        account: 'abhishekpandey_26',
+        account: r.account,
         featured: false,
       },
     ]),

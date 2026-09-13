@@ -8,8 +8,8 @@ const posts = [
 ];
 
 const curated = [
-  { id: 'bbbbbbbb', views: 9000, likes: 9, caption: 'the big one', thumb: 'ig-bbbbbbbb.jpg', url: 'u2' },
-  { id: 'aaaaaaaa', views: 90, likes: 1, caption: 'stale copy', thumb: 'ig-aaaaaaaa.jpg', url: 'u1' },
+  { id: 'bbbbbbbb', views: 9000, likes: 9, caption: 'the big one', thumb: 'ig-bbbbbbbb.jpg', url: 'u2', account: 'spinandswing26' },
+  { id: 'aaaaaaaa', views: 90, likes: 1, caption: 'stale copy', thumb: 'ig-aaaaaaaa.jpg', url: 'u1', account: 'abhishekpandey_26' },
 ];
 
 test('ranks by views across both sources', () => {
@@ -39,8 +39,14 @@ test('excluded reels never appear, from either source', () => {
 test('curated reels are shaped like posts for the card template', () => {
   const big = rankReels({ posts, curated, excluded: [] })[0];
   assert.equal(big.isReel, true);
-  assert.equal(typeof big.account, 'string');
   assert.equal(big.thumb, 'ig-bbbbbbbb.jpg');
+});
+
+test('a curated reel keeps its own account, never a hardcoded one', () => {
+  // 13 of 25 curated reels are spinandswing26; assuming one handle mislabelled them.
+  const got = rankReels({ posts, curated, excluded: [] });
+  assert.equal(got.find((r) => r.shortcode === 'bbbbbbbb').account, 'spinandswing26');
+  assert.equal(got.find((r) => r.shortcode === 'cccccccc').account, 'abhishekpandey_26');
 });
 
 test('null views sort last instead of crashing', () => {

@@ -54,7 +54,9 @@ export const InningsSchema = z.array(
     title: z.string().min(1),
     accredited: z.boolean(),
     desc: z.string(),
-    reels: z.array(z.object({ id: shortcode, caption: z.string() })).optional(),
+    // `account` is which handle posted it: 13 of 25 are spinandswing26, so it cannot
+    // be assumed from the section it appears in.
+    reels: z.array(z.object({ id: shortcode, caption: z.string(), account: z.string().min(1) })).optional(),
   }),
 );
 
