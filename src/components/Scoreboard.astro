@@ -1,7 +1,7 @@
 ---
 import { social } from '../lib/social.js';
 import { scoreboardStats } from '../lib/stats.js';
-import { compactCount, longDate } from '../lib/format.js';
+import { compactCount } from '../lib/format.js';
 import { Users, Eye, TrendingUp, ExternalLink, Activity, Award } from 'lucide-astro';
 
 const s = scoreboardStats(social);
@@ -16,9 +16,6 @@ const s = scoreboardStats(social);
       <p class="board-subtitle reveal-text">
         Follower and view counts from public YouTube and Instagram pages, refreshed daily.
       </p>
-    </div>
-    <div class="header-right">
-      <span class="hud-pill">UPDATED {longDate(s.asOf).toUpperCase()}</span>
     </div>
   </header>
 
