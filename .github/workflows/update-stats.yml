@@ -1,0 +1,38 @@
+name: Update social stats
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # daily at 03:00 UTC -- change the cron expression to adjust frequency
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r scraper/requirements.txt
+      - run: python scraper/scrape.py
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      # Reuses the existing schema validation (astro build fails on malformed
+      # social.json) as a safety gate before anything gets pushed to prod.
+      - run: npm test
+      - run: npm run build
+
+      - name: Commit and push if the scrape changed anything
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/data/social.json src/assets/social
+          git diff --staged --quiet || git commit -m "chore: refresh social stats"
+          git push
