@@ -1,6 +1,6 @@
 # Social Sync v2 — revised plan
 
-**Status:** Grill round 1 decided on 2026-09-13 (§4) and recorded in ADR-0009. Tasks 0–3 are done on branch `social-sync-v2`. `update-stats.yml` was disabled on 2026-09-13. Task 4 is blocked on consent (Q6). Task 2's live local run is deferred to the same consent.
+**Status:** Grill round 1 decided on 2026-09-13 (§4) and recorded in ADR-0009. Tasks 0–3 are done on branch `social-sync-v2`. The full local pipeline was run live on the user's instruction (2026-09-13, §5), and everything is green. `update-stats.yml` stays disabled. Task 4's workflow edits are ready locally but untested on a GitHub runner, which needs a push. Push waits for the user.
 **Replaces:** the pasted "Automated Multi-Account Content Pipeline (Scrapling + Hot/Cold CSVs + GitHub Actions)" draft.
 **Governing docs:** ADR-0003 (data pipeline), ADR-0005 (hosting), ADR-0007 (stack), ADR-0008 (task-observer), and the Global Constraints in `2026-09-12-abhishek-portfolio.md`.
 
@@ -103,3 +103,17 @@ and apply the OPEN hits. End each task with the one-line observation summary.
 4. **Storage:** one curated JSON file. No CSVs.
 5. **Hot/cold tiering:** dropped.
 6. **Consent:** required before the scheduled refresh runs. `update-stats.yml` is **still active** (its one scheduled run so far was the wipe in `3ed9a7d`), so the user decides whether to disable it until consent arrives.
+
+## 5. Local pipeline test — 2026-09-13
+
+Chain: `scrape.py` (live, logged out) → value diff vs committed `social.json` → `unittest` scraper tests → `npm test` → `npm run build` → `verify-pipeline.mjs` → dev-server DOM check.
+
+| Run | Result | Found |
+|-----|--------|-------|
+| 1 | exit 0, tests and build green | Only 2/25 curated counts refreshed. Featured `DcOV2DtBXIL` dropped. |
+| 2 | exit 0, green | 9 reels got likes = 3 (an unconfirmed embedded count from another item) |
+| 3 | exit 0; Python 36/36, JS 30/30, build, verify 10/10 PASS; no console errors | 12/25 curated changed, 0 suspect drops, 0 featured lost, `DW84LM4y4Fr` 7.4M → 11.18M views |
+
+**Known ceiling (logged out):** exact views exist only for reels on the first page (12) of each account's `/reels/` tab. 3 of 25 curated reels are there today. The other 22 keep their last views, and likes refresh when the page's rounded count confirms them. Pagination has no reachable public query id, so going further means reverse-engineering Instagram's private API, which ADR-0003 rules out. The upgrade path is the Instagram Graph API with Abhishek's access.
+
+**Not yet tested:** the GitHub-runner run (IP blocking, `GITHUB_STEP_SUMMARY`). It needs a push and a `workflow_dispatch`.
