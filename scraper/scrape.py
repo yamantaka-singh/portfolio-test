@@ -4,7 +4,7 @@ Run from the repo root:  scraper/.venv/bin/python scraper/scrape.py
 Public pages only, logged out, no credentials. Re-running keeps `featured` flags.
 """
 import json
-import sys
+import os
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -99,7 +99,7 @@ def scrape_instagram(featured, pool_size=6):
                 print("WARN IG post", err)
         return profiles, posts, pool
 
-    for handle in IG_REELS_ACCOUNTS:
+    for handle in IG_ACCOUNTS:
         try:
             reels_page = get(f"https://www.instagram.com/{handle}/reels/")
             candidates = parse.parse_instagram_reels_tab(reels_page.body.decode("utf-8", "ignore"))
@@ -107,7 +107,9 @@ def scrape_instagram(featured, pool_size=6):
             print("WARN IG reels tab", err)
             candidates = []
         candidates.sort(key=lambda c: c["views"], reverse=True)
-        pool += candidates
+        pool += candidates  # every account's tab feeds curated counts
+        if handle not in IG_REELS_ACCOUNTS:
+            continue
         for c in candidates[:pool_size]:
             url = f"https://www.instagram.com/reel/{c['id']}/"
             try:
@@ -224,6 +226,14 @@ def check_not_wiped(previous, videos, posts):
         raise RuntimeError(f"scrape_instagram returned 0 posts but {len(previous['posts'])} existed before -- refusing to overwrite")
 
 
+def keep_featured(previous, fresh, key):
+    """A human-featured item survives dropping out of the top-views pool -- the scraper
+    never un-picks what a person picked (ADR-0003). Its counts stay at their last values.
+    """
+    have = {x[key] for x in fresh}
+    return fresh + [x for x in previous if x.get("featured") and x[key] not in have]
+
+
 def merge_curated(ids, previous, fresh):
     """Counts for every curated reel id. A missing or zero fresh count keeps the previous
     one -- a bot-check page parses to None/0 and must never overwrite a real number.
@@ -246,7 +256,9 @@ def refresh_curated(ids, pool):
                 image = by_id[i]["thumbUrl"]
             else:
                 page = get(f"https://www.instagram.com/reel/{i}/")
-                fresh[i] = {"views": None, "likes": parse.parse_instagram_post(meta(page, "og:description"))["likes"]}
+                rounded = parse.parse_instagram_post(meta(page, "og:description"))["likes"]
+                fresh[i] = {"views": None,
+                            "likes": parse.parse_instagram_like_count(page.body.decode("utf-8", "ignore"), rounded)}
                 image = meta(page, "og:image")
             if image and not (THUMBS / f"ig-{i}.jpg").exists():
                 save_image(image, f"ig-{i}.jpg")
@@ -264,18 +276,31 @@ def main():
 
     ig_profiles, posts, pool = scrape_instagram(featured)
     yt_profiles, videos = scrape_youtube(featured)
-    check_not_wiped(previous, videos, posts)
+    check_not_wiped(previous, videos, posts)  # before carry-over, so an empty scrape still refuses
+    posts = keep_featured(previous.get("posts", []), posts, "shortcode")
+    videos = keep_featured(previous.get("videos", []), videos, "id")
 
     data = {
         "scrapedAt": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "profiles": ig_profiles + yt_profiles + [scrape_linkedin()],
         "videos": videos,
         "posts": posts,
-        "curated": merge_curated(curated_ids, previous.get("curated", {}), refresh_curated(curated_ids, pool)),
     }
+    fresh = refresh_curated(curated_ids, pool)
+    data["curated"] = merge_curated(curated_ids, previous.get("curated", {}), fresh)
     OUT_JSON.parent.mkdir(parents=True, exist_ok=True)
     OUT_JSON.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
-    print(f"profiles={len(data['profiles'])} videos={len(videos)} posts={len(posts)} -> {OUT_JSON.relative_to(ROOT)}")
+    print(f"profiles={len(data['profiles'])} videos={len(videos)} posts={len(posts)} "
+          f"curated_fresh={len(fresh)}/{len(curated_ids)} -> {OUT_JSON.relative_to(ROOT)}")
+
+    # Curation gate (ADR-0009): list top reels nobody has filed yet, never publish them.
+    unfiled = [p["url"] for p in posts if p["shortcode"] not in curated_ids]
+    if unfiled:
+        note = "Reels not yet filed in src/data/innings.json:\n" + "".join(f"- {u}\n" for u in unfiled)
+        print(note)
+        if os.environ.get("GITHUB_STEP_SUMMARY"):
+            with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as f:
+                f.write(note)
 
 
 if __name__ == "__main__":

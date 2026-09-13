@@ -229,5 +229,35 @@ class MergeCurated(unittest.TestCase):
         self.assertEqual(got, {"b": {"views": None, "likes": None}})
 
 
+class KeepFeatured(unittest.TestCase):
+    def test_featured_item_outside_new_pool_survives(self):
+        prev = [{"shortcode": "a", "featured": True}, {"shortcode": "b", "featured": False}]
+        got = scrape.keep_featured(prev, [{"shortcode": "c", "featured": False}], "shortcode")
+        self.assertEqual([x["shortcode"] for x in got], ["c", "a"])
+
+    def test_no_duplicate_when_featured_item_is_still_in_pool(self):
+        got = scrape.keep_featured([{"id": "a", "featured": True}], [{"id": "a", "featured": True}], "id")
+        self.assertEqual(len(got), 1)
+
+
+class ReelLikeCount(unittest.TestCase):
+    def test_exact_like_count_from_embedded_json(self):
+        self.assertEqual(parse.parse_instagram_like_count('"pk":"1","like_count":63947,"comment_count":210', 64000), 63947)
+
+    def test_missing_is_none(self):
+        self.assertIsNone(parse.parse_instagram_like_count("<html></html>"))
+
+    def test_unconfirmed_exact_count_is_none(self):
+        # Seen live: og:description had no likes and the page's first embedded
+        # like_count (3) belonged to other media -- never trust it unconfirmed.
+        self.assertIsNone(parse.parse_instagram_like_count('"like_count":3'))
+
+    def test_count_that_disagrees_with_rounded_og_likes_is_ignored(self):
+        # The page embeds related media too: 999 can't be this reel's "64K likes".
+        self.assertEqual(parse.parse_instagram_like_count('"like_count":999', 64000), 64000)
+        self.assertEqual(parse.parse_instagram_like_count('"like_count":63947', 64000), 63947)
+        self.assertEqual(parse.parse_instagram_like_count("<html></html>", 44000), 44000)
+
+
 if __name__ == "__main__":
     unittest.main()

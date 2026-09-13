@@ -1,5 +1,5 @@
 {
-  "scrapedAt": "2026-09-13T08:43:03+00:00",
+  "scrapedAt": "2026-09-13T16:43:54+00:00",
   "profiles": [
     {
       "platform": "instagram",
@@ -14,7 +14,7 @@
       "platform": "instagram",
       "handle": "spinandswing26",
       "url": "https://www.instagram.com/spinandswing26/",
-      "followers": 4351,
+      "followers": 4346,
       "postCount": 548,
       "name": null,
       "headline": null
@@ -43,8 +43,8 @@
       "url": "https://www.linkedin.com/in/abhishek-pandey-26sep03",
       "followers": null,
       "postCount": null,
-      "name": "Abhishek Pandey",
-      "headline": "Spin &amp; Swing"
+      "name": null,
+      "headline": null
     }
   ],
   "videos": [
@@ -54,7 +54,7 @@
       "id": "DxgBGpUzZ08",
       "title": "Gt fan vs Mi fan",
       "publishedAt": "2026-05-31T07:30:40-07:00",
-      "views": 18674473,
+      "views": 18674479,
       "thumb": "yt-DxgBGpUzZ08.jpg",
       "featured": false
     },
@@ -64,7 +64,7 @@
       "id": "YPeQi6-h30M",
       "title": "Guess the Jersey number !",
       "publishedAt": "2026-01-18T03:30:27-08:00",
-      "views": 7725178,
+      "views": 7725183,
       "thumb": "yt-YPeQi6-h30M.jpg",
       "featured": false
     },
@@ -84,7 +84,7 @@
       "id": "ehA4CLVExQM",
       "title": "Guess the Jersey number - Pt 10",
       "publishedAt": "2026-03-05T00:20:27-08:00",
-      "views": 3861570,
+      "views": 3861571,
       "thumb": "yt-ehA4CLVExQM.jpg",
       "featured": false
     },
@@ -124,7 +124,7 @@
       "id": "GIJrFq2RTgE",
       "title": "Guess the Squad of RCB !!",
       "publishedAt": "2026-05-30T06:54:23-07:00",
-      "views": 849955,
+      "views": 849958,
       "thumb": "yt-GIJrFq2RTgE.jpg",
       "featured": false
     },
@@ -216,8 +216,8 @@
       "shortcode": "DclYxOiBsuy",
       "url": "https://www.instagram.com/reel/DclYxOiBsuy/",
       "caption": "Episode 6 : Story Behind the Post ft - @anujrawat_1755 @ar__unfiltered \n.\n.\n.\n.\n#puranidilli #delhipremierleague #dpl2026 #anujrawat #gujarattitans \n.\n.\n( Purani Dilli , Dpl , Dpl 2026 , Delhi premier league , Anuj Rawat , Gujarat Titans )\".",
-      "likes": 9884,
-      "views": 123612,
+      "likes": 9888,
+      "views": 123650,
       "isReel": true,
       "thumb": "ig-DclYxOiBsuy.jpg",
       "featured": false
@@ -228,8 +228,8 @@
       "shortcode": "Dcs1bhEoeTf",
       "url": "https://www.instagram.com/reel/Dcs1bhEoeTf/",
       "caption": "Captain leading from the front @tejasvi._.18 \n.\n.\n.\n.\n.\n#dpl #delhipremierleague #dplseason3 #tejasvidhaiya #southdelhisuperstarz \n.\n.\n( South delhi superstarz , tejasvi dhaiya , Dpl final , Delhi Premier league , Dpl Season 3 , Dpl reels )\".",
-      "likes": 8877,
-      "views": 119838,
+      "likes": 8892,
+      "views": 119979,
       "isReel": true,
       "thumb": "ig-Dcs1bhEoeTf.jpg",
       "featured": false
@@ -240,10 +240,22 @@
       "shortcode": "Dc2YOiqhiDb",
       "url": "https://www.instagram.com/reel/Dc2YOiqhiDb/",
       "caption": "Episode 9 : Story Behind the Post ft - Shweta Sehrawat \n.\n.\n.\n.\n#southdelhisuperstarz #delhipremierleague #dpl2026 #shwetasehrawat #shwetasehrawatstory \n.\n.\n( Shweta Sehrawat, South delhi Superstarz ,  Dpl , Dpl 2026 , Delhi premier league )\".",
-      "likes": 1712,
-      "views": 31575,
+      "likes": 1714,
+      "views": 31651,
       "isReel": true,
       "thumb": "ig-Dc2YOiqhiDb.jpg",
+      "featured": false
+    },
+    {
+      "platform": "instagram",
+      "account": "abhishekpandey_26",
+      "shortcode": "Dc5BfhLyXjn",
+      "url": "https://www.instagram.com/reel/Dc5BfhLyXjn/",
+      "caption": "COMEBACK LOADING @fazilka_falcons 🩷🦅\n.\n.\n.\n.\n#fazilka #fazilkafalcons #shubmangill #sherepunjabt20 #t20cricket \n.\n.\n.\n( Fazilka , Fazilkafalcons , Shubman Gill , Sherepunjabt20 , T20 Cricket )\".",
+      "likes": 3,
+      "views": 28767,
+      "isReel": true,
+      "thumb": "ig-Dc5BfhLyXjn.jpg",
       "featured": false
     },
     {
@@ -252,10 +264,22 @@
       "shortcode": "Dc2Rv1shQzz",
       "url": "https://www.instagram.com/reel/Dc2Rv1shQzz/",
       "caption": "Episode 8 : Story Behind the Post ft - @priyapunia16 \n.\n.\n.\n.\n#southdelhisuperstarz #delhipremierleague #dpl2026 #priyapunia #priyapunia💟 \n.\n.\n( Priya Punia , South delhi Superstarz ,  Dpl , Dpl 2026 , Delhi premier league )\".",
-      "likes": 1658,
-      "views": 25344,
+      "likes": 1661,
+      "views": 25410,
       "isReel": true,
       "thumb": "ig-Dc2Rv1shQzz.jpg",
+      "featured": false
+    },
+    {
+      "platform": "instagram",
+      "account": "abhishekpandey_26",
+      "shortcode": "Dc9EL1lspXc",
+      "url": "https://www.instagram.com/reel/Dc9EL1lspXc/",
+      "caption": "1 run ki Kimat bhut hoti hai @fazilka_falcons 😂🩷\n.\n.\n.\n.\n#fazilkafalcons #sherepunjabt20 #sherepunjab #shubhmangill #pbks \n.\n.\n( Fazilka Falcons , Shere Punjab t20 , Shere Punjab , Shubhman Gill , Pbks , T20 )\".",
+      "likes": 3,
+      "views": 13692,
+      "isReel": true,
+      "thumb": "ig-Dc9EL1lspXc.jpg",
       "featured": false
     },
     {
@@ -278,7 +302,7 @@
     },
     "DJTjMYSSL4B": {
       "views": 165000,
-      "likes": 13000
+      "likes": 12924
     },
     "DJmHLxRSeFU": {
       "views": 8200,
@@ -286,7 +310,7 @@
     },
     "DKMMtRnIzAE": {
       "views": 210000,
-      "likes": 17000
+      "likes": 16521
     },
     "DKOxcw4y6LX": {
       "views": 7400,
@@ -294,7 +318,7 @@
     },
     "DT2m9vACEU8": {
       "views": 137500,
-      "likes": 11000
+      "likes": 10627
     },
     "DT8FW8_iAc5": {
       "views": 78000,
@@ -322,7 +346,7 @@
     },
     "DVlsJKSjJTH": {
       "views": 350000,
-      "likes": 28000
+      "likes": 28494
     },
     "DVRDbLVCqmy": {
       "views": 68000,
@@ -333,16 +357,16 @@
       "likes": 5600
     },
     "DW84LM4y4Fr": {
-      "views": 7412500,
-      "likes": 593000
+      "views": 11183710,
+      "likes": 592678
     },
     "DY8twCQohkY": {
       "views": 812500,
-      "likes": 65000
+      "likes": 64751
     },
     "DYQOCiysdD0": {
       "views": 512500,
-      "likes": 41000
+      "likes": 40763
     },
     "DY8nQzKhspB": {
       "views": 85000,
@@ -354,23 +378,23 @@
     },
     "DcRzXB-zlPg": {
       "views": 800000,
-      "likes": 64000
+      "likes": 63947
     },
     "DcOV2DtBXIL": {
       "views": 512500,
-      "likes": 41000
+      "likes": 41205
     },
     "DcdlCohB4qZ": {
       "views": 237500,
-      "likes": 19000
+      "likes": 18568
     },
     "DclYxOiBsuy": {
-      "views": 123500,
-      "likes": 9900
+      "views": 123650,
+      "likes": 9888
     },
     "Dc2Rv1shQzz": {
-      "views": 20800,
-      "likes": 1700
+      "views": 25410,
+      "likes": 1661
     }
   }
 }

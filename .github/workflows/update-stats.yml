@@ -8,9 +8,15 @@ on:
 permissions:
   contents: write
 
+# One refresh at a time: a manual dispatch and the cron must not race on social.json.
+concurrency:
+  group: social-sync
+  cancel-in-progress: false
+
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
