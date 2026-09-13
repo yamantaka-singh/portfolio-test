@@ -3,6 +3,7 @@ import '@fontsource-variable/big-shoulders-display';
 import '@fontsource-variable/hanken-grotesk';
 import '../styles/global.css';
 import Analytics from '@vercel/analytics/astro';
+import SpeedInsights from '@vercel/speed-insights/astro';
 import BroadcastDock from '../components/BroadcastDock.astro';
 
 interface Props {
@@ -20,6 +21,7 @@ const { title, description } = Astro.props;
     <meta name="description" content={description} />
     <slot name="head" />
     <Analytics />
+    <SpeedInsights />
   </head>
   <body>
     <slot />
