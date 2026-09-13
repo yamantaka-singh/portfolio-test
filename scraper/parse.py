@@ -174,6 +174,24 @@ def parse_youtube_watch_page(html):
     }
 
 
+def parse_youtube_api_videos(body):
+    """{id: {title, views, publishedAt}} from a YouTube Data API videos.list response.
+
+    An error response or a non-JSON body gives {}, so the caller falls back to watch pages.
+    """
+    try:
+        items = json.loads(body).get("items", [])
+    except (ValueError, AttributeError):
+        return {}
+    out = {}
+    for it in items:
+        views = it.get("statistics", {}).get("viewCount")
+        out[it["id"]] = {"title": it["snippet"]["title"],
+                         "views": int(views) if views is not None else None,
+                         "publishedAt": it["snippet"]["publishedAt"]}
+    return out
+
+
 def parse_linkedin(og_title):
     title = re.sub(r"\s*\|\s*LinkedIn\s*$", "", og_title or "")
     if " - " not in title:

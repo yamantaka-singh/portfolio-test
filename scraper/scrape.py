@@ -22,6 +22,7 @@ IG_ACCOUNTS = ["abhishekpandey_26", "spinandswing26"]
 IG_REELS_ACCOUNTS = ["abhishekpandey_26"]  # Pulse of the Crowd: reels from this account only
 YT_CHANNELS = ["spinandswing26", "abhishekunseen26"]
 LINKEDIN = "abhishek-pandey-26sep03"
+YT_API_KEY = os.environ.get("YT_API_KEY")  # optional: without it, watch pages are scraped (bot-checked on GitHub runners)
 
 
 def get(url, **kw):
@@ -128,6 +129,20 @@ def scrape_instagram(featured, pool_size=6):
     return profiles, posts, pool
 
 
+def youtube_api_details(ids):
+    """Exact title/views/date for up to 50 videos in one YouTube Data API call (1 quota unit).
+
+    The key travels in a header, never the URL, so it can't leak into a logged error.
+    """
+    try:
+        page = get("https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=" + ",".join(ids),
+                   headers={"X-Goog-Api-Key": YT_API_KEY})
+        return parse.parse_youtube_api_videos(page.body.decode("utf-8", "ignore"))
+    except Exception as err:
+        print("WARN YT API, falling back to watch pages:", err)
+        return {}
+
+
 def youtube_thumb(video_id):
     for size in ("maxresdefault", "hqdefault"):
         try:
@@ -184,11 +199,12 @@ def scrape_youtube(featured, pool_size=8):
             candidates = {v["id"]: v for v in (
                 parse.parse_youtube_videos_page(listing.body.decode("utf-8", "ignore")) + shorts_candidates
             )}.values()
-            candidates = sorted(candidates, key=lambda v: v["views"] or 0, reverse=True)
-            for c in candidates[:pool_size]:
+            candidates = sorted(candidates, key=lambda v: v["views"] or 0, reverse=True)[:pool_size]
+            api = youtube_api_details([c["id"] for c in candidates]) if YT_API_KEY and candidates else {}
+            for c in candidates:
                 try:
-                    watch = get(f"https://www.youtube.com/watch?v={c['id']}")
-                    detail = parse.parse_youtube_watch_page(watch.body.decode("utf-8", "ignore"))
+                    detail = api.get(c["id"]) or parse.parse_youtube_watch_page(
+                        get(f"https://www.youtube.com/watch?v={c['id']}").body.decode("utf-8", "ignore"))
                     thumb = youtube_thumb(c["id"])
                     if not thumb or detail["views"] is None:
                         raise RuntimeError(f"incomplete detail for {c['id']}: {detail}, thumb={thumb}")
@@ -214,16 +230,28 @@ def scrape_linkedin():
     return row
 
 
-def check_not_wiped(previous, videos, posts):
-    """A scrape can come back empty without raising -- e.g. every watch-page fetch
-    silently returns a bot-check/consent page instead of real content (seen live
-    from a GitHub Actions runner IP, not reproducible from a normal machine).
-    Refuse to overwrite real data with nothing rather than wiping it.
+def carry_over(previous, videos, posts):
+    """A scrape can come back empty without raising: bot-check or login-wall pages instead
+    of content (seen live on GitHub runners). A blocked platform keeps its last good data
+    so the other one can still refresh. If both come back empty, nothing refreshed, so
+    refuse outright rather than commit a new timestamp over stale data.
     """
+    if not videos and not posts and (previous.get("videos") or previous.get("posts")):
+        raise RuntimeError("both YouTube and Instagram returned nothing -- refusing to overwrite")
     if not videos and previous.get("videos"):
-        raise RuntimeError(f"scrape_youtube returned 0 videos but {len(previous['videos'])} existed before -- refusing to overwrite")
+        print(f"WARN YouTube returned 0 videos, keeping the previous {len(previous['videos'])}")
+        videos = previous["videos"]
     if not posts and previous.get("posts"):
-        raise RuntimeError(f"scrape_instagram returned 0 posts but {len(previous['posts'])} existed before -- refusing to overwrite")
+        print(f"WARN Instagram returned 0 posts, keeping the previous {len(previous['posts'])}")
+        posts = previous["posts"]
+    return videos, posts
+
+
+def merge_profiles(previous, fresh):
+    """Profile rows with any None field (a login wall parses to None) filled from the previous run."""
+    old = {(p["platform"], p["handle"]): p for p in previous}
+    return [{k: v if v is not None else old.get((p["platform"], p["handle"]), {}).get(k) for k, v in p.items()}
+            for p in fresh]
 
 
 def keep_featured(previous, fresh, key):
@@ -276,13 +304,13 @@ def main():
 
     ig_profiles, posts, pool = scrape_instagram(featured)
     yt_profiles, videos = scrape_youtube(featured)
-    check_not_wiped(previous, videos, posts)  # before carry-over, so an empty scrape still refuses
+    videos, posts = carry_over(previous, videos, posts)
     posts = keep_featured(previous.get("posts", []), posts, "shortcode")
     videos = keep_featured(previous.get("videos", []), videos, "id")
 
     data = {
         "scrapedAt": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "profiles": ig_profiles + yt_profiles + [scrape_linkedin()],
+        "profiles": merge_profiles(previous.get("profiles", []), ig_profiles + yt_profiles + [scrape_linkedin()]),
         "videos": videos,
         "posts": posts,
     }

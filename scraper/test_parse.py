@@ -197,21 +197,42 @@ class LinkedIn(unittest.TestCase):
         self.assertEqual(parse.parse_linkedin(None), {"name": None, "headline": None})
 
 
-class CheckNotWiped(unittest.TestCase):
-    def test_raises_when_videos_wiped(self):
+class CarryOver(unittest.TestCase):
+    def test_raises_when_both_platforms_come_back_empty(self):
         with self.assertRaises(RuntimeError):
-            scrape.check_not_wiped({"videos": [{"id": "a"}]}, videos=[], posts=[])
+            scrape.carry_over({"videos": [{"id": "a"}], "posts": [{"shortcode": "a"}]}, videos=[], posts=[])
 
-    def test_raises_when_posts_wiped(self):
-        with self.assertRaises(RuntimeError):
-            scrape.check_not_wiped({"posts": [{"shortcode": "a"}]}, videos=[{"id": "a"}], posts=[])
+    def test_blocked_platform_keeps_previous_data(self):
+        # Seen live on a GitHub runner: Instagram login-walls while YouTube still works.
+        prev = {"videos": [{"id": "a"}], "posts": [{"shortcode": "p"}]}
+        self.assertEqual(scrape.carry_over(prev, videos=[{"id": "b"}], posts=[]), ([{"id": "b"}], [{"shortcode": "p"}]))
+        self.assertEqual(scrape.carry_over(prev, videos=[], posts=[{"shortcode": "q"}]), ([{"id": "a"}], [{"shortcode": "q"}]))
 
     def test_allows_empty_when_previous_was_also_empty(self):
-        scrape.check_not_wiped({}, videos=[], posts=[])
+        self.assertEqual(scrape.carry_over({}, videos=[], posts=[]), ([], []))
 
-    def test_allows_a_real_scrape_through(self):
-        scrape.check_not_wiped({"videos": [{"id": "a"}], "posts": [{"shortcode": "a"}]},
-                                videos=[{"id": "b"}], posts=[{"shortcode": "b"}])
+
+class MergeProfiles(unittest.TestCase):
+    def test_null_counts_keep_previous_values(self):
+        prev = [{"platform": "instagram", "handle": "x", "followers": 10, "postCount": 5}]
+        fresh = [{"platform": "instagram", "handle": "x", "followers": None, "postCount": 6}]
+        self.assertEqual(scrape.merge_profiles(prev, fresh),
+                         [{"platform": "instagram", "handle": "x", "followers": 10, "postCount": 6}])
+
+
+class YouTubeApi(unittest.TestCase):
+    def test_videos_list_response(self):
+        body = ('{"items":[{"id":"DxgBGpUzZ08","snippet":{"publishedAt":"2026-05-31T14:30:40Z","title":"Gt fan vs Mi fan"},'
+                '"statistics":{"viewCount":"18674473"}},{"id":"YPeQi6-h30M","snippet":{"publishedAt":"2026-01-18T11:30:27Z",'
+                '"title":"Guess"},"statistics":{}}]}')
+        self.assertEqual(parse.parse_youtube_api_videos(body), {
+            "DxgBGpUzZ08": {"title": "Gt fan vs Mi fan", "views": 18_674_473, "publishedAt": "2026-05-31T14:30:40Z"},
+            "YPeQi6-h30M": {"title": "Guess", "views": None, "publishedAt": "2026-01-18T11:30:27Z"},
+        })
+
+    def test_error_or_garbage_is_empty(self):
+        self.assertEqual(parse.parse_youtube_api_videos('{"error":{"code":403}}'), {})
+        self.assertEqual(parse.parse_youtube_api_videos("<html>"), {})
 
 
 class MergeCurated(unittest.TestCase):
