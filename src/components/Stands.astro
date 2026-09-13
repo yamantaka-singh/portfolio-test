@@ -1,16 +1,14 @@
 ---
 import { Image } from 'astro:assets';
-import { social, profilesBy, thumb } from '../lib/social.js';
+import { profilesBy, thumb, topReels } from '../lib/social.js';
 import { compactCount } from '../lib/format.js';
 import { Instagram, Heart, Eye, Play, Sparkles } from 'lucide-astro';
 
 const accounts = profilesBy('instagram');
 
-// Featured posts (manually curated, e.g. no scraped view count available) lead;
-// the rest are sorted by real view count.
-const topPosts = [...social.posts]
-  .sort((a, b) => Number(b.featured) - Number(a.featured) || (b.views ?? 0) - (a.views ?? 0))
-  .slice(0, 6);
+// Most-watched of all time, across the scraped pool and the curated tournament reels
+// (the scrape only sees recent reels, which are not the biggest ones).
+const topPosts = topReels.slice(0, 6);
 ---
 <div class="stands-container">
   <header class="stands-header">

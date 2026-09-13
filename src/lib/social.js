@@ -1,6 +1,8 @@
 import raw from '../data/social.json';
 import rawInnings from '../data/innings.json';
+import { excludedReels } from '../data/site.js';
 import { parseSocial, parseInnings } from './social-schema.js';
+import { rankReels } from './reels.js';
 
 export const social = parseSocial(raw);
 export const featuredVideos = social.videos.filter((v) => v.featured);
@@ -24,6 +26,13 @@ export const innings = parseInnings(rawInnings).map((i) => ({
     };
   }),
 }));
+
+/** Scraped posts and curated tournament reels, ranked by views. */
+export const topReels = rankReels({
+  posts: social.posts,
+  curated: innings.flatMap((i) => i.reels ?? []),
+  excluded: excludedReels,
+});
 
 const thumbs = import.meta.glob('../assets/social/*.jpg', { eager: true, import: 'default' });
 /** @param {string} fileName e.g. "yt-DfECjUL9ZvU.jpg" */
