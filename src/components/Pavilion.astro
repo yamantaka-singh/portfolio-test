@@ -90,7 +90,7 @@ import photoDesk from '../assets/photos/abhishek-broadcast-desk.jpg';
                               <Image
                                 class="reel-thumb"
                                 src={thumb(r.thumb)}
-                                alt=""
+                                alt={r.caption || `${item.title} reel`}
                                 widths={[320, 500]}
                                 sizes="(min-width: 64rem) 200px, 50vw"
                               />

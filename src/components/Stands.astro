@@ -47,9 +47,9 @@ const topPosts = topReels.slice(0, 6);
             <div class="thumb-frame">
               <Image 
                 class="reel-thumb" 
-                src={thumb(p.thumb)} 
-                alt="" 
-                widths={[360, 640]} 
+                src={thumb(p.thumb)}
+                alt={p.caption || `Instagram reel by @${p.account}`}
+                widths={[360, 640]}
                 sizes="(min-width: 64rem) 260px, 60vw" 
               />
               <div class="frame-vignette"></div>
