@@ -275,6 +275,16 @@ class InstagramStealthFallback(unittest.TestCase):
         self.assertEqual(page.body, b"real page")
 
     @mock.patch("scrape.Fetcher")
+    def test_stealth_fallback_is_bounded(self, fetcher):
+        # 2026-09-16: the Mac slept mid-job and the run stalled for ~30 minutes --
+        # every other call in this file has timeout=30, this one didn't.
+        fetcher.get.return_value = mock.Mock(status=403, body=b"blocked")
+        with mock.patch("scrape.StealthyFetcher") as stealth:
+            stealth.fetch.return_value = mock.Mock(status=200, body=b"real page")
+            scrape.get("https://www.instagram.com/x/")
+            self.assertEqual(stealth.fetch.call_args.kwargs.get("timeout"), 30_000)
+
+    @mock.patch("scrape.Fetcher")
     def test_non_instagram_blocked_does_not_retry_with_stealth(self, fetcher):
         fetcher.get.return_value = mock.Mock(status=403, body=b"blocked")
         with mock.patch("scrape.StealthyFetcher") as stealth:

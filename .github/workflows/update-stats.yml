@@ -23,6 +23,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # 2026-09-16 run: the Mac dropped into Maintenance Sleep mid-job (pmset log),
+      # the network died, the job's GitHub auth lease lapsed before results could be
+      # reported -- job showed "failure" with blank step conclusions and no log,
+      # though nothing actually crashed. -t bounds it to the job timeout below, so a
+      # crashed job can't leave caffeinate running forever.
+      - run: caffeinate -dimsu -t 1200 &
+
       # No setup-python/setup-node: those provision toolchains for throwaway hosted
       # runners and fail on a real Mac trying to write to /Users/runner. This runner
       # already has Python and Node on PATH.

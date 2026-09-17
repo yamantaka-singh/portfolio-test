@@ -44,7 +44,7 @@ def get(url, **kw):
     # credentials. Instagram-only -- it's the one blocking plain requests on some IPs
     # (login-wall or 429); YouTube already has its own API fallback (youtube_api_details).
     if "instagram.com" in url:
-        page = StealthyFetcher.fetch(url, headless=True, network_idle=True)
+        page = StealthyFetcher.fetch(url, headless=True, network_idle=True, timeout=30_000)
         if page.status == 200:
             return page
     raise RuntimeError(f"HTTP {page.status} for {url}")
