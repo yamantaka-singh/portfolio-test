@@ -8,10 +8,10 @@ on:
 permissions:
   contents: write
 
-# One refresh at a time: a manual dispatch and the cron must not race on social.json.
+# One refresh at a time: newer triggers cancel stale queued runs if the runner was offline.
 concurrency:
   group: social-sync
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   scrape:
